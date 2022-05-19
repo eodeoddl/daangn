@@ -1,0 +1,231 @@
+.header {
+  width: 100%;
+  height: 72.6px;
+  background-color: #fff;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.fixedBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+
+.fixedBarWrapper {
+  width: 1024px;
+  margin: 0 auto;
+  padding: 16px 0;
+  position: relative;
+  font-size: 16px;
+  color: #212529;
+}
+
+.logo {
+  width: 120px;
+  vertical-align: text-bottom;
+  margin-bottom: 5px;
+}
+
+.searchBar {
+  position: absolute;
+  top: 16px;
+  left: 152px;
+  border: solid 1px #e9ecef;
+  border-radius: 5px;
+  height: 40px;
+  padding: 0 1.6rem;
+  /* box-sizing: content-box; */
+}
+
+.focus {
+  border: solid 1px #212529;
+  border-radius: 5px;
+}
+
+.inputWrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.searchInput {
+  width: 340px;
+  border: none;
+  background-color: transparent;
+}
+
+.searchButton {
+  cursor: pointer;
+  border: none;
+  font: inherit;
+  outline: inherit;
+  text-align: center;
+  background-color: transparent;
+}
+
+.searchIcon {
+  width: 19px;
+  height: 19px;
+  padding: 1rem 0;
+  box-sizing: content-box;
+}
+
+.userAnchor {
+  text-decoration: none;
+  color: #333;
+  display: flex;
+}
+
+.profileWrap {
+  width: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  text-decoration: none;
+  border-radius: 10px;
+  margin-right: 10px;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.profileWrap:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.profilePhoto {
+  width: 30%;
+  border-radius: 50%;
+  margin-right: 5px;
+  display: block;
+}
+
+.profileName {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.fixedBarMenu {
+  display: flex;
+  position: absolute;
+  top: 16px;
+  right: 0px;
+  color: #4d5159;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.downloadWrapper {
+  display: inline-block;
+  position: relative;
+  margin-right: 10px;
+}
+
+.fixedMenuCheckbox {
+  display: none;
+}
+
+.fixedMenuLabel {
+  display: inline-flex;
+  width: 120px;
+  height: 40px;
+  justify-content: center;
+  align-items: center;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+}
+
+.menuIcon {
+  margin-left: 9px;
+  margin-top: -3px;
+}
+
+.fixedMenuCheckbox:checked + .fixedMenuLabel .menuIcon {
+  transform: rotateX(-180deg);
+}
+
+.fixedMenuUl {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 46px;
+  width: 200px;
+  height: 114px;
+  padding: 24px;
+  border: 1px solid #868b94;
+  border-radius: 6px;
+  background-color: #f8f9fa;
+  list-style-type: none;
+}
+
+.fixedMenuCheckbox:checked ~ .fixedMenuUl {
+  display: block;
+}
+
+.menuAnchor {
+  display: block;
+  /* align-items: center; */
+  font-size: 14px;
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+  color: #4d5159;
+}
+
+.menuAnchor li {
+  line-height: 150%;
+}
+
+.fixedMenuUl li ~ li {
+  margin-top: 24px;
+}
+
+.menuAnchor img {
+  vertical-align: middle;
+}
+
+.menuAnchor span {
+  margin-left: 8px;
+}
+
+.loginButton {
+  width: 100px;
+  height: 40px;
+  border: 1px solid #d1d3d8;
+  border-radius: 6px;
+  margin-right: 10px;
+}
+
+.loginButton:hover {
+  cursor: pointer;
+}
+
+.loginButton span {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.chatButton {
+  width: 120px;
+  height: 40px;
+  border: 1px solid #d1d3d8;
+  border-radius: 6px;
+}
+
+.chatButton span {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.bottonText {
+  font-size: 16px;
+  color: #4d5159;
+}
+
+.buttonBeta {
+  margin-top: 1px;
+  margin-left: 2px;
+  color: #ff7236;
+  font-family: Roboto;
+  font-size: 14px;
+}

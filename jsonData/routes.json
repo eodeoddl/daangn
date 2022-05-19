@@ -1,0 +1,7 @@
+{
+  "/search/*": "/$1",
+  "/search/:searchTerm/noResult": "/search/:searchTerm",
+  "/data/*": "/search",
+  "/searchResult/*": "/search",
+  "/noResult/*": "/search"
+}

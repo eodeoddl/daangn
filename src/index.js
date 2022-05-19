@@ -1,17 +1,32 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import App from './App.jsx';
+import { ThemeProvider } from 'styled-components';
+import theme from './components/publicStyle/theme';
+import { BrowserRouter } from 'react-router-dom';
+import Item from './service/item';
+import LoginService from './service/loginService';
+import FireStore from './service/fireStore';
+import KakaoMapAPI from './service/kakaoMapAPI';
+
+const itemDataApi = new Item();
+const loginService = new LoginService();
+const fireStore = new FireStore();
+const kakaoMapAPI = new KakaoMapAPI();
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <ThemeProvider theme={theme}>
+      <BrowserRouter>
+        <App
+          itemDataApi={itemDataApi}
+          loginService={loginService}
+          fireStore={fireStore}
+          kakaoMapAPI={kakaoMapAPI}
+        />
+      </BrowserRouter>
+    </ThemeProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
