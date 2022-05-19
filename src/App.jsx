@@ -197,11 +197,8 @@ function App({ itemDataApi, loginService, fireStore, kakaoMapAPI }) {
       ).then((res) => {
         const [B, H] = res.documents;
         setUserInfo((prevState) => {
-          console.log('prevState ', prevState); // null
-          // console.log(userHistory);
           return {
             ...prevState,
-            // userHistory,
             address: { region_B: B, region_H: H },
           };
         });
@@ -219,40 +216,23 @@ function App({ itemDataApi, loginService, fireStore, kakaoMapAPI }) {
     }
   }, [kakaoMapAPI, loginService]);
 
+  // const fetchHistory = useCallback(
+  //   (loginState) => {
+  //     fireStore.setUserData(userInfo);
+  //     fireStore.getUserData(userInfo.uid, setUserInfo, loginState);
+  //     fireStore.setUserArticle(userInfo.uid);
+  //   },
+  //   [fireStore]
+  // );
   // 테스트용 fireStore api 요청
   // 유저 정보가 있다면 fireStore에 데이터 저장
   // 이곳에서 유저의 location도 firebase에 업데이트
-  useEffect(() => {
-    console.log('useEffect 5555555555555555555');
-    if (!loginState && userInfo.history) return;
-    fireStore.setUserData(userInfo);
-    fireStore.getUserData(userInfo.uid, setUserInfo);
-    fireStore.setUserArticle(userInfo.uid);
-
-    // console.log(userInfo.uid);
-  }, [fireStore, history, loginState]);
-
   // useEffect(() => {
-  //   if (!loginState) return;
-  //   setUserInfo((prevState) => {
-  //     console.log(prevState);
-  //     return {
-  //       ...prevState,
-  //       userHistory,
-  //     };
-  //   });
-  // }, [loginState]);
-
-  // 유저 정보보기 data세팅 active
-  // useEffect(() => {
-  //   if (!loginState) return;
-
-  //   setUserState({
-  //     userHistory,
-  //     ...userInfo,
-  //     fireStore,
-  //   });
-  // }, [fireStore, loginState, userHistory, userInfo]);
+  //   console.log('useEffect 5555555555555555555');
+  //   if (!loginState || !userInfo.uid) fetchHistory(false);
+  //   fireStore.getUserData(userInfo.uid, setUserInfo);
+  //   fetchHistory(true);
+  // }, [fetchHistory, loginState, userInfo.uid]);
 
   return (
     <>

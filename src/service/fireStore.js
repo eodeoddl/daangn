@@ -51,8 +51,9 @@ class FireStore {
     }
   }
 
-  async getUserData(userId, setUserInfo) {
-    console.log(userId);
+  async getUserData(userId, setUserInfo, needInfo) {
+    console.log(needInfo);
+    if (!needInfo) return;
     const docRef = doc(firebaseStore, 'users', userId);
     console.log(docRef);
     const docSnap = await getDoc(docRef);
