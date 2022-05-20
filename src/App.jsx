@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useReducer } from 'react';
 import { useRouteMatch, Route, Switch, useHistory } from 'react-router-dom';
 import Article from './components/datails/article';
 import Footer from './components/footer/footer';
@@ -17,6 +17,9 @@ import Search from './components/search/search';
 import UserInfo from './components/userInfo/userInfo';
 // import useGeolocation from './customHook/useGeolocation';
 
+const reducer = (state, action) => {};
+const init = (initialState) => {};
+
 function App({ itemDataApi, loginService, fireStore, kakaoMapAPI }) {
   const history = useHistory();
   // const location = useLocation();
@@ -28,7 +31,8 @@ function App({ itemDataApi, loginService, fireStore, kakaoMapAPI }) {
   const [showModal, setShowModal] = useState(false);
   const [loginState, setLoginState] = useState(false);
   const [userInfo, setUserInfo] = useState({ history: null });
-  const [userHistory, setUserHistory] = useState({});
+  const [state, dispatch] = useReducer(reducer, {}, init);
+
   // const [userState, setUserState] = useState({
   //   activeHistory: null,
   //   userHistory: null,

@@ -1,3 +1,14 @@
+[2022-05-20](##2020-05-20)  
+[2022-05-19](##2020-05-19)
+
+## 2022-05-20
+
+- app.jsx
+  - useReducer 문법, 사용법 적응하기  
+    reducer 함수의 초기 값은 바로 정의할수없음 (in this use case)  
+    로그인 -> setUserInfo -> userInfo.uid = truthy -> uid가 있을경우에 reducer 함수 action.type으로 setUserInfo  
+    reducer 함수의 세번째 인자로 초기화 지연함수로 필요한 경우에만 초기값세팅 (함수의 reference로 기억)
+
 ## 2022-05-19
 
 - app.jsx
