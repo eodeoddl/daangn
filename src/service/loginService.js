@@ -25,14 +25,14 @@ class LoginService {
       });
   }
 
-  observeAuthState(setUserInfo, setLoginState) {
+  observeAuthState(setUserInfo, fireStore, setLoginState) {
     console.log('on auth state changed');
     onAuthStateChanged(firebaseAuth, (user) => {
       if (user) {
         console.log(user);
         const { displayName, email, photoURL, uid } = user;
         setUserInfo((prevState) => {
-          return { ...prevState, displayName, email, photoURL, uid };
+          return { ...prevState, displayName, email, photoURL, uid, fireStore };
         });
         setLoginState(true);
       } else {

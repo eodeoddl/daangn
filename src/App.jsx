@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useReducer } from 'react';
-import { useRouteMatch, Route, Switch, useHistory } from 'react-router-dom';
+import { Route, Switch, useHistory } from 'react-router-dom';
 import Article from './components/datails/article';
 import Footer from './components/footer/footer';
 import Header from './components/header/header';
@@ -17,12 +17,8 @@ import Search from './components/search/search';
 import UserInfo from './components/userInfo/userInfo';
 // import useGeolocation from './customHook/useGeolocation';
 
-const reducer = (state, action) => {};
-const init = (initialState) => {};
-
 function App({ itemDataApi, loginService, fireStore, kakaoMapAPI }) {
   const history = useHistory();
-  // const location = useLocation();
 
   const [didSearch, setDidSearch] = useState(false);
   const [searchTerm, setSearchTerm] = useState(null);
@@ -31,7 +27,7 @@ function App({ itemDataApi, loginService, fireStore, kakaoMapAPI }) {
   const [showModal, setShowModal] = useState(false);
   const [loginState, setLoginState] = useState(false);
   const [userInfo, setUserInfo] = useState({ history: null });
-  const [state, dispatch] = useReducer(reducer, {}, init);
+  const [state, dispatch] = useReducer(reducer, userInfo);
 
   // const [userState, setUserState] = useState({
   //   activeHistory: null,
@@ -186,8 +182,8 @@ function App({ itemDataApi, loginService, fireStore, kakaoMapAPI }) {
 
   // 로그인 정보만 auth 정보.
   useEffect(() => {
-    loginService.observeAuthState(setUserInfo, setLoginState);
-  }, [loginService]);
+    loginService.observeAuthState(setUserInfo, fireStore, setLoginState);
+  }, [fireStore, loginService]);
 
   // 유저상태 관찰후 바뀔경우 useInfo업데이트
   // geolocation 좌표가져와서 userInfo 업데이트
@@ -219,6 +215,16 @@ function App({ itemDataApi, loginService, fireStore, kakaoMapAPI }) {
       console.log('error');
     }
   }, [kakaoMapAPI, loginService]);
+
+  useEffect(() => {
+    dispatch({ type: 'refresh', payload: userInfo });
+    console.log(state);
+    fireStore.setUserHistory(state.uid).then((res) => console.log(res));
+
+    // console.log(state);
+    // const { uid } = state;
+    // fireStore.setUserHistory(uid, setUserInfo);
+  }, [fireStore, state, userInfo]);
 
   // const fetchHistory = useCallback(
   //   (loginState) => {
@@ -292,3 +298,20 @@ function App({ itemDataApi, loginService, fireStore, kakaoMapAPI }) {
 }
 
 export default App;
+
+const reducer = (state, action) => {
+  const { uid, fireStore } = state;
+  console.log(uid);
+  switch (action.type) {
+    case 'refresh':
+      return refreshInfo(action.payload);
+    case 'setHistory':
+      const history = fireStore;
+      return { ...state, history };
+    default:
+      throw new Error();
+  }
+};
+const refreshInfo = (userInfo) => {
+  return userInfo;
+};

@@ -51,21 +51,24 @@ class FireStore {
     }
   }
 
-  async getUserData(userId, setUserInfo, needInfo) {
-    console.log(needInfo);
-    if (!needInfo) return;
+  async setUserHistory(userId) {
+    // console.log(needInfo);
+    // if (!needInfo) return;
+    console.log(userId);
     const docRef = doc(firebaseStore, 'users', userId);
     console.log(docRef);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
+      console.log('1');
       console.log(docSnap.data().history);
-      setUserInfo((prevState) => {
-        return {
-          ...prevState,
-          history: docSnap.data().history,
-        };
-      });
+      return docSnap.data().history;
+      // setUserInfo((prevState) => {
+      //   return {
+      //     ...prevState,
+      //     history: docSnap.data().history,
+      //   };
+      // });
     } else {
       console.log('no data');
     }
