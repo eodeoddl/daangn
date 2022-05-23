@@ -61,8 +61,7 @@
   this개념과 getter setter 에 대해 이해도가 부족함.  
   객체literal대신 함수의 클로저 사용도 고려
 
-  ~~history를 요청할때 fireStore내의 값을 새로업데이트 하는 api요청을 해야하는데, ~~  
-  ~~이 값은 promise값이므로 dispatch 함수내부에서 promise값을 풀어서 업데이트 할 수 있는 방법을 찾아야한다. ~~  
+  ~~history를 요청할때 fireStore내의 값을 새로업데이트 하는 api요청을 해야하는데, 이 값은 promise값이므로 dispatch 함수내부에서 promise값을 풀어서 업데이트 할 수 있는 방법을 찾아야한다. ~~  
   object literal의 getter와 setter 프로퍼티로 해결
 
   값이 제대로 전달되지않아 dispatch 의 호출방식 Effect 내에서 무한루프 확인못함...
