@@ -217,14 +217,12 @@ function App({ itemDataApi, loginService, fireStore, kakaoMapAPI }) {
   }, [kakaoMapAPI, loginService]);
 
   useEffect(() => {
+    if (!loginState) return;
     dispatch({ type: 'refresh', payload: userInfo });
     console.log(state);
-    fireStore.setUserHistory(state.uid).then((res) => console.log(res));
-
-    // console.log(state);
-    // const { uid } = state;
-    // fireStore.setUserHistory(uid, setUserInfo);
-  }, [fireStore, state, userInfo]);
+    dispatch({ type: 'setHistory' });
+    console.log(state);
+  }, [fireStore, loginState, state, userInfo]);
 
   // const fetchHistory = useCallback(
   //   (loginState) => {
@@ -300,14 +298,30 @@ function App({ itemDataApi, loginService, fireStore, kakaoMapAPI }) {
 export default App;
 
 const reducer = (state, action) => {
-  const { uid, fireStore } = state;
-  console.log(uid);
+  console.log(state);
   switch (action.type) {
     case 'refresh':
       return refreshInfo(action.payload);
     case 'setHistory':
-      const history = fireStore;
-      return { ...state, history };
+      console.log(state);
+      const userInfo = {
+        data: { ...state },
+
+        set setHistory(history) {
+          this.data = { ...this.data, history };
+        },
+
+        get EditedInfo() {
+          return this.data;
+        },
+      };
+      console.log(userInfo.data);
+      state.fireStore
+        .getUserHistory(state.uid)
+        .then((res) => (userInfo.setHistory = res));
+      console.log(userInfo);
+      console.log(userInfo.EditedInfo);
+      return;
     default:
       throw new Error();
   }

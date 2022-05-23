@@ -51,9 +51,7 @@ class FireStore {
     }
   }
 
-  async setUserHistory(userId) {
-    // console.log(needInfo);
-    // if (!needInfo) return;
+  async getUserHistory(userId) {
     console.log(userId);
     const docRef = doc(firebaseStore, 'users', userId);
     console.log(docRef);
