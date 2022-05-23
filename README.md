@@ -36,7 +36,7 @@
         state.fireStore
           .getUserHistory(state.uid)
           .then((res) => (userInfo.setHistory = res));
-        console.log(userInfo); // 정상적으로 setter가 실행되어 userInfo.data값은 truthy값
+        console.log(userInfo); // 정상적으로 setter가 실행되어 userInfo.data.history값은 truthy
         console.log(userInfo.data); // 이렇게 접근하면 최신화되지않은값을 가지고있음
         console.log(userInfo.EditedInfo); // getter로 호출을 해도 최신화되지않은 값임.
         return userInfo.EditedInfo; // 바뀌지 않은값 리턴
@@ -56,7 +56,7 @@
 
   하지만 reducer 함수내부에서 setHistory 코드블럭이 실행되고 나서 return 값은 refresh 부분과 같은 값을 리턴  
   fireStore api요청후 콘솔로 setHistory코드 블럭안에 정의된 userInfo값을 console.log 했을때 getter의 this값이  
-  setter값이 실행되기 이전값임. this는 항상 최신값이 유지되하는데 안되는 이유를 모르겠음  
+  setter값이 실행되기 이전값임. 객체 literal의 this는 항상 최신값이 유지되하는데 안되는 이유를 모르겠음  
   this개념과 getter setter 에 대해 이해도가 부족함.  
   객체literal대신 함수의 클로저 사용도 고려
 
