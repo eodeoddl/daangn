@@ -15,6 +15,7 @@ import Portal from './components/portal/portal';
 import Search from './components/search/search';
 // import UserArticles from './components/userInfo/userArticles';
 import UserInfo from './components/userInfo/userInfo';
+// import UpdateInfo from './customHook/updateUser';
 // import useGeolocation from './customHook/useGeolocation';
 
 function App({ itemDataApi, loginService, fireStore, kakaoMapAPI }) {
@@ -27,7 +28,7 @@ function App({ itemDataApi, loginService, fireStore, kakaoMapAPI }) {
   const [showModal, setShowModal] = useState(false);
   const [loginState, setLoginState] = useState(false);
   const [userInfo, setUserInfo] = useState({ history: null });
-  const [state, dispatch] = useReducer(reducer, userInfo);
+  const [state, dispatch] = useReducer(reducer, userInfo, refreshInfo);
 
   // const [userState, setUserState] = useState({
   //   activeHistory: null,
@@ -218,11 +219,10 @@ function App({ itemDataApi, loginService, fireStore, kakaoMapAPI }) {
 
   useEffect(() => {
     if (!loginState) return;
+    console.log('call dispatch');
     dispatch({ type: 'refresh', payload: userInfo });
-    console.log(state);
     dispatch({ type: 'setHistory' });
-    console.log(state);
-  }, [fireStore, loginState, state, userInfo]);
+  }, [loginState, userInfo]);
 
   // const fetchHistory = useCallback(
   //   (loginState) => {
@@ -298,30 +298,26 @@ function App({ itemDataApi, loginService, fireStore, kakaoMapAPI }) {
 export default App;
 
 const reducer = (state, action) => {
-  console.log(state);
   switch (action.type) {
     case 'refresh':
       return refreshInfo(action.payload);
     case 'setHistory':
-      console.log(state);
       const userInfo = {
-        data: { ...state },
+        data: state,
 
         set setHistory(history) {
-          this.data = { ...this.data, history };
+          this.data.history = history;
         },
 
-        get EditedInfo() {
+        get editedInfo() {
           return this.data;
         },
       };
-      console.log(userInfo.data);
       state.fireStore
         .getUserHistory(state.uid)
         .then((res) => (userInfo.setHistory = res));
-      console.log(userInfo);
-      console.log(userInfo.EditedInfo);
-      return;
+      console.log(userInfo.editedInfo);
+      return { ...userInfo.editedInfo };
     default:
       throw new Error();
   }

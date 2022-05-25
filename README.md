@@ -1,6 +1,65 @@
 [2022-05-20](#2020-05-20)  
-[2022-05-19](#2020-05-19)
+[2022-05-19](#2020-05-19)  
 [2022-05-23](#2020-05-23)
+
+## 2022\-05\-25
+
+-app.jsx
+
+```javascript
+const [userInfo, setUserInfo] = useState({ history: null });
+const [state, dispatch] = useReducer(reducer, userInfo, refreshInfo);
+
+useEffect(() => {
+  loginService.observeAuthState(setUserInfo, fireStore, setLoginState);
+}, [fireStore, loginService]);
+
+useEffect(() => {
+  if (!loginState) return;
+  console.log('call dispatch');
+  dispatch({ type: 'refresh', payload: userInfo });
+  dispatch({ type: 'setHistory' });
+}, [loginState, userInfo]);
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'refresh':
+      return refreshInfo(action.payload);
+    case 'setHistory':
+      const userInfo = {
+        data: state,
+
+        set setHistory(history) {
+          this.data.history = history;
+        },
+
+        get editedInfo() {
+          return this.data;
+        },
+      };
+      state.fireStore
+        .getUserHistory(state.uid)
+        .then((res) => (userInfo.setHistory = res));
+      return { ...userInfo.editedInfo };
+    default:
+      throw new Error();
+  }
+};
+const refreshInfo = (userInfo) => {
+  return userInfo;
+};
+```
+
+내가 원하는대로 동작 하기는 함.  
+ 현재 동작 방식은 dispatch로 userInfo에 직접 접근해서 원본userInfo의 history 프로퍼티를 직접변경하는 방식으로 동작함.  
+ react 공식문서에서 setState로 값을 업데이를 하지않는 방식은 추천되지않는 다고 알고있는데 dispatch사용해서 변경하니 state에 직접  
+ 변경하는게 맞는 방식인지 모르겠음.(useReducer의 동작방식? 코드흐름이 원래 이런건지 의문)  
+ getter setter 코드 수정부분에서 this.data.history에 직접접근해서 바꾸는 방식이기 때문에 원본의 주소값이 변하지않음.  
+ getter 부분도 this.data를 참조하기때문에 data자체의 주소는 변경이없고 프로퍼티만 바뀐채로 리턴  
+ useReducer 부분에서 userInfo를 초기값으로 참조하기 때문에 setUserInfo를 통하지않고 변경되는 것 같기도함.  
+ 현재 코드는 문제없이 작동하기때문에 지금은 넘어가고 다음reducer를 사용할때 똑같은 방식으로 코드짯을때도 문제없는지 확인해 볼 필요있음.  
+ setstate 를 사용하지 않기때문에 리렌더링이 없이 데이터 업데이트가 되는것은 좋은점인듯?  
+reducer 작동방식이 원래 이런식인지 좀더 찾아볼것
 
 ## 2022\-05\-20
 
