@@ -109,7 +109,7 @@ observeAuthState(fireStore, setLoginState, dispatch) {
 - jsonServer api 요청을 fireStore api로 바꾸기(todo list)  
   components/details/article.jsx: > components/publicStyle/carousual.jsx:132 = getItemById api  
   app.jsx:173 , app.jsx:149 = getLatestList api  
-  search.jsx:20 = onSearch api
+  search.jsx:20 = onSearch api  
   기타 app.jsp의 함수 handleLoading함수를 props로 받는 컴포넌트들..
 
 ## 2022\-05\-25
