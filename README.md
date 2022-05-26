@@ -2,6 +2,77 @@
 [2022-05-19](#2020-05-19)  
 [2022-05-23](#2020-05-23)
 
+## 2022\-05\-26
+
+```javascript
+// const [userInfo, setUserInfo] = useState({ history: null });
+const [userInfo, dispatch] = useReducer(reducer, {}, resetInfo);
+
+useEffect(() => {
+  loginService.observeAuthState(fireStore, setLoginState, dispatch);
+}, [fireStore, loginService]);
+
+useEffect(() => {
+  if (!loginState) return;
+  fireStore.getUserHistory(userInfo.uid).then((res) => {
+    dispatch({ type: 'setHistory', history: res });
+  });
+}, [fireStore, loginState, userInfo.uid]);
+
+useEffect(() => {
+  const boundedAdressAPI = kakaoMapAPI.getAddress.bind(kakaoMapAPI);
+
+  const success = (position) => {
+    boundedAdressAPI(position.coords.longitude, position.coords.latitude).then(
+      (res) => {
+        const [B, H] = res.documents;
+        dispatch({ type: 'setAdress', address: { region_B: B, region_H: H } });
+        // setUserInfo((prevState) => {
+        //   return {
+        //     ...prevState,
+        //     address: { region_B: B, region_H: H },
+        //   };
+        // });
+      }
+    );
+  };
+
+  const error = () => {
+    console.log('not surpported on your device');
+  };
+
+  if ('geolocation' in navigator) {
+    navigator.geolocation.getCurrentPosition(success, error);
+  } else {
+    console.log('error');
+  }
+}, [kakaoMapAPI, loginService]);
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'reset':
+      return resetInfo();
+    case 'setHistory':
+      return {
+        ...state,
+        history: action.history,
+      };
+    case 'setUserInfo':
+      return { ...state, ...action.userInfo };
+    case 'setAddress':
+      return { ...state, ...action.address };
+    default:
+      throw new Error();
+  }
+};
+const resetInfo = () => {
+  return {};
+};
+```
+
+- 리액트 상태의 불변성.  
+  객체의 불변성을 지키는 의미에서 이전에 작성한 useReducer코드는 잘못된 코드임.. setState와 마찬가지 개념이고 useReducer가 setState를 대체하는 개념이기때문에 setState({...state, ~~})같은 업데이트 방식에서 state의 종속성에서 벗어나기위한 개념이란것을 숙지해야된다.
+
 ## 2022\-05\-25
 
 -app.jsx

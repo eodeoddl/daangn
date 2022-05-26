@@ -27,14 +27,9 @@ function App({ itemDataApi, loginService, fireStore, kakaoMapAPI }) {
   const [moreLoading, setMoreLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [loginState, setLoginState] = useState(false);
-  const [userInfo, setUserInfo] = useState({ history: null });
-  const [state, dispatch] = useReducer(reducer, userInfo, refreshInfo);
+  // const [userInfo, setUserInfo] = useState({ history: null });
+  const [userInfo, dispatch] = useReducer(reducer, {}, resetInfo);
 
-  // const [userState, setUserState] = useState({
-  //   activeHistory: null,
-  //   userHistory: null,
-  //   userInfo: null,
-  // });
   const itemIdxRef = useRef(0);
 
   const [hotItems, setHotItems] = useState([
@@ -183,8 +178,16 @@ function App({ itemDataApi, loginService, fireStore, kakaoMapAPI }) {
 
   // 로그인 정보만 auth 정보.
   useEffect(() => {
-    loginService.observeAuthState(setUserInfo, fireStore, setLoginState);
+    loginService.observeAuthState(fireStore, setLoginState, dispatch);
   }, [fireStore, loginService]);
+
+  // 유저가 있을때 dispatch로 정보업데이트
+  useEffect(() => {
+    if (!loginState) return;
+    fireStore.getUserHistory(userInfo.uid).then((res) => {
+      dispatch({ type: 'setHistory', history: res });
+    });
+  }, [fireStore, loginState, userInfo.uid]);
 
   // 유저상태 관찰후 바뀔경우 useInfo업데이트
   // geolocation 좌표가져와서 userInfo 업데이트
@@ -197,12 +200,13 @@ function App({ itemDataApi, loginService, fireStore, kakaoMapAPI }) {
         position.coords.latitude
       ).then((res) => {
         const [B, H] = res.documents;
-        setUserInfo((prevState) => {
-          return {
-            ...prevState,
-            address: { region_B: B, region_H: H },
-          };
-        });
+        dispatch({ type: 'setAdress', address: { region_B: B, region_H: H } });
+        // setUserInfo((prevState) => {
+        //   return {
+        //     ...prevState,
+        //     address: { region_B: B, region_H: H },
+        //   };
+        // });
       });
     };
 
@@ -216,31 +220,6 @@ function App({ itemDataApi, loginService, fireStore, kakaoMapAPI }) {
       console.log('error');
     }
   }, [kakaoMapAPI, loginService]);
-
-  useEffect(() => {
-    if (!loginState) return;
-    console.log('call dispatch');
-    dispatch({ type: 'refresh', payload: userInfo });
-    dispatch({ type: 'setHistory' });
-  }, [loginState, userInfo]);
-
-  // const fetchHistory = useCallback(
-  //   (loginState) => {
-  //     fireStore.setUserData(userInfo);
-  //     fireStore.getUserData(userInfo.uid, setUserInfo, loginState);
-  //     fireStore.setUserArticle(userInfo.uid);
-  //   },
-  //   [fireStore]
-  // );
-  // 테스트용 fireStore api 요청
-  // 유저 정보가 있다면 fireStore에 데이터 저장
-  // 이곳에서 유저의 location도 firebase에 업데이트
-  // useEffect(() => {
-  //   console.log('useEffect 5555555555555555555');
-  //   if (!loginState || !userInfo.uid) fetchHistory(false);
-  //   fireStore.getUserData(userInfo.uid, setUserInfo);
-  //   fetchHistory(true);
-  // }, [fetchHistory, loginState, userInfo.uid]);
 
   return (
     <>
@@ -299,29 +278,21 @@ export default App;
 
 const reducer = (state, action) => {
   switch (action.type) {
-    case 'refresh':
-      return refreshInfo(action.payload);
+    case 'reset':
+      return resetInfo();
     case 'setHistory':
-      const userInfo = {
-        data: state,
-
-        set setHistory(history) {
-          this.data.history = history;
-        },
-
-        get editedInfo() {
-          return this.data;
-        },
+      return {
+        ...state,
+        history: action.history,
       };
-      state.fireStore
-        .getUserHistory(state.uid)
-        .then((res) => (userInfo.setHistory = res));
-      console.log(userInfo.editedInfo);
-      return { ...userInfo.editedInfo };
+    case 'setUserInfo':
+      return { ...state, ...action.userInfo };
+    case 'setAdress':
+      return { ...state, ...action.address };
     default:
       throw new Error();
   }
 };
-const refreshInfo = (userInfo) => {
-  return userInfo;
+const resetInfo = () => {
+  return {};
 };

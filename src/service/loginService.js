@@ -25,19 +25,27 @@ class LoginService {
       });
   }
 
-  observeAuthState(setUserInfo, fireStore, setLoginState) {
-    console.log('on auth state changed');
+  observeAuthState(fireStore, setLoginState, dispatch) {
     onAuthStateChanged(firebaseAuth, (user) => {
       if (user) {
-        console.log(user);
         const { displayName, email, photoURL, uid } = user;
-        setUserInfo((prevState) => {
-          return { ...prevState, displayName, email, photoURL, uid, fireStore };
+        dispatch({
+          type: 'setUserInfo',
+          userInfo: {
+            fireStore,
+            displayName,
+            email,
+            photoURL,
+            uid,
+          },
         });
+        // setUserInfo((prevState) => {
+        //   return { ...prevState, displayName, email, photoURL, uid, fireStore };
+        // });
         setLoginState(true);
       } else {
         setLoginState(false);
-        setUserInfo(null);
+        dispatch({ type: 'reset' });
       }
     });
   }
