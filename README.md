@@ -4,6 +4,8 @@
 
 ## 2022\-05\-26
 
+app.jsx
+
 ```javascript
 // const [userInfo, setUserInfo] = useState({ history: null });
 const [userInfo, dispatch] = useReducer(reducer, {}, resetInfo);
@@ -70,8 +72,39 @@ const resetInfo = () => {
 };
 ```
 
+loginService.js
+
+```javascript
+observeAuthState(fireStore, setLoginState, dispatch) {
+    onAuthStateChanged(firebaseAuth, (user) => {
+      if (user) {
+        const { displayName, email, photoURL, uid } = user;
+        dispatch({
+          type: 'setUserInfo',
+          userInfo: {
+            fireStore,
+            displayName,
+            email,
+            photoURL,
+            uid,
+          },
+        });
+        // setUserInfo((prevState) => {
+        //   return { ...prevState, displayName, email, photoURL, uid, fireStore };
+        // });
+        setLoginState(true);
+      } else {
+        setLoginState(false);
+        dispatch({ type: 'reset' });
+      }
+    });
+  }
+```
+
 - 리액트 상태의 불변성.  
-  객체의 불변성을 지키는 의미에서 이전에 작성한 useReducer코드는 잘못된 코드임.. setState와 마찬가지 개념이고 useReducer가 setState를 대체하는 개념이기때문에 setState({...state, ~~})같은 업데이트 방식에서 state의 종속성에서 벗어나기위한 개념이란것을 숙지해야된다.
+  객체의 불변성을 지키는 의미에서 이전에 작성한 useReducer코드는 잘못된 코드임.. setState와 마찬가지 개념이고 useReducer가 setState를 대체하는 개념이기때문에 setState({...state, ~~})같은 업데이트 방식에서 state의 종속성에서 벗어나기위한 개념이란것을 숙지해야된다.  
+  완성된 코드를 보면 setState와 prevState에 더이상 의존하지 않기때문에 useEffect함수 의존배열에서도 state에 대한 의존을 삭제한 것을 볼 수 있다. 완성하고 나면 별거아닌것같은데 생소한 개념을 적용할때는 언제나 어렵고 오래걸리는것 같다.  
+  userInfo관련된 useReducer 코드는 더이상 터치할 일이없을듯.
 
 ## 2022\-05\-25
 
