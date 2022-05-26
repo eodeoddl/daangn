@@ -14,6 +14,7 @@ class Item {
   // limit 값으로 가져올 개수, 시작인덱스 받기
   async getLatestList(start, limit) {
     try {
+      console.log('getLatestList 11111111111111111');
       const response = await this.item.get('data', {
         params: {
           _sort: 'id',
@@ -32,6 +33,7 @@ class Item {
   // 검색 api (내용으로..)
   async onSearch(query) {
     try {
+      console.log('OnSearch 111111111111111111111111111111');
       const response = await this.item.get('data', {
         params: {
           _sort: 'id',

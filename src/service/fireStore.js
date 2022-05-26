@@ -54,19 +54,10 @@ class FireStore {
   async getUserHistory(userId) {
     console.log(userId);
     const docRef = doc(firebaseStore, 'users', userId);
-    console.log(docRef);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      console.log('1');
-      console.log(docSnap.data().history);
       return docSnap.data().history;
-      // setUserInfo((prevState) => {
-      //   return {
-      //     ...prevState,
-      //     history: docSnap.data().history,
-      //   };
-      // });
     } else {
       console.log('no data');
     }
@@ -76,9 +67,6 @@ class FireStore {
   async setInitArticle() {
     const articleRef = collection(firebaseStore, 'articles');
 
-    // await setDoc(articleRef, dummyIndex, {
-
-    // });
     await addDoc(articleRef, {
       title: `판매`,
       uid: '7AJFZSRZ0hhz7zBq6LhBO4u9QJf2',

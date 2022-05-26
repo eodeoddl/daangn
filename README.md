@@ -22,13 +22,13 @@ useEffect(() => {
 }, [fireStore, loginState, userInfo.uid]);
 
 useEffect(() => {
-  const boundedAdressAPI = kakaoMapAPI.getAddress.bind(kakaoMapAPI);
+  const boundedAddressAPI = kakaoMapAPI.getAddress.bind(kakaoMapAPI);
 
   const success = (position) => {
-    boundedAdressAPI(position.coords.longitude, position.coords.latitude).then(
+    boundedAddressAPI(position.coords.longitude, position.coords.latitude).then(
       (res) => {
         const [B, H] = res.documents;
-        dispatch({ type: 'setAdress', address: { region_B: B, region_H: H } });
+        dispatch({ type: 'setAddress', address: { region_B: B, region_H: H } });
         // setUserInfo((prevState) => {
         //   return {
         //     ...prevState,
@@ -105,6 +105,12 @@ observeAuthState(fireStore, setLoginState, dispatch) {
   객체의 불변성을 지키는 의미에서 이전에 작성한 useReducer코드는 잘못된 코드임.. setState와 마찬가지 개념이고 useReducer가 setState를 대체하는 개념이기때문에 setState({...state, ~~})같은 업데이트 방식에서 state의 종속성에서 벗어나기위한 개념이란것을 숙지해야된다.  
   완성된 코드를 보면 setState와 prevState에 더이상 의존하지 않기때문에 useEffect함수 의존배열에서도 state에 대한 의존을 삭제한 것을 볼 수 있다. 완성하고 나면 별거아닌것같은데 생소한 개념을 적용할때는 언제나 어렵고 오래걸리는것 같다.  
   userInfo관련된 useReducer 코드는 더이상 터치할 일이없을듯.
+
+- jsonServer api 요청을 fireStore api로 바꾸기(todo list)
+  components/details/article.jsx: > components/publicStyle/carousual.jsx:132 = getItemById api 호출  
+  app.jsx:173 , app.jsx:149 = getLatestList api  
+  search.jsx:20 = onSearch api
+  기타 app.jsp의 함수 handleLoading함수를 props로 받는 컴포넌트들..
 
 ## 2022\-05\-25
 

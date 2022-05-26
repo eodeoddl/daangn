@@ -27,7 +27,6 @@ function App({ itemDataApi, loginService, fireStore, kakaoMapAPI }) {
   const [moreLoading, setMoreLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [loginState, setLoginState] = useState(false);
-  // const [userInfo, setUserInfo] = useState({ history: null });
   const [userInfo, dispatch] = useReducer(reducer, {}, resetInfo);
 
   const itemIdxRef = useRef(0);
@@ -200,13 +199,7 @@ function App({ itemDataApi, loginService, fireStore, kakaoMapAPI }) {
         position.coords.latitude
       ).then((res) => {
         const [B, H] = res.documents;
-        dispatch({ type: 'setAdress', address: { region_B: B, region_H: H } });
-        // setUserInfo((prevState) => {
-        //   return {
-        //     ...prevState,
-        //     address: { region_B: B, region_H: H },
-        //   };
-        // });
+        dispatch({ type: 'setAddress', address: { region_B: B, region_H: H } });
       });
     };
 
@@ -287,7 +280,7 @@ const reducer = (state, action) => {
       };
     case 'setUserInfo':
       return { ...state, ...action.userInfo };
-    case 'setAdress':
+    case 'setAddress':
       return { ...state, ...action.address };
     default:
       throw new Error();
