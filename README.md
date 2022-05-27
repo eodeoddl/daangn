@@ -1,6 +1,30 @@
-[2022-05-20](#2020-05-20)  
-[2022-05-19](#2020-05-19)  
-[2022-05-23](#2020-05-23)
+## 2022\-05\-27
+
+src/components/userInfo/postingForm.jsx 추가  
+json-server을 fireStore로 대체하기전 posting form을 통해 데이터를 fireStore로 보내는 폼을 먼저 만들기로함.
+
+fireStore 자료구조
+
+1.  유저가 올린 posting 정보(article)는 내림차순으로 보관한다.(article의 id를 사용)
+1.  article의 id는 유저가 포스팅을 한 시점의 server timestamp를 사용한다  
+    이것을 사용해서 정렬을하고 article 끌어올리기 기능을 구현
+1.  사용자 주소는 userInfo.region_B 에있는 법정동 정보를 쓰는것을 기본값으로 한다.
+1.  title, description, region, price, files, cartegory, address, uid 를 필드로 갖는다.
+    특이사항으로 files 필드는 배열을 값으로 가진다.  
+    검색 api는 유저가 올린 article을 찾아올때 uid를 통해 가져오고, region값으로 나의 위치와 가까운곳에서 올린 article 부터 결과값이 노출 될 수 있도록, price로 높은가격 낮은가격순, cartegory로 물품의 종류에따른 filter기능을 제공할 예정
+1.  files 보관을 fireStorage를 사용해야할것 같은데 store를 사용할지 storage를 사용할지 아직 명확하진않음.
+
+postingForm.jsx
+
+1. input select로 cartegory를 입력 받음
+2. input text로 title, price를 입력받음  
+   price는 숫자만 입력받을 수 있도록 처리한다(정규표현식 사용).  
+   또 체크박스를 이용해서 가격을 제시받을 수 있는 기능도 구현
+3. input textarea는 decription 입력받음.  
+   4.input file(multiple)은 input요소를 label과 연결 후 display:none으로 숨긴후 label에 스타일링한다.  
+    updateImageDisplay() 함수를 이용해서 내가 업로드한 사진의 미리볼 수 있고 대표 사진도 나타내준다.  
+    대표사진은 업로드한 이미지 파일중 첫번째 이미지를 사용하고 대표사진을 삭제하게되면 다음 인덱스에 위치한 이미지가 자동으로 대표사진으로 설정된다.
+4. 해시 태그 기능으로 세부적인 카테고리를 나눌수 있고 포스팅이 완료된 시점에서 다른사람들이 구독하기 버튼을 통해 가격이 변동될때 알림이 갈 수 있도록 한다.
 
 ## 2022\-05\-26
 
@@ -107,10 +131,10 @@ observeAuthState(fireStore, setLoginState, dispatch) {
   userInfo관련된 useReducer 코드는 더이상 터치할 일이없을듯.
 
 - jsonServer api 요청을 fireStore api로 바꾸기(todo list)  
-  components/details/article.jsx: > components/publicStyle/carousual.jsx:132 = getItemById api  
+  components/details/article.jsx > components/publicStyle/carousual.jsx:132 = getItemById api  
   app.jsx:173 , app.jsx:149 = getLatestList api  
   search.jsx:20 = onSearch api  
-  기타 app.jsp의 함수 handleLoading함수를 props로 받는 컴포넌트들..
+  기타 app.jsx의 함수 handleLoading함수를 props로 받는 컴포넌트들..
 
 ## 2022\-05\-25
 

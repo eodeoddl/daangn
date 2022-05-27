@@ -2,6 +2,7 @@ import React, { memo, useEffect, useState } from 'react';
 import { Link, useRouteMatch } from 'react-router-dom';
 import styled from 'styled-components';
 import UseQuery from '../../customHook/useQuery';
+import PostingForm from './postingForm';
 import UserArticles from './userArticles';
 import UserManner from './userManner';
 import UserReview from './userReview';
@@ -88,10 +89,13 @@ const UserInfo = ({ userInfo, fireStore }) => {
     data: {},
   });
 
+  const staticMenu = ['게시글 작성'];
+
   const components = {
     매너칭찬: <UserManner data={activeHistory.data} />,
     판매물품: <UserArticles fireStore={fireStore} uid={userInfo.uid} />,
     거래후기: <UserReview data={activeHistory.data} />,
+    '게시글 작성': <PostingForm />,
   };
 
   // 유저정보보기 style 함수
@@ -102,6 +106,8 @@ const UserInfo = ({ userInfo, fireStore }) => {
 
   // 유저 정보 클릭한 메뉴에따라 세팅
   const toggleActive = (key) => {
+    // static 메뉴는 value값이 undefined
+    // static 메뉴의 value 값이 필요할 경우 여기서 처리
     setActiveHistory({
       data: { [key]: userInfo.history[key] },
     });
@@ -151,6 +157,23 @@ const UserInfo = ({ userInfo, fireStore }) => {
                           pathname: url,
                           search,
                         }}
+                      >
+                        {menu}
+                      </Link>
+                    </li>
+                  );
+                })}
+              {staticMenu &&
+                staticMenu.map((menu) => {
+                  return (
+                    <li
+                      key={menu}
+                      className={toggleActiveStyle(menu)}
+                      onClick={() => toggleActive(menu)}
+                    >
+                      <Link
+                        className='filter-link'
+                        to={{ pathname: url, search: `?kind=${menu}` }}
                       >
                         {menu}
                       </Link>
