@@ -3,7 +3,7 @@
 src/components/userInfo/postingForm.jsx 추가  
 json-server을 fireStore로 대체하기전 posting form을 통해 데이터를 fireStore로 보내는 폼을 먼저 만들기로함.
 
-fireStore 자료구조
+### fireStore 자료구조
 
 1.  유저가 올린 posting 정보(article)는 내림차순으로 보관한다.(article의 id를 사용)
 1.  article의 id는 유저가 포스팅을 한 시점의 server timestamp를 사용한다  
@@ -14,7 +14,7 @@ fireStore 자료구조
     검색 api는 유저가 올린 article을 찾아올때 uid를 통해 가져오고, region값으로 나의 위치와 가까운곳에서 올린 article 부터 결과값이 노출 될 수 있도록, price로 높은가격 낮은가격순, cartegory로 물품의 종류에따른 filter기능을 제공할 예정
 1.  files 보관을 fireStorage를 사용해야할것 같은데 store를 사용할지 storage를 사용할지 아직 명확하진않음.
 
-postingForm.jsx
+### postingForm.jsx
 
 1. input select로 cartegory를 입력 받음
 2. input text로 title, price를 입력받음  
