@@ -2,7 +2,7 @@
 
 ### postingForm.jsx
 
-~~1. input file 미리보기만들기.(대표이미지)~~  
+~~1. input file 미리보기만들기.(대표이미지 처리까지)~~  
 ~~1. input file 미리보기 삭제기능 구현~~  
 ~~1. input text 숫자만 입력받기~~  
 ~~1. input file 스타일링~~
