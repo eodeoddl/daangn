@@ -2,7 +2,14 @@
 
 ### postingForm.jsx
 
+~~1. input file 미리보기만들기.(대표이미지) ~~  
+~~1. input file 미리보기 삭제기능 구현~~  
+~~1. input text 숫자만 입력받기 ~~  
+~~1. input file 스타일링~~
+
 1. cartegory 입력창 input select대신 button과 modal을 이용해서 구현하기로 수정
+1. useReducer로 업데이트 로직따로 분리 후 한번에 데이더 보내서 처리하기.
+1. html css 어렵다..
 
 ## 2022\-05\-27
 
