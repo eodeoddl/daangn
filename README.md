@@ -1,3 +1,9 @@
+## 2020\-05\-30
+
+### postingForm.jsx
+
+1. cartegory 입력창 input select대신 button과 modal을 이용해서 구현하기로 수정
+
 ## 2022\-05\-27
 
 src/components/userInfo/postingForm.jsx 추가  
