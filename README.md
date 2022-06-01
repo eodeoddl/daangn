@@ -5,12 +5,12 @@
 ~~posting form textarea, submit button을 제외한 css 처리~~  
 ~~reducer로 상태 업데이트~~
 
-input file로 업로드한 미리보기 이미지의 길이가 container 길이를 초과할때 carousel 처리해야됨  
- container에 overflow hidden 처리를 해도 x축은 처리가안됨 hidden 처리가 되야 carosel 만들수 있음..  
- 현재 생각은 conatainer가 flex box이기 때문에 item들의 넓이값을 자동으로 처리해서 그런듯.  
- flex box대신 다른 걸로 layout처리하거나 shrink, basis, grow 속성을 적용해야할것 같음.  
-textarea, submit btn css 처리해야됨  
-css끝나면 fireStore로 데이터 업로드하는 작업
+1. input file로 업로드한 미리보기 이미지의 길이가 container 길이를 초과할때 carousel 처리해야됨  
+   container에 overflow hidden 처리를 해도 x축은 처리가안됨 hidden 처리가 되야 carousel 만들수 있음..  
+   현재 생각은 conatainer가 flex box이기 때문에 item들의 넓이값을 자동으로 처리해서 그런듯.  
+   flex box대신 다른 걸로 layout처리하거나 shrink, basis, grow 속성을 적용해야할것 같음.
+1. textarea, submit btn css 처리해야됨
+1. css끝나면 fireStore로 데이터 업로드하는 작업
 
 ## 2020\-05\-31
 
