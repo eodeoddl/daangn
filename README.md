@@ -1,8 +1,8 @@
 ## 2020\-06\-01
 
-~~cartegory.jsx 추가 (portal을 이용한 modal) ~~
-~~input price : blur, focus css 처리 ~~
-~~posting form textarea, submit button을 제외한 css 처리 ~~
+~~cartegory.jsx 추가 (portal을 이용한 modal)~~  
+~~input price : blur, focus css 처리~~  
+~~posting form textarea, submit button을 제외한 css 처리~~  
 ~~reducer로 상태 업데이트~~
 
 input file로 업로드한 미리보기 이미지의 길이가 container 길이를 초과할때 carousel 처리해야됨  
