@@ -1,3 +1,24 @@
+## 2020\-06\-01
+
+~~cartegory.jsx 추가 (portal을 이용한 modal) ~~
+~~input price : blur, focus css 처리 ~~
+~~posting form textarea, submit button을 제외한 css 처리 ~~
+~~reducer로 상태 업데이트~~
+
+input file로 업로드한 미리보기 이미지의 길이가 container 길이를 초과할때 carousel 처리해야됨  
+ container에 overflow hidden 처리를 해도 x축은 처리가안됨 hidden 처리가 되야 carosel 만들수 있음..  
+ 현재 생각은 conatainer가 flex box이기 때문에 item들의 넓이값을 자동으로 처리해서 그런듯.  
+ flex box대신 다른 걸로 layout처리하거나 shrink, basis, grow 속성을 적용해야할것 같음.  
+textarea, submit btn css 처리해야됨  
+css끝나면 fireStore로 데이터 업로드하는 작업
+
+## 2020\-05\-31
+
+input file로 업로드시에 onChange이벤트를 이용해서 업로드를 감지한다. 이때 같은 파일을 다시 업로드하게되면 event가 다시
+발생하지 않는다.  
+이것은 onChange이벤트는 실질적인 data변화가 이루어 져야 다시 trigger 되기때문이다. 때문에 file을 업로드하게되면 같은 값을
+다시 올리는 경우의 수를 생각해서 e.target.value를 초기화 해주는 작업이 필요하다.
+
 ## 2020\-05\-30
 
 ### postingForm.jsx

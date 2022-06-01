@@ -1,24 +1,62 @@
-import { useState, useReducer } from 'react';
+import { useState, useReducer, useRef } from 'react';
 import styled from 'styled-components';
 import { MdAddAPhoto, MdClose } from 'react-icons/md';
+import { IoIosArrowDown } from 'react-icons/io';
+import Portal from '../portal/portal';
+import Cartegory from './cartegory';
 
 const Form = styled.form`
   display: flex;
   flex-wrap: wrap;
   padding: 20px;
 
+  input[name='article title'] {
+    width: 100%;
+    height: 30px;
+    appearance: none;
+    border: none;
+    border-bottom: 2px solid #ccc;
+    margin-bottom: 20px;
+    padding: 0.4em;
+  }
+
+  .cartegory {
+    width: 40%;
+    height: 30px;
+    border: none;
+    border-bottom: 2px solid #ccc;
+    margin-right: 20%;
+    margin-bottom: 20px;
+    padding: 0.4em;
+    background-color: transparent;
+    color: #000;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  .price-label {
+    width: 5%;
+    font-size: 20px;
+    color: #ccc;
+  }
+
+  input[name='price'] {
+    width: 35%;
+    height: 30px;
+    border: none;
+    appearance: none;
+    border-bottom: 2px solid #ccc;
+    margin-bottom: 20px;
+    padding: 0.4em;
+  }
+
   textarea {
     resize: none;
     width: 100%;
     min-height: 500px;
-  }
-
-  select {
-    width: 20%;
-  }
-
-  input[name='article title'] {
-    width: 80%;
   }
 
   input[name='hash tag'] {
@@ -39,7 +77,7 @@ const Form = styled.form`
 
     label {
       position: relative;
-      width: 100px;
+      min-width: 100px;
       margin-right: 20px;
 
       span {
@@ -63,17 +101,17 @@ const Form = styled.form`
 
     .preview-img-container {
       width: 90%;
-      display: flex;
-      align-items: center;
 
       ul {
         list-style-type: none;
         height: 100%;
+        width: 100%;
+        display: flex;
 
         li {
-          display: inline-block;
           position: relative;
-          width: 100px;
+          max-width: 100px;
+          width: 100%;
           height: 100%;
           margin-right: 15px;
 
@@ -158,9 +196,21 @@ const fileTypes = [
 ];
 
 const PostingForm = () => {
-  const [fileList, setFileList] = useState([]);
   const [fileImg, setFileImg] = useState([]);
-  const [fileList1, dispatch] = useReducer(reducer, []);
+  const [showModal, setShowModal] = useState(false);
+  const [formData, dispatch] = useReducer(reducer, {});
+  const priceLabel = useRef(null);
+
+  // const focusLabel = () => {};
+  // let reader = new FileReader();
+
+  // 미리보기 이미지는 최소, 최대 넓이값 100px로 고정
+  // const getImgTotalWidth = () => {
+  //   if(fileImg.length) {
+
+  //   }
+  //   return null;
+  // }
 
   const onPriceInput = (e) => {
     e.target.value = e.target.value.replace(/[^0-9.]/g, '');
@@ -171,30 +221,25 @@ const PostingForm = () => {
   };
 
   const updateImageDisplay = (e) => {
+    console.log(e.target.value);
     const curFiles = e.target.files;
 
     if (curFiles.length === 0) {
       return;
     } else {
-      const fileArray = [];
       const imgSrc = [];
 
       for (let file of curFiles) {
         if (validFileType(file)) {
           imgSrc.push(URL.createObjectURL(file));
-          fileArray.push(file);
         } else {
           console.log('wrong file type');
         }
       }
 
       setFileImg(imgSrc);
-      setFileList(fileArray);
+      e.target.value = '';
     }
-  };
-
-  const onLoadFile = (e) => {
-    updateImageDisplay(e);
   };
 
   const onDeleteFile = (index) => {
@@ -203,60 +248,106 @@ const PostingForm = () => {
     setFileImg([...newFileImg]);
   };
 
+  const onInputCartegory = () => {
+    setShowModal(true);
+  };
+
+  const onBlur = (e) => {
+    if (e.target.value) priceLabel.current.style.color = '#000';
+    else priceLabel.current.style.color = '#ccc';
+  };
+
+  const onFocus = () => {
+    priceLabel.current.style.color = '#000';
+  };
+
   return (
-    <Form>
-      <input type='text' name='article title' />
-      <input
-        type='text'
-        name='price'
-        placeholder='가격을 적어주세요'
-        onChange={onPriceInput}
-      />
-      <textarea name='description' type='text' />
-      <div className='img-container'>
-        <label htmlFor='image_uploads'>
-          <MdAddAPhoto className='MdAddAPhoto' />
-          <span>{fileImg.length}/10</span>
+    <>
+      <Form>
+        <input type='text' name='article title' placeholder='제목' />
+        <button
+          type='button'
+          className='cartegory'
+          onClick={() => onInputCartegory()}
+        >
+          {formData.cartegory ? formData.cartegory : '카테고리를 선택하세요'}
+          <IoIosArrowDown />
+        </button>
+        <label htmlFor='price' className={`price-label`} ref={priceLabel}>
+          ￦
         </label>
         <input
-          id='image_uploads'
-          type='file'
-          multiple
-          accept='image/*'
-          name='file upload'
-          onChange={onLoadFile}
+          type='text'
+          name='price'
+          id='price'
+          placeholder='가격을 적어주세요'
+          onChange={onPriceInput}
+          onBlur={(e) => onBlur(e)}
+          onFocus={() => onFocus()}
         />
-        <div className='preview-img-container'>
-          {!fileImg.length && <span>이미지를 선택하세요</span>}
-          {fileImg.length && (
-            <ul>
-              {fileImg.map((url, i) => {
-                const element =
-                  i === 0 ? <p className='thumbnail'>대표사진</p> : null;
-                return (
-                  <li key={`img Index${i}`}>
-                    <img alt={`img Index${i}`} src={url} />
-                    {element}
-                    <button
-                      type='button'
-                      className='delete-btn'
-                      onClick={() => onDeleteFile(i)}
-                    >
-                      <MdClose className='close-img' />
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
+        <textarea name='description' type='text' />
+        <div className='img-container'>
+          <label htmlFor='image_uploads'>
+            <MdAddAPhoto className='MdAddAPhoto' />
+            <span>{fileImg.length}/10</span>
+          </label>
+          <input
+            id='image_uploads'
+            type='file'
+            multiple
+            accept='image/*'
+            name='file upload'
+            onChange={(e) => updateImageDisplay(e)}
+          />
+          <div className='preview-img-container'>
+            {fileImg.length ? (
+              <ul>
+                {fileImg.map((url, i) => {
+                  const element =
+                    i === 0 ? <p className='thumbnail'>대표사진</p> : null;
+                  return (
+                    <li key={`img Index${i}`}>
+                      <img alt={`img Index${i}`} src={url} />
+                      {element}
+                      <button
+                        type='button'
+                        className='delete-btn'
+                        onClick={() => onDeleteFile(i)}
+                      >
+                        <MdClose className='close-img' />
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <span>이미지를 선택하세요</span>
+            )}
+          </div>
         </div>
-      </div>
-      <input type='text' name='hash tag' />
-      <input type='submit' value='posting' />
-    </Form>
+        <input type='text' name='hash tag' />
+        <input type='submit' value='posting' />
+      </Form>
+      <Portal idSelector='posting-form-modal'>
+        {showModal && (
+          <Cartegory
+            setShowModal={setShowModal}
+            cartegory={cartegory}
+            dispatch={dispatch}
+          />
+        )}
+      </Portal>
+    </>
   );
 };
 
 export default PostingForm;
 
-const reducer = (fileList1, dispatch) => {};
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'setCartegory':
+      return { ...state, cartegory: cartegory[action.index] };
+    default:
+      throw new Error();
+  }
+};
