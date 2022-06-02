@@ -1,4 +1,5 @@
-import { useState, useReducer, useRef } from 'react';
+import { useState, useReducer, useRef, useCallback, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { MdAddAPhoto, MdClose } from 'react-icons/md';
 import { IoIosArrowDown } from 'react-icons/io';
@@ -10,7 +11,7 @@ const Form = styled.form`
   flex-wrap: wrap;
   padding: 20px;
 
-  input[name='article title'] {
+  input[name='title'] {
     width: 100%;
     height: 30px;
     appearance: none;
@@ -39,7 +40,7 @@ const Form = styled.form`
 
   .price-label {
     width: 5%;
-    font-size: 20px;
+    font-size: 17px;
     color: #ccc;
   }
 
@@ -56,7 +57,10 @@ const Form = styled.form`
   textarea {
     resize: none;
     width: 100%;
-    min-height: 500px;
+    height: 500px;
+    border: 1px solid #000;
+    border-radius: 5px;
+    padding: 10px;
   }
 
   input[name='hash tag'] {
@@ -162,6 +166,19 @@ const Form = styled.form`
       }
     }
   }
+
+  button[type='submit'],
+  button[type='reset'] {
+    font-size: 16px;
+    font-weight: 700;
+    padding: 5px;
+    border-radius: 2px;
+    apearance: none;
+  }
+
+  button[type='reset'] {
+    margin-right: 10px;
+  }
 `;
 
 const cartegory = [
@@ -195,22 +212,16 @@ const fileTypes = [
   'image/x-icon',
 ];
 
-const PostingForm = () => {
+const PostingForm = ({ userInfo }) => {
   const [fileImg, setFileImg] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [formData, dispatch] = useReducer(reducer, {});
+  const [formData, dispatch] = useReducer(reducer, {}, init);
   const priceLabel = useRef(null);
+  const history = useHistory();
 
-  // const focusLabel = () => {};
-  // let reader = new FileReader();
-
-  // 미리보기 이미지는 최소, 최대 넓이값 100px로 고정
-  // const getImgTotalWidth = () => {
-  //   if(fileImg.length) {
-
-  //   }
-  //   return null;
-  // }
+  useEffect(() => {
+    dispatch({ type: 'onLoad', userInfo });
+  }, [userInfo]);
 
   const onPriceInput = (e) => {
     e.target.value = e.target.value.replace(/[^0-9.]/g, '');
@@ -221,23 +232,25 @@ const PostingForm = () => {
   };
 
   const updateImageDisplay = (e) => {
-    console.log(e.target.value);
-    const curFiles = e.target.files;
+    const { files, name } = e.target;
 
-    if (curFiles.length === 0) {
+    if (files.length === 0) {
       return;
     } else {
       const imgSrc = [];
+      const fileList = [];
 
-      for (let file of curFiles) {
+      for (let file of files) {
         if (validFileType(file)) {
           imgSrc.push(URL.createObjectURL(file));
+          fileList.push(file);
         } else {
           console.log('wrong file type');
         }
       }
 
       setFileImg(imgSrc);
+      // dispatch({ type: 'setFormData', name, value: fileList });
       e.target.value = '';
     }
   };
@@ -246,6 +259,7 @@ const PostingForm = () => {
     const newFileImg = fileImg.slice();
     newFileImg.splice(index, 1);
     setFileImg([...newFileImg]);
+    // dispatch({ type: 'deleteFile', index });
   };
 
   const onInputCartegory = () => {
@@ -261,10 +275,27 @@ const PostingForm = () => {
     priceLabel.current.style.color = '#000';
   };
 
+  const onSubmit = (e) => {
+    e.preventDefault();
+    userInfo.fireStore.setArticle(formData);
+    alert('게시글이 등록되었습니다.');
+    history.push('/');
+  };
+
+  const onChangeValue = useCallback((e) => {
+    const { name, value } = e.target;
+    dispatch({ type: 'setFormData', name, value });
+  }, []);
+
   return (
     <>
       <Form>
-        <input type='text' name='article title' placeholder='제목' />
+        <input
+          type='text'
+          name='title'
+          placeholder='제목'
+          onChange={(e) => onChangeValue(e)}
+        />
         <button
           type='button'
           className='cartegory'
@@ -273,7 +304,7 @@ const PostingForm = () => {
           {formData.cartegory ? formData.cartegory : '카테고리를 선택하세요'}
           <IoIosArrowDown />
         </button>
-        <label htmlFor='price' className={`price-label`} ref={priceLabel}>
+        <label htmlFor='price' className='price-label' ref={priceLabel}>
           ￦
         </label>
         <input
@@ -281,11 +312,19 @@ const PostingForm = () => {
           name='price'
           id='price'
           placeholder='가격을 적어주세요'
-          onChange={onPriceInput}
+          onChange={(e) => {
+            onPriceInput(e);
+            onChangeValue(e);
+          }}
           onBlur={(e) => onBlur(e)}
           onFocus={() => onFocus()}
         />
-        <textarea name='description' type='text' />
+        <textarea
+          name='description'
+          type='text'
+          placeholder='텍스트를 입력하세요'
+          onChange={(e) => onChangeValue(e)}
+        />
         <div className='img-container'>
           <label htmlFor='image_uploads'>
             <MdAddAPhoto className='MdAddAPhoto' />
@@ -296,19 +335,19 @@ const PostingForm = () => {
             type='file'
             multiple
             accept='image/*'
-            name='file upload'
-            onChange={(e) => updateImageDisplay(e)}
+            name='files'
+            onChange={(e) => {
+              updateImageDisplay(e);
+            }}
           />
           <div className='preview-img-container'>
             {fileImg.length ? (
               <ul>
                 {fileImg.map((url, i) => {
-                  const element =
-                    i === 0 ? <p className='thumbnail'>대표사진</p> : null;
                   return (
                     <li key={`img Index${i}`}>
                       <img alt={`img Index${i}`} src={url} />
-                      {element}
+                      {i === 0 ? <p className='thumbnail'>대표사진</p> : null}
                       <button
                         type='button'
                         className='delete-btn'
@@ -321,12 +360,25 @@ const PostingForm = () => {
                 })}
               </ul>
             ) : (
-              <span>이미지를 선택하세요</span>
+              <span className=''>이미지를 선택하세요</span>
             )}
           </div>
         </div>
-        <input type='text' name='hash tag' />
-        <input type='submit' value='posting' />
+        {/* <input type='text' name='hash tag' /> */}
+        <div className='btn-container'>
+          <button
+            type='reset'
+            onClick={() => {
+              dispatch({ type: 'reset' });
+              setFileImg([]);
+            }}
+          >
+            취소
+          </button>
+          <button type='submit' onClick={(e) => onSubmit(e)}>
+            글쓰기
+          </button>
+        </div>
       </Form>
       <Portal idSelector='posting-form-modal'>
         {showModal && (
@@ -347,7 +399,23 @@ const reducer = (state, action) => {
   switch (action.type) {
     case 'setCartegory':
       return { ...state, cartegory: cartegory[action.index] };
+    case 'setFormData':
+      return { ...state, [action.name]: action.value };
+    case 'deleteFile':
+      const files = state.files.slice();
+      files.splice(action.index, 1);
+      return { ...state, files: [...files] };
+    case 'onLoad':
+      return init(action.userInfo);
+    case 'reset':
+      const { uid, region_B } = state;
+      return { uid, region_B };
     default:
       throw new Error();
   }
+};
+
+const init = (userInfo) => {
+  const { uid, region_B } = userInfo;
+  return { uid, region_B };
 };

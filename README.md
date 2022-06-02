@@ -1,4 +1,31 @@
-## 2020\-06\-01
+## 2022\-06\-02
+
+~~postingForm 완성하고 fireStore로 데이터 추가작업완료.~~  
+~~input file을 제외하고 나머지 값들만..~~  
+~~게시글 작성완료하고 home으로 이동할때 스크롤이 이전 페이지위치하는 문제 해결~~
+
+이미지노출을 위한 로직과 formdata를 한번에 모아서 보내기위한 로직이 따로 분리되야하는데
+img url은 미리보기 기능을 위해 필요한 것일뿐 서버에 보낼 필요가없음. => 이미지 src는 useState로 처리하고 나머지는 reducer로 처리.  
+js의 formData 객체를 이용해서 form에 입력된 값을 서버로 보낸다. => 나는 fireStore api를 사용하기때문에 굳이formdata객체를
+사용할 필요가 없음.
+
+auth 경우의 수
+
+1.  사용자가 로그인을 한 상태에서 다른사람의 info를 탐색하는 경우 => postingForm이 보여지지않아야함.
+1.  사용자가 로그인을 한 상태에서 본인의 info를 탐색하는경우 => postingForm 노출.
+1.  로그인을 하지않고 url로 postingForm에 직접접근하는 경우 => root로 강제로 보내고 로그인 modal을 띄워준다.
+
+사용자 입력값을 받는 처리는 onChange를 이용해서 state를 실시간으로 업데이트한다.  
+의문점. state의 변화가 발생하는데 state에 변화에 관련된 component자체의 업데이트가 없다면 re-render가 발생하는지
+확인이 필요할 것 같다. => component 업데이트와 상관없이 state 변화로 인해 값이 바뀔때마다 re-render 발생하고 useCallback을 사용해도 똑같음.  
+onChange 이벤트로 처리를하지않고 submit btn으로 처리를 하고싶은데 그러면 dom에 직접 접근해서 값을 가져와야하는데 맞는 방법인지 모르겠음.  
+무엇이 최선일지 고민하고 검색해봐야할듯.
+
+store에 file을 직접 올리려고했는데 업로드 되지않음.
+에러내용  
+ uncaught (in promise) FirebaseError: Function addDoc() called with invalid data. Unsupported field value: a custom File object (found in document article/OJsIvsdRAv3JA8ERasyS)
+
+## 2022\-06\-01
 
 ~~cartegory.jsx 추가 (portal을 이용한 modal)~~  
 ~~input price : blur, focus css 처리~~  
@@ -10,16 +37,16 @@
    현재 생각은 conatainer가 flex box이기 때문에 item들의 넓이값을 자동으로 처리해서 그런듯.  
    flex box대신 다른 걸로 layout처리하거나 shrink, basis, grow 속성을 적용해야할것 같음.
 1. textarea, submit btn css 처리해야됨
-1. css끝나면 fireStore로 데이터 업로드하는 작업
+1. css끝나면 fireStore로 데이터 업로드하는 작업하고 json-server 코드들 더이상 사용하지않을 예정.
 
-## 2020\-05\-31
+## 2022\-05\-31
 
 input file로 업로드시에 onChange이벤트를 이용해서 업로드를 감지한다. 이때 같은 파일을 다시 업로드하게되면 event가 다시
 발생하지 않는다.  
 이것은 onChange이벤트는 실질적인 data변화가 이루어 져야 다시 trigger 되기때문이다. 때문에 file을 업로드하게되면 같은 값을
 다시 올리는 경우의 수를 생각해서 e.target.value를 초기화 해주는 작업이 필요하다.
 
-## 2020\-05\-30
+## 2022\-05\-30
 
 ### postingForm.jsx
 
@@ -43,7 +70,7 @@ json-server을 fireStore로 대체하기전 posting form을 통해 데이터를 
 1.  article의 id는 유저가 포스팅을 한 시점의 server timestamp를 사용한다  
     이것을 사용해서 정렬을하고 article 끌어올리기 기능을 구현
 1.  사용자 주소는 userInfo.region_B 에있는 법정동 정보를 쓰는것을 기본값으로 한다.
-1.  title, description, region, price, files, cartegory, address, uid 를 필드로 갖는다.
+1.  title, description, region, price, files, cartegory, uid 를 필드로 갖는다.
     특이사항으로 files 필드는 배열을 값으로 가진다.  
     검색 api는 유저가 올린 article을 찾아올때 uid를 통해 가져오고, region값으로 나의 위치와 가까운곳에서 올린 article 부터 결과값이 노출 될 수 있도록, price로 높은가격 낮은가격순, cartegory로 물품의 종류에따른 filter기능을 제공할 예정
 1.  files 보관을 fireStorage를 사용해야할것 같은데 store를 사용할지 storage를 사용할지 아직 명확하진않음.

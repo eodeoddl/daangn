@@ -78,6 +78,15 @@ class FireStore {
     });
   }
 
+  async setArticle(data) {
+    const articleRef = collection(firebaseStore, 'article');
+    console.log(articleRef);
+    await addDoc(articleRef, {
+      ...data,
+      uploaded: serverTimestamp(),
+    });
+  }
+
   // make user > artilce collection & getCollection by document id
   async setUserArticle(uid) {
     console.log(uid);

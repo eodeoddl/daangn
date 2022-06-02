@@ -9,6 +9,7 @@ import Item from './service/item';
 import LoginService from './service/loginService';
 import FireStore from './service/fireStore';
 import KakaoMapAPI from './service/kakaoMapAPI';
+import { ScrollTop } from './components/publicStyle/scrollTop';
 
 const itemDataApi = new Item();
 const loginService = new LoginService();
@@ -19,6 +20,7 @@ ReactDOM.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
       <BrowserRouter>
+        <ScrollTop />
         <App
           itemDataApi={itemDataApi}
           loginService={loginService}

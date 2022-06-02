@@ -95,7 +95,7 @@ const UserInfo = ({ userInfo, fireStore }) => {
     매너칭찬: <UserManner data={activeHistory.data} />,
     판매물품: <UserArticles fireStore={fireStore} uid={userInfo.uid} />,
     거래후기: <UserReview data={activeHistory.data} />,
-    '게시글 작성': <PostingForm />,
+    '게시글 작성': <PostingForm userInfo={userInfo} />,
   };
 
   // 유저정보보기 style 함수
