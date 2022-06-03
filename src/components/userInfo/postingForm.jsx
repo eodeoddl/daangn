@@ -66,9 +66,6 @@ const Form = styled.form`
   input[name='hash tag'] {
   }
 
-  input[type='submit'] {
-  }
-
   .img-container {
     width: 100%;
     height: 140px;
@@ -212,11 +209,12 @@ const fileTypes = [
   'image/x-icon',
 ];
 
-const PostingForm = ({ userInfo }) => {
+const PostingForm = ({ userInfo, fireStorage }) => {
   const [fileImg, setFileImg] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [formData, dispatch] = useReducer(reducer, {}, init);
   const priceLabel = useRef(null);
+  const fileInputRef = useRef(null);
   const history = useHistory();
 
   useEffect(() => {
@@ -231,6 +229,12 @@ const PostingForm = ({ userInfo }) => {
     return fileTypes.includes(file.type);
   };
 
+  const makeStoragePath = (file) => {
+    // 문자열 메서드 substring or split or slice 사용가능
+    // const endIdx = file.name.indexOf('/');
+    return file.type.split('/')[0];
+  };
+
   const updateImageDisplay = (e) => {
     const { files, name } = e.target;
 
@@ -238,21 +242,38 @@ const PostingForm = ({ userInfo }) => {
       return;
     } else {
       const imgSrc = [];
-      const fileList = [];
+      // const fileList = [];
 
       for (let file of files) {
         if (validFileType(file)) {
           imgSrc.push(URL.createObjectURL(file));
-          fileList.push(file);
+          // fileList.push(file);
         } else {
           console.log('wrong file type');
         }
       }
 
       setFileImg(imgSrc);
+      // console.log(fileList);
       // dispatch({ type: 'setFormData', name, value: fileList });
-      e.target.value = '';
     }
+  };
+
+  const uploadFile = () => {
+    // const { files } = e.target;
+    const { files } = fileInputRef.current;
+    console.log(files);
+
+    // 여기서 file을 storage로 업데이트하고 ref를 리턴받아 state에 저장한다.
+    if (validFileType) {
+      for (let file of files) {
+        fireStorage.uploadFile(makeStoragePath(file), file);
+      }
+    } else {
+      console.log('wrong file type');
+    }
+
+    fileInputRef.current.value = '';
   };
 
   const onDeleteFile = (index) => {
@@ -277,7 +298,10 @@ const PostingForm = ({ userInfo }) => {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    userInfo.fireStore.setArticle(formData);
+    const { files } = fileInputRef.current;
+    console.log(files);
+    userInfo.fireStore.setArticle(formData, fireStorage.uploadFile, files);
+    // uploadFile();
     alert('게시글이 등록되었습니다.');
     history.push('/');
   };
@@ -338,7 +362,9 @@ const PostingForm = ({ userInfo }) => {
             name='files'
             onChange={(e) => {
               updateImageDisplay(e);
+              // uploadFile(e);
             }}
+            ref={fileInputRef}
           />
           <div className='preview-img-container'>
             {fileImg.length ? (
@@ -375,7 +401,12 @@ const PostingForm = ({ userInfo }) => {
           >
             취소
           </button>
-          <button type='submit' onClick={(e) => onSubmit(e)}>
+          <button
+            type='submit'
+            onClick={(e) => {
+              onSubmit(e);
+            }}
+          >
             글쓰기
           </button>
         </div>

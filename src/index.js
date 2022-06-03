@@ -10,10 +10,12 @@ import LoginService from './service/loginService';
 import FireStore from './service/fireStore';
 import KakaoMapAPI from './service/kakaoMapAPI';
 import { ScrollTop } from './components/publicStyle/scrollTop';
+import FireStorage from './service/fireStorage';
 
 const itemDataApi = new Item();
 const loginService = new LoginService();
 const fireStore = new FireStore();
+const fireStorage = new FireStorage();
 const kakaoMapAPI = new KakaoMapAPI();
 
 ReactDOM.render(
@@ -25,6 +27,7 @@ ReactDOM.render(
           itemDataApi={itemDataApi}
           loginService={loginService}
           fireStore={fireStore}
+          fireStorage={fireStorage}
           kakaoMapAPI={kakaoMapAPI}
         />
       </BrowserRouter>

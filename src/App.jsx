@@ -18,7 +18,13 @@ import UserInfo from './components/userInfo/userInfo';
 // import UpdateInfo from './customHook/updateUser';
 // import useGeolocation from './customHook/useGeolocation';
 
-function App({ itemDataApi, loginService, fireStore, kakaoMapAPI }) {
+function App({
+  itemDataApi,
+  loginService,
+  fireStore,
+  fireStorage,
+  kakaoMapAPI,
+}) {
   const history = useHistory();
 
   const [didSearch, setDidSearch] = useState(false);
@@ -251,7 +257,11 @@ function App({ itemDataApi, loginService, fireStore, kakaoMapAPI }) {
           />
         </Route>
         <Route path='/user/:displayName'>
-          <UserInfo userInfo={userInfo} fireStore={fireStore} />
+          <UserInfo
+            userInfo={userInfo}
+            fireStore={fireStore}
+            fireStorage={fireStorage}
+          />
         </Route>
       </Switch>
       <Footer />

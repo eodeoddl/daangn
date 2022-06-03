@@ -1,3 +1,44 @@
+## 2022\-06\-03
+
+file업로드 firestrage이용..
+
+1. 파일 데이터는 store가 아니라 storage에 저장된다.
+1. 파일을 가리키는 참조를 만들면 fireStorage를 initializing한 앱에서 액세스 권한이 부여된다.
+1. 참조는 메모리에 부담을 주지않고 많이 만들수 있으며 여러작업에서 재사용하기도 용이하다.
+1. 참조는 child(), parent, root 속성을 통해 파일의 계층구조를 탐색할수 있다.
+   그리고 각각의 속성은 다시 참조를 반환하므로 여러번 연결할 수 있다.
+1. fullpath, name, bucket 속성으로 참조가 가리키는 파일의 전체경로, 파일이름, 파일이 저장된 버킷을 알 수 있다.
+
+나의 앱에서는 store의 fileRef 필드는 file이 저장된 storage의 참조를 저장하고, 필요할때 참조를 통하여 접근하는 방식으로
+구현한다.
+
+파일의 경로는 article id/ file name으로 경로를 지정한다.  
+=> firestore id값을 자동생성으로 사용하게되니 ariticle의 id로 참조를 만들때 자동생성된 id를 기억할 수 없다..
+=> fireStorage안에서 firestore 문서의 id값을 가져와서 저장하는 방식도 고려해봄.
+
+파일명.파일타입 을 업로드했다고 가정하게 되면
+참조는 '파일타입(just string..) / 파일명.파일타입'으로 저장한다.(ex. image/111.png)  
+=> file명이 같으면 기존파일이 overwrite가 됨. path를 구분할 수 있는 고유한 id 필요하다.  
+=> 최종 path는 'articleId/image/111.png' 이런식으로 저장할 예정.
+
+문서를 제출하면서 store에 저장하는 과정안에서는 스토어의 자동생성 id를 참조할수 있다.  
+이때 fireStorage작업을 하려고했는데 작동하지않음. 에러도 안뜨고 store저장하는 api자체가 실행되지않는다.  
+좀더 알아보고 안되면 store에 저장하면서 id값을 리턴받고 리턴받은 id값을 사용해서 path로 지정한다.  
+이방식은 file 데이터를 제외한 나머지정보를 store저장 - 리턴받은 id이용해서 storage path 만들면서 file업로드 - storage에 저장된 file의 참조(storage path)를 다시 store에 저장하는 방식이 될 것 같은데 store에 저장하는 api호출을 두번하게되니 비효율적인느낌..
+
+파일을 storage에 업로드하는것은 성공했지만 같은 이름의 파일을 올릴경우 overwrite되는 문제때문에 id를 어떻게 만들것인지가 제일중요(되도록이면 store업데이트하면서 자동생성되는 id 값을 이용하고싶음).  
+library이용을 자제 하고싶은데, 정안되면 library도움 받아서 id 생성해서 할 예정이다.
+
+onchange 이벤트로 state 업데이트를할때 지속적인 리렌더링 방지 해결방법
+
+1. setTimeout 함수를 사용. setState업데이트를 특정 시간후에 업데이트.
+1. lodash library 사용
+1. onblur 이벤트에 input의 focus가 사라졌을때 업데이트.
+1. onchange 리렌더링 이슈는 위 세가지 방법중 하나 선택해서 구현할 예정
+1. storage 한다고 리렌더링 최적화코드 쳐보지도 못함.
+1. carousel도 아직 완성안됨.
+1. 오늘은 진행한게없네.
+
 ## 2022\-06\-02
 
 ~~postingForm 완성하고 fireStore로 데이터 추가작업완료.~~  

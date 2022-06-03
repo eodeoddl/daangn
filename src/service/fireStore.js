@@ -78,9 +78,11 @@ class FireStore {
     });
   }
 
-  async setArticle(data) {
+  async setArticle(data, uploadFileApi, files) {
     const articleRef = collection(firebaseStore, 'article');
     console.log(articleRef);
+    console.log(uploadFileApi);
+    console.log(files);
     await addDoc(articleRef, {
       ...data,
       uploaded: serverTimestamp(),

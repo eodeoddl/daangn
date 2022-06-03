@@ -81,7 +81,7 @@ const InfoCard = styled.section`
   }
 `;
 
-const UserInfo = ({ userInfo, fireStore }) => {
+const UserInfo = ({ userInfo, fireStore, fireStorage }) => {
   let { url } = useRouteMatch();
   let query = UseQuery();
 
@@ -95,7 +95,9 @@ const UserInfo = ({ userInfo, fireStore }) => {
     매너칭찬: <UserManner data={activeHistory.data} />,
     판매물품: <UserArticles fireStore={fireStore} uid={userInfo.uid} />,
     거래후기: <UserReview data={activeHistory.data} />,
-    '게시글 작성': <PostingForm userInfo={userInfo} />,
+    '게시글 작성': (
+      <PostingForm userInfo={userInfo} fireStorage={fireStorage} />
+    ),
   };
 
   // 유저정보보기 style 함수
