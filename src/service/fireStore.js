@@ -78,15 +78,14 @@ class FireStore {
     });
   }
 
-  async setArticle(data, uploadFileApi, files) {
-    const articleRef = collection(firebaseStore, 'article');
-    console.log(articleRef);
-    console.log(uploadFileApi);
-    console.log(files);
-    await addDoc(articleRef, {
+  // data arg comes form postingForm.jsx
+  async setArticle(data) {
+    const collectionRef = collection(firebaseStore, 'article');
+    const docRef = await addDoc(collectionRef, {
       ...data,
       uploaded: serverTimestamp(),
     });
+    return docRef.id;
   }
 
   // make user > artilce collection & getCollection by document id

@@ -259,28 +259,32 @@ const PostingForm = ({ userInfo, fireStorage }) => {
     }
   };
 
-  const uploadFile = () => {
-    // const { files } = e.target;
-    const { files } = fileInputRef.current;
-    console.log(files);
+  // const uploadFile = () => {
+  //   // const { files } = e.target;
+  //   const { files } = fileInputRef.current;
+  //   console.log(files);
 
-    // 여기서 file을 storage로 업데이트하고 ref를 리턴받아 state에 저장한다.
-    if (validFileType) {
-      for (let file of files) {
-        fireStorage.uploadFile(makeStoragePath(file), file);
-      }
-    } else {
-      console.log('wrong file type');
-    }
+  //   if (validFileType) {
+  //     for (let file of files) {
+  //       fireStorage.uploadFile(makeStoragePath(file), file);
+  //     }
+  //   } else {
+  //     console.log('wrong file type');
+  //   }
 
-    fileInputRef.current.value = '';
-  };
+  //   fileInputRef.current.value = '';
+  // };
 
-  const onDeleteFile = (index) => {
+  const onDeleteImg = (index) => {
     const newFileImg = fileImg.slice();
     newFileImg.splice(index, 1);
     setFileImg([...newFileImg]);
     // dispatch({ type: 'deleteFile', index });
+  };
+
+  const onDeleteFile = (index) => {
+    const { files } = fileInputRef.current;
+    console.log(files);
   };
 
   const onInputCartegory = () => {
@@ -299,9 +303,23 @@ const PostingForm = ({ userInfo, fireStorage }) => {
   const onSubmit = (e) => {
     e.preventDefault();
     const { files } = fileInputRef.current;
-    console.log(files);
-    userInfo.fireStore.setArticle(formData, fireStorage.uploadFile, files);
-    // uploadFile();
+
+    const result = userInfo.fireStore.setArticle(formData).then((articleId) => {
+      // setArticle return article id
+      // uploadFile api needs arguments
+      for (let file of files) {
+        const fileRef = fireStorage.uploadFile(
+          articleId,
+          makeStoragePath(file),
+          file
+        ); // this api return file ref
+        console.log(fileRef);
+        fileRef.then((res) => fireStorage.getImgURL(res));
+      }
+    });
+
+    console.log(result);
+
     alert('게시글이 등록되었습니다.');
     history.push('/');
   };
@@ -377,7 +395,10 @@ const PostingForm = ({ userInfo, fireStorage }) => {
                       <button
                         type='button'
                         className='delete-btn'
-                        onClick={() => onDeleteFile(i)}
+                        onClick={() => {
+                          onDeleteImg(i);
+                          onDeleteFile(i);
+                        }}
                       >
                         <MdClose className='close-img' />
                       </button>

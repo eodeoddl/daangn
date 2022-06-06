@@ -1,3 +1,10 @@
+## 2022\-06\-06
+
+파일을 storage로 업로드하는 타이밍
+
+1. input file 에 파일을 올리는 event때
+1. 전체적인 데이터를 전부 작성하고 submit btn 을 눌렀을때
+
 ## 2022\-06\-03
 
 file업로드 firestrage이용..
