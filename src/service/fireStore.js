@@ -88,6 +88,10 @@ class FireStore {
     return docRef.id;
   }
 
+  updateImageUrl(url) {
+    console.log(url);
+  }
+
   // make user > artilce collection & getCollection by document id
   async setUserArticle(uid) {
     console.log(uid);

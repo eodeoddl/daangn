@@ -57,14 +57,17 @@ class FireStorage {
       firebaseStorage,
       `${articleRef}/${path}/${file.name}`
     );
-    await uploadBytes(storageRef, file);
-    return storageRef;
+    const snapshot = await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(snapshot.ref);
+
+    return url;
   }
 
-  async getImgURL(storageRef) {
-    getDownloadURL(storageRef).then((url) => console.log(url));
-    // return
-  }
+  // getImgURL(storageRef) {
+  //   console.log(storageRef);
+  //   getDownloadURL(storageRef).then((url) => console.log(url));
+
+  // }
 
   getFileFromRef(ref) {}
 }

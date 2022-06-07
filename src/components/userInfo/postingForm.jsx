@@ -300,28 +300,34 @@ const PostingForm = ({ userInfo, fireStorage }) => {
     priceLabel.current.style.color = '#000';
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     const { files } = fileInputRef.current;
-
-    const result = userInfo.fireStore.setArticle(formData).then((articleId) => {
-      // setArticle return article id
-      // uploadFile api needs arguments
-      for (let file of files) {
-        const fileRef = fireStorage.uploadFile(
-          articleId,
-          makeStoragePath(file),
-          file
-        ); // this api return file ref
-        console.log(fileRef);
-        fileRef.then((res) => fireStorage.getImgURL(res));
-      }
-    });
-
-    console.log(result);
+    const urlArr = [];
 
     alert('게시글이 등록되었습니다.');
     history.push('/');
+
+    // this api return articleId asynchronously
+    const articleId = await userInfo.fireStore.setArticle(formData);
+
+    // uploadFile api needs arguments & run synchronously
+    for (let file of files) {
+      const url = await fireStorage.uploadFile(
+        articleId,
+        makeStoragePath(file),
+        file
+      );
+      urlArr.push(url);
+    }
+    console.log(urlArr);
+    // fireStorage.getImgUrl()
+    //   fileSnapshot.then((snapshot) => {
+    //     fireStorage.getImgURL(snapshot.ref);
+    //   });
+    // }
+    // userInfo.fireStore.setArticle(formData).then((articleId) => {
+    // });
   };
 
   const onChangeValue = useCallback((e) => {

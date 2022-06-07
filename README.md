@@ -1,3 +1,34 @@
+## 2022\-06\-07
+
+- async/await 함수는 promise를 리턴함.
+- promise의 값을 풀어서 사용할때 async / await 함수의 리턴값을 then으로 계속 연결을 하는것이 옳바른 방향인가?
+  연속적인 promise값을 연결할때는 async/await 함수의 return 값을 then으로 연결
+- async/await 함수를 사용해야될 상황과 아닌상황 구분.  
+  함수의 호출이 비동기적으로 작동하는것이 더 효율적일 때도있다.  
+  비동기 함수가 서로에게 영향을 끼치지 않는 경우는 처리속도면에서 비동기식으로 작성하는것이 더 효율적임.  
+  나의 경우를 예로 들자면 file업로드는 함수는 async적용할 필요가없이 바로 file의 reference를 동기적으로 리턴하는게 맞음.  
+  굳이 async처리를 해서 지연시간을 늘릴 필요는 없다!
+  setArticle 함수의 경우는 article이 store에 업데이트 되기 전까지 article의 id가 생성되었으리라는 보장이없으므로 async/await 함수를 사용하는것이 맞는 방법이다.
+- promise를 한개씩 순차적으로 처리하는게 아닌 promise를 병렬적으로 처리하고 완료후 어떤 작업을 해야되는 상황의 해결방법.
+
+- 비동기의 동작원리
+
+  1. call stack 에서 비동기 함수가 호출되면 먼저 Call stack 에 쌓였다가 Web Api로 해당 비동기 함수가 이동(trigger x)되고 callStack에선 사라진다.
+
+  1. Web Api 에서 비동기 함수가 포함된 event listener가 실행 되면 해당 이벤트의 call back 함수는 call back queue로 이동된다.
+
+  1. call stack 이 비어있는지 event loop가 확인을 하고 call stack이 비어있다면 call back queue에 있는 call back 함수를
+     call stack으로 이동한다.
+
+  1. call stack에 들어온 함수는 실행이되고 실행이 끝나면 call stack 에서 사라진다.
+
+google api인 getDownloadURL(), uploadBytes() 메서드는 결과값으로 promise를 리턴한다.
+이 메서드는 비동기식으로 작동을 하기때문에 async/await 처리를 하게된다면, 각 함수가 어떠한 값을 리턴할때까지 .. 수정
+
+async/await함수의 목적은 사용하는 여러 promise의 동작을 동기스럽게 사용할 수 있게 하고, 어떠한 동작을 여러 promise의 그룹에서 간단하게 동작하게 하는 것이다.
+
+async 함수는 항상 promise를 반환한다. 만약 aysnc 함수의 반환값이 명시적으로 promise값이 아니라면 암묵적으로 promise로 감싸진다.
+
 ## 2022\-06\-06
 
 파일을 storage로 업로드하는 타이밍은 전체적인 데이터를 전부 작성하고 submit btn 을 눌렀을때로 확정
