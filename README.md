@@ -1,8 +1,32 @@
+## 2022\-06\-08
+
+1. input file로 입력받은 파일을 storage로 저장하는 작업완료
+1. storage로 저장한 file의 다운로드 경로를 store로 저장하는작업 완료
+1. async/await 함수의 사용으로 then 콜백지옥 문제해결
+1. input file의 fileList 객체를 수정하는 작업완료
+1. fireStore 필드로 workProgress 추가하고 workProgress 값이 true일 때만 다른사용자에게 노출.
+   파일업로드와 다운로드 url 저장 작업이 끝나기 전까지 다른사용자에게 article 노출이 되지않도록 설계
+
+input file에 파일을 사용자가 선택해서 올렸을때 잘못올린 파일을 삭제가 가능해야한다.  
+input file 은 내부적으로 files라는 이름의 fileList 객체를 가지고있다.  
+문제는 fileList 객체에 직접 접근해서 fileList 객체를 수정할 수 없다는 것이다.  
+때문에 fileList 객체를 배열로 변환하고 필요한 작업을 한 후에(나의 경우는 선택한 file객체 삭제) dataTransfer 객체의 items 프로퍼티의 add 메서드로 transfer의 객체의 items 프로퍼티의 item을 다시 만들고 transfer의 files 프로퍼티로 fileList객체를 리턴받아 input file의 fileList를 다시 설정해주는것으로 해결했다.
+
+postingForm.jsx 미리보기 carousel만 완성하기!  
+postingform은 현재 제어컴포넌트 형식으로 state를 관리하고있음. 따라서 제어하는 state가 변할때마다 따라 렌더링이 발생한다.  
+비제어컴포넌트를 사용하는 것도 고려했지만 react-hook-form 라이브러리를 사용해서 해결 할 수도있고 나중에 state에 따른 다른 작업이 필요할 수 있기때문에 제어컴포넌트 형식을 유지하기로 결정함(사실 귀찮음...)
+
+todo list
+
+1. carousel완성하기
+1. 사용자가 posting한 article을 다른 사용자에게 보여주고 보여지는 article 에선 구독하기(가격변동시 알림), 채팅, 댓글달기 기능구현
+1. 검색으로도 article 접근할 수 있고 사용자의 프로필을 통해 article을 보여주는 두가지 경우의 수
+
 ## 2022\-06\-07
 
 - async/await 함수는 promise를 리턴함.
 - promise의 값을 풀어서 사용할때 async / await 함수의 리턴값을 then으로 계속 연결을 하는것이 옳바른 방향인가?
-  연속적인 promise값을 연결할때는 async/await 함수의 return 값을 then으로 연결
+  연속적인 promise값을 연결할때는 async/await 함수의 return 값을 then으로 연결하기 보단 변수에 할당하여 해당 변수는 promise가 값을 리턴할때까지 기다리는 코드로 가독성을 높이는것이 더 좋은 방법!
 - async/await 함수를 사용해야될 상황과 아닌상황 구분.  
   함수의 호출이 비동기적으로 작동하는것이 더 효율적일 때도있다.  
   비동기 함수가 서로에게 영향을 끼치지 않는 경우는 처리속도면에서 비동기식으로 작성하는것이 더 효율적임.  
@@ -15,15 +39,15 @@
 
   1. call stack 에서 비동기 함수가 호출되면 먼저 Call stack 에 쌓였다가 Web Api로 해당 비동기 함수가 이동(trigger x)되고 callStack에선 사라진다.
 
-  1. Web Api 에서 비동기 함수가 포함된 event listener가 실행 되면 해당 이벤트의 call back 함수는 call back queue로 이동된다.
+  1. Web Api 에서 비동기 함수의 event listener가 실행 되면 해당 이벤트의 call back 함수는 call back queue로 이동된다.
 
   1. call stack 이 비어있는지 event loop가 확인을 하고 call stack이 비어있다면 call back queue에 있는 call back 함수를
      call stack으로 이동한다.
 
-  1. call stack에 들어온 함수는 실행이되고 실행이 끝나면 call stack 에서 사라진다.
+  1. call stack에 들어온 콜백함수는 실행이되고 실행이 끝나면 call stack 에서 사라진다.
 
 google api인 getDownloadURL(), uploadBytes() 메서드는 결과값으로 promise를 리턴한다.
-이 메서드는 비동기식으로 작동을 하기때문에 async/await 처리를 하게된다면, 각 함수가 어떠한 값을 리턴할때까지 .. 수정
+이 메서드는 비동기식으로 작동을 하기때문에 async/await 처리를 하게된다면, 각 함수가 어떠한 값을 리턴할때까지 기다리고 다음 작업을 할 수있다.
 
 async/await함수의 목적은 사용하는 여러 promise의 동작을 동기스럽게 사용할 수 있게 하고, 어떠한 동작을 여러 promise의 그룹에서 간단하게 동작하게 하는 것이다.
 

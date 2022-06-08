@@ -1,4 +1,11 @@
-import { useState, useReducer, useRef, useCallback, useEffect } from 'react';
+import {
+  useState,
+  useReducer,
+  useRef,
+  useCallback,
+  useEffect,
+  useMemo,
+} from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { MdAddAPhoto, MdClose } from 'react-icons/md';
@@ -146,7 +153,6 @@ const Form = styled.form`
             appearance: none;
             background-color: #000;
             border-radius: 50%;
-            // opacity: 100;
           }
 
           .close-img {
@@ -212,10 +218,14 @@ const fileTypes = [
 const PostingForm = ({ userInfo, fireStorage }) => {
   const [fileImg, setFileImg] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [formData, dispatch] = useReducer(reducer, {}, init);
+  const [formData, dispatch] = useReducer(
+    reducer,
+    { workProgress: false },
+    init
+  );
+  const history = useHistory();
   const priceLabel = useRef(null);
   const fileInputRef = useRef(null);
-  const history = useHistory();
 
   useEffect(() => {
     dispatch({ type: 'onLoad', userInfo });
@@ -236,55 +246,40 @@ const PostingForm = ({ userInfo, fireStorage }) => {
   };
 
   const updateImageDisplay = (e) => {
-    const { files, name } = e.target;
+    const { files } = e.target;
 
     if (files.length === 0) {
       return;
     } else {
       const imgSrc = [];
-      // const fileList = [];
 
       for (let file of files) {
         if (validFileType(file)) {
           imgSrc.push(URL.createObjectURL(file));
-          // fileList.push(file);
         } else {
           console.log('wrong file type');
         }
       }
 
       setFileImg(imgSrc);
-      // console.log(fileList);
-      // dispatch({ type: 'setFormData', name, value: fileList });
     }
   };
-
-  // const uploadFile = () => {
-  //   // const { files } = e.target;
-  //   const { files } = fileInputRef.current;
-  //   console.log(files);
-
-  //   if (validFileType) {
-  //     for (let file of files) {
-  //       fireStorage.uploadFile(makeStoragePath(file), file);
-  //     }
-  //   } else {
-  //     console.log('wrong file type');
-  //   }
-
-  //   fileInputRef.current.value = '';
-  // };
 
   const onDeleteImg = (index) => {
     const newFileImg = fileImg.slice();
     newFileImg.splice(index, 1);
     setFileImg([...newFileImg]);
-    // dispatch({ type: 'deleteFile', index });
   };
 
   const onDeleteFile = (index) => {
     const { files } = fileInputRef.current;
-    console.log(files);
+    const dataTransfer = new DataTransfer();
+
+    Array.from(files)
+      .filter((file) => file !== files[index])
+      .forEach((file) => dataTransfer.items.add(file));
+
+    fileInputRef.current.files = dataTransfer.files;
   };
 
   const onInputCartegory = () => {
@@ -302,6 +297,7 @@ const PostingForm = ({ userInfo, fireStorage }) => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    // console.log(formRef.current);
     const { files } = fileInputRef.current;
     const urlArr = [];
 
@@ -311,7 +307,7 @@ const PostingForm = ({ userInfo, fireStorage }) => {
     // this api return articleId asynchronously
     const articleId = await userInfo.fireStore.setArticle(formData);
 
-    // uploadFile api needs arguments & run synchronously
+    // uploadFile api needs arguments & run asynchronously & return file download url
     for (let file of files) {
       const url = await fireStorage.uploadFile(
         articleId,
@@ -320,14 +316,7 @@ const PostingForm = ({ userInfo, fireStorage }) => {
       );
       urlArr.push(url);
     }
-    console.log(urlArr);
-    // fireStorage.getImgUrl()
-    //   fileSnapshot.then((snapshot) => {
-    //     fireStorage.getImgURL(snapshot.ref);
-    //   });
-    // }
-    // userInfo.fireStore.setArticle(formData).then((articleId) => {
-    // });
+    userInfo.fireStore.updateImageUrl(articleId, urlArr);
   };
 
   const onChangeValue = useCallback((e) => {
@@ -337,7 +326,7 @@ const PostingForm = ({ userInfo, fireStorage }) => {
 
   return (
     <>
-      <Form>
+      <Form onSubmit={(e) => onSubmit(e)}>
         <input
           type='text'
           name='title'
@@ -386,7 +375,6 @@ const PostingForm = ({ userInfo, fireStorage }) => {
             name='files'
             onChange={(e) => {
               updateImageDisplay(e);
-              // uploadFile(e);
             }}
             ref={fileInputRef}
           />
@@ -430,9 +418,9 @@ const PostingForm = ({ userInfo, fireStorage }) => {
           </button>
           <button
             type='submit'
-            onClick={(e) => {
-              onSubmit(e);
-            }}
+            // onClick={(e) => {
+            //   onSubmit(e);
+            // }}
           >
             글쓰기
           </button>

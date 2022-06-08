@@ -63,22 +63,7 @@ class FireStore {
     }
   }
 
-  // this api is just for test
-  async setInitArticle() {
-    const articleRef = collection(firebaseStore, 'articles');
-
-    await addDoc(articleRef, {
-      title: `판매`,
-      uid: '7AJFZSRZ0hhz7zBq6LhBO4u9QJf2',
-      displayName: '리에이미',
-      price: 1000,
-      description:
-        '미사용 새상품인데 배송상 이음새부분 눌려진 자국있어요\n지인아들 선물용이였는데 방치중입니다\n직접오셔야돼요',
-      uploaded: serverTimestamp(),
-    });
-  }
-
-  // data arg comes form postingForm.jsx
+  // data arg comes from postingForm.jsx
   async setArticle(data) {
     const collectionRef = collection(firebaseStore, 'article');
     const docRef = await addDoc(collectionRef, {
@@ -88,8 +73,9 @@ class FireStore {
     return docRef.id;
   }
 
-  updateImageUrl(url) {
-    console.log(url);
+  updateImageUrl(articleId, url) {
+    const docRef = doc(firebaseStore, 'article', articleId);
+    setDoc(docRef, { image: url, workProgress: true }, { merge: true });
   }
 
   // make user > artilce collection & getCollection by document id
