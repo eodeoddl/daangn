@@ -12,7 +12,7 @@ input file 은 내부적으로 files라는 이름의 fileList 객체를 가지�
 문제는 fileList 객체에 직접 접근해서 fileList 객체를 수정할 수 없다는 것이다.  
 때문에 fileList 객체를 배열로 변환하고 필요한 작업을 한 후에(나의 경우는 선택한 file객체 삭제) dataTransfer 객체의 items 프로퍼티의 add 메서드로 transfer의 객체의 items 프로퍼티의 item을 다시 만들고 transfer의 files 프로퍼티로 fileList객체를 리턴받아 input file의 fileList를 다시 설정해주는것으로 해결했다.
 
-postingForm.jsx 미리보기 carousel만 완성하기!  
+onchange event re-render 문제에 대해..  
 postingform은 현재 제어컴포넌트 형식으로 state를 관리하고있음. 따라서 제어하는 state가 변할때마다 따라 렌더링이 발생한다.  
 비제어컴포넌트를 사용하는 것도 고려했지만 react-hook-form 라이브러리를 사용해서 해결 할 수도있고 나중에 state에 따른 다른 작업이 필요할 수 있기때문에 제어컴포넌트 형식을 유지하기로 결정함(사실 귀찮음...)
 
