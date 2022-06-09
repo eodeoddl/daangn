@@ -9,6 +9,7 @@ import {
   getDocs,
   addDoc,
   serverTimestamp,
+  updateDoc,
 } from 'firebase/firestore';
 
 class FireStore {
@@ -51,6 +52,18 @@ class FireStore {
     }
   }
 
+  // get all user article
+  async getUserArticle(uid, setArticle) {
+    const collectionRef = collection(firebaseStore, 'users', uid, 'articles');
+    console.log(collectionRef);
+    const querySnapshot = await getDocs(collectionRef);
+    const dataArr = [];
+    querySnapshot.forEach((article) => {
+      dataArr.push({ id: article.id, data: article.data() });
+    });
+    setArticle(dataArr);
+  }
+
   async getUserHistory(userId) {
     console.log(userId);
     const docRef = doc(firebaseStore, 'users', userId);
@@ -61,21 +74,6 @@ class FireStore {
     } else {
       console.log('no data');
     }
-  }
-
-  // data arg comes from postingForm.jsx
-  async setArticle(data) {
-    const collectionRef = collection(firebaseStore, 'article');
-    const docRef = await addDoc(collectionRef, {
-      ...data,
-      uploaded: serverTimestamp(),
-    });
-    return docRef.id;
-  }
-
-  updateImageUrl(articleId, url) {
-    const docRef = doc(firebaseStore, 'article', articleId);
-    setDoc(docRef, { image: url, workProgress: true }, { merge: true });
   }
 
   // make user > artilce collection & getCollection by document id
@@ -98,16 +96,36 @@ class FireStore {
     });
   }
 
-  // get all user article
-  async getUserArticle(uid, setArticle) {
-    const collectionRef = collection(firebaseStore, 'users', uid, 'articles');
-    console.log(collectionRef);
-    const querySnapshot = await getDocs(collectionRef);
-    const dataArr = [];
-    querySnapshot.forEach((article) => {
-      dataArr.push({ id: article.id, data: article.data() });
+  // data arg comes from postingForm.jsx
+  async setArticle(data) {
+    const collectionRef = collection(firebaseStore, 'article');
+    const docRef = await addDoc(collectionRef, {
+      ...data,
+      uploaded: serverTimestamp(),
     });
-    setArticle(dataArr);
+    return docRef.id;
+  }
+
+  async updateImageUrl(articleId, url) {
+    const docRef = doc(firebaseStore, 'article', articleId);
+    await setDoc(docRef, { image: url }, { merge: true });
+    updateDoc(docRef, { workProgress: true });
+  }
+
+  // 포스팅한 article 한개가져오기 유저가 검색하고 검색결과중 한개의 article 경로를 요청한 경우 or
+  // 특정 사용자의 profile에서 사용자의 모든 article 중에 한가지의 경로를 요청했을때
+  // return 값은 docsnapshot 이고 snapshot.exist() 메서드로 검색여부가 존재하는지 알 수 있음(true or false)
+  async getArticleById(articleId) {
+    // const collectionRef = collection(firebaseStore, 'article')
+    const docRef = doc(firebaseStore, 'article', articleId);
+    return await getDoc(docRef);
+  }
+  // arguments condition is serverTimeStamp, region, searchTerm
+  async getOrderedSearchTerm(searchTerm, region) {
+    const response = [];
+    const collectionRef = collection(firebaseStore, 'article');
+
+    return response;
   }
 }
 

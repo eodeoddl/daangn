@@ -1,9 +1,9 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './header.module.css';
 
 const Header = React.memo(
-  ({ handleSubmit, handleShowModal, loginState, logout, userInfo }) => {
+  ({ handleSearch, handleShowModal, loginState, logout, userInfo }) => {
     const inputEl = useRef(null);
 
     const focusSearchBar = () => {
@@ -13,13 +13,13 @@ const Header = React.memo(
     const onKeyPress = (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        handleSubmit(inputEl.current.value);
+        handleSearch(inputEl.current.value);
       }
     };
 
     const onClick = (e) => {
       e.preventDefault();
-      handleSubmit(inputEl.current.value);
+      handleSearch(inputEl.current.value);
     };
 
     const onLogin = () => {

@@ -144,7 +144,7 @@ function App({
     },
   ]);
 
-  const handleSubmit = (searchTerm) => {
+  const handleSearch = (searchTerm) => {
     setDidSearch(true);
     setSearchTerm(searchTerm);
   };
@@ -169,6 +169,7 @@ function App({
         pathname: `/search/${searchTerm}`,
       });
     }
+
     return () => {
       setDidSearch(false);
     };
@@ -223,7 +224,7 @@ function App({
   return (
     <>
       <Header
-        handleSubmit={handleSubmit}
+        handleSearch={handleSearch}
         handleShowModal={handleShowModal}
         userInfo={userInfo}
         loginState={loginState}
@@ -249,10 +250,10 @@ function App({
             moreLoading={moreLoading}
           />
         </Route>
-        <Route exact path='/article/:itemId'>
+        <Route exact path='/article/:articleId'>
           <Article
             latestItemList={latestItemList}
-            itemDataApi={itemDataApi}
+            // itemDataApi={itemDataApi}
             handleShowModal={handleShowModal}
           />
         </Route>

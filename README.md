@@ -1,3 +1,35 @@
+## 2022\-06\-09
+
+1. 이전에 작성했던 code 분석 및 firebase api설계
+1. app.jsx / search.jsx state, router 리팩토링
+
+article.jsx 컴포넌트 정리
+
+1. root의 route path인 /article/:artilceId로 렌더링된다.
+1. root에는 search 컴포넌트가 존재하고 article.jsx 컴포넌트와 latestItemList props를 공유한다.
+1. latestItemList는 article, search 컴포넌트의 하단에 위치하고 사용자가 접근한 article과 비슷한 물품을 빠르게 검색할 수 있도록 도와준다.
+   lastesItemList는 api class props로 넘겨주고 serverTimestamp, region_B, 사용자가 탐색하고있는 article의 cartegory와 같은 cartegory 순으로 정렬을 해서 보여준다.
+1. 기존 코드에서는 props로 api class를 받는데, 이 api props는 Carousel의 image를 로드하는데 사용을 했었으나 fireStore에 img를 로드할 수 있는 경로를 저장해두었기에 해당 props는 필요가없음.
+1. ariticle 컴포넌트 안에는 carousel을 다른곳에서도 사용할 수 있게 module화 한 carousel 컴포넌트가 존재한다.
+1. 위치별 정렬은 regin_B 필드의 값중에 depth_name이 최대 4개까지 존재하게되는데, article의 depth를 순차적으로 1~4까지 비교하고 depth4가 같은 article 을 먼저 보여주고 만약 depth4가 곂치는 article이 더이상 존재하지않는다면 depth3이 곂치는 article순으로 depth1까지 순차적으로 article을 정렬한다.
+1. article.jsx를 불러오는 route 요청은 두가지 경우가 있는데, 사용자가 물품 searching을 했을때와 다른 사람의 아이디의 올린 물품을 검색하는 경우로 나뉜다.
+1. api로 검색하고자하는 article에 접근할 수 있는 방법을 제공하는 search.jsx와 userInfo.jsx를 먼저 작업해야함. 그 후에 article.jsx
+
+search.jsx 컴포넌트 정리
+
+1. search 컴포넌트로 이동하는 route path 요청은 haeder.jsx에서 이뤄지고 root에서 state를 관리한다.  
+   state는 didSearch, searchTerm이 있고 didSearch의 값으로 사용자가 검색하고 재검색을 할때 route path 요청을 여러번 할 수 있도록 했다.  
+   searchTerm은 사용자가 검색한 단어를 route로 로드하는 jsx페이지의 props로 넘겨주어 api요청의 arguments로 사용한다.
+1. route path 요청은 history 객체의 push로 root에서 제어한다.
+
+fireStore 쿼리 정렬
+
+fireStore 문자열 검색 api는 따로 존재하지않음.  
+때문에 api로 정렬할수 있는 field는 api로 정렬을 하고 js 문자열 함수를 이용해서 필드의 값을 직접탐색 해보기로함.  
+store내부 함수에서 한번에 정렬해서 리턴해야 쓸데없는 메모리 손실을 줄일수 있음.  
+store query 검색으로 timeStamp, region 두가지 조건으로 정렬 후 snapshot 리턴받고 snapshot의 필드로 접근해서 string.includes로 filtering(title 필드 먼저 필터하고 필터된 값 모아주고 그 다음은 description 필드 필터링해서 후순위로 쌓아주기)  
+이 값들은 search/:searchTerm path로 렌더링되는 컴포넌트에 보여질 값임.
+
 ## 2022\-06\-08
 
 1. input file로 입력받은 파일을 storage로 저장하는 작업완료
@@ -13,7 +45,7 @@ input file 은 내부적으로 files라는 이름의 fileList 객체를 가지�
 때문에 fileList 객체를 배열로 변환하고 필요한 작업을 한 후에(나의 경우는 선택한 file객체 삭제) dataTransfer 객체의 items 프로퍼티의 add 메서드로 transfer의 객체의 items 프로퍼티의 item을 다시 만들고 transfer의 files 프로퍼티로 fileList객체를 리턴받아 input file의 fileList를 다시 설정해주는것으로 해결했다.
 
 onchange event re-render 문제에 대해..  
-postingform은 현재 제어컴포넌트 형식으로 state를 관리하고있음. 따라서 제어하는 state가 변할때마다 따라 렌더링이 발생한다.  
+postingform은 현재 제어컴포넌트 형식으로 state를 관리하고있음. 따라서 제어하는 state가 변할때마다 렌더링이 발생한다.  
 비제어컴포넌트를 사용하는 것도 고려했지만 react-hook-form 라이브러리를 사용해서 해결 할 수도있고 나중에 state에 따른 다른 작업이 필요할 수 있기때문에 제어컴포넌트 형식을 유지하기로 결정함(사실 귀찮음...)
 
 todo list

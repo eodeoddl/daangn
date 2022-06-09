@@ -1,21 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { withRouter, Route, Redirect } from 'react-router-dom';
+import { withRouter, Route, Redirect, useParams } from 'react-router-dom';
 import HeaderMessage from './headerMessage';
 import NoResult from './noResult';
 import SearchResult from './searchResult';
 
 const Search = ({
   match,
-  location,
-  history,
   itemDataApi,
-  searchTerm,
   latestItemList,
   handleLoading,
   moreLoading,
+  searchTerm,
+  location,
 }) => {
   const [searchedItem, setSearchedItem] = useState([]);
 
+  // 현재는 json-server를 이용한 통신하고 있음
+  // fireStore api로 대체
   useEffect(() => {
     const item = () => {
       itemDataApi
@@ -28,7 +29,7 @@ const Search = ({
         });
     };
     item();
-  }, [itemDataApi, location.pathname, searchTerm]);
+  }, [itemDataApi, searchTerm, location]);
 
   return (
     <>

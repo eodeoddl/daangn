@@ -220,7 +220,7 @@ const PostingForm = ({ userInfo, fireStorage }) => {
   const [showModal, setShowModal] = useState(false);
   const [formData, dispatch] = useReducer(
     reducer,
-    { workProgress: false },
+    { workProgress: false, subscribe: 0, comments: null },
     init
   );
   const history = useHistory();

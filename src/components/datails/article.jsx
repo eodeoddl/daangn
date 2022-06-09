@@ -148,25 +148,16 @@ const Container = styled.article`
   }
 `;
 
-const Article = ({
-  match,
-  location,
-  latestItemList,
-  handleShowModal,
-  itemDataApi,
-}) => {
-  // itemId = article id 와 동일
-
+const Article = ({ match, location, latestItemList, handleShowModal }) => {
   const [slideIdx, setSlideIdx] = useState(0);
   const [articleData, setArticleData] = useState(null);
   const slideTrackRef = useRef(null);
-  // const imgSrc = useRef(null);
   const [imgSrc, setImgSrc] = useState(null);
 
-  const { itemId } = useParams();
-  console.log(itemId);
+  const { articleId } = useParams();
+  console.log(articleId);
 
-  // data 초기값설정.. data는 location.state.data or useParams의 itemId를 이용해서 fireStore로 직접가져오기.
+  // data 초기값설정.. data는 location.state.data or useParams의 articleId를 이용해서 fireStore로 직접가져오기.
   useEffect(() => {
     const data = location.state.data;
     // const data = location.state.data || 'fireStoreApi';
@@ -189,16 +180,10 @@ const Article = ({
   }, [location.state.data]);
 
   console.log('slideTrackRef', slideTrackRef);
-  console.log('match.params.itemId :', match.params.itemId);
+  console.log('match.params.articleId :', match.params.articleId);
   console.log('location.state.data :', location.state.data);
   console.log('match', match);
   console.log('slideIdx', slideIdx);
-  console.log(
-    'getItemById',
-    itemDataApi
-      .getItemById(match.params.itemId)
-      .then((res) => console.log(res.data))
-  );
 
   const onClickDot = () => {
     console.log('dot click');
@@ -246,7 +231,7 @@ const Article = ({
             id={articleData.id}
             slideIdx={slideIdx}
             handleShowModal={handleShowModal}
-            itemDataApi={itemDataApi}
+            // itemDataApi={itemDataApi}
             ref={slideTrackRef}
           />
           <button className='prev-btn' onClick={onClickPrev} />
