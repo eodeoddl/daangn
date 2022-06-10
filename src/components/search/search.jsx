@@ -7,6 +7,8 @@ import SearchResult from './searchResult';
 const Search = ({
   match,
   itemDataApi,
+  fireStore,
+  userInfo,
   latestItemList,
   handleLoading,
   moreLoading,
@@ -14,6 +16,18 @@ const Search = ({
   location,
 }) => {
   const [searchedItem, setSearchedItem] = useState([]);
+
+  useEffect(() => {
+    console.log('search useEffect');
+    const getArticle = async () => {
+      const res = await fireStore.getOrderedSearchTerm(
+        searchTerm,
+        userInfo.region_B
+      );
+      console.log(res);
+    };
+    getArticle();
+  }, [fireStore, searchTerm, userInfo.region_B]);
 
   // 현재는 json-server를 이용한 통신하고 있음
   // fireStore api로 대체

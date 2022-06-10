@@ -245,7 +245,9 @@ function App({
           <Search
             latestItemList={latestItemList}
             searchTerm={searchTerm}
+            userInfo={userInfo}
             itemDataApi={itemDataApi}
+            fireStore={fireStore}
             handleLoading={handleLoading}
             moreLoading={moreLoading}
           />

@@ -1,3 +1,29 @@
+## 2022\-06\-10
+
+기본적으로 fireStore 쿼리는 조건에 맞는 모든문서를 문서 ID에 따라 오름차순으로 정렬한다.  
+orderBy()를 사용하여 데이터의 정렬순서를 지정하고 limit()를 사용하여 검색된 문서 수를 제한 할 수 있음.  
+만약 내림차순 정렬을 하고 싶으면 orderBy('필드이름', 'desc')를 사용해서 정렬할 수 있다.
+
+firebase error
+
+Uncaught (in promise) FirebaseError: The query requires an index. You can create it here: https://console.firebase.google.com/v1/r/project/daangnclone/firestore/indexes?blahblah
+
+fireStore는 대부분의 기본쿼리에 대한 색인이 자동으로 생성된다. 만약 기존 색인에 매핑된 쿼리 아닌 복합쿼리를 생성하게되면 오류 메시지가 뜨게된다. 오류 메시지에는 누락된 색인을 만드는 직접적인 링크가 뜨게 되고 생성된 링크를 따라 firebase console로 이동하고 복합쿼리에 대한 자동으로 입력된 정보를 검토한후 색인을 생성할 수 있다.
+
+fireStore.js
+
+getOrderedSearchTerm() 메서드 작성중..  
+api정렬은 timeStamp, workProgress 값으로 먼저 정렬했고, 사용자가 검색한 연관된 article만 또 정렬해야하는데 api가 존재하지않아 직접 작성. 검색어와 지역으로 두번정렬을 해야하는데 코드가 길어질것같아 reducer 함수를 이용하기로 했고, 로직에 대해서 고민중.
+
+1. 첫번째 필터로 title, description 값이 검색어를 포함하고 있는지 체크를 먼저했음.  
+   postiongForm.jsx에서 사용자가 아무값도 입력하지 않았을때 체크를 하지않아 null값이 넘어왔을때 String.prototype.includes를 상속받을 수 없기때문에 postingForm.jsx의 null값 체크 코드를 작성해야함.
+
+1. 문자열 함수인 match()를 이용해서 해당 필드에 검색한 단어가 몇번 반복이 되는지 알 수 있고, 반복 회수가 많아질수록 상위index를 갖게 만들어 노출이 상위에 되게한다. match 함수에선 regExp를 인자로 받는데 이것이 사용자가 입력하는 가변인자로 사용을 하려는데 가변인자로 정규표현식 만드는 방법을 잘모르겠다. 현재 match 함수를 실행식키면 분명 검색한 문자열을 포함하고 있음에도 null값을 리턴한다. 추측인데 regExp 생성을 잘못한것같음. mdn 정규표현식 문서를 좀 더 참고해야할듯..
+
+1. 단어로 정렬 후에 사용자의 위치와 가까운 곳에서 부터 다시정렬
+
+1. if문의 중첩이 많기 때문에 코드 가독성을 높이는 코드 작성의 필요성. 아직까진 고려할 사항은 아닌듯 로직먼저 완성을 하되 머리속에 염두는 하면서 작성하기.
+
 ## 2022\-06\-09
 
 1. 이전에 작성했던 code 분석 및 firebase api설계

@@ -10,6 +10,7 @@ import {
   addDoc,
   serverTimestamp,
   updateDoc,
+  orderBy,
 } from 'firebase/firestore';
 
 class FireStore {
@@ -121,11 +122,36 @@ class FireStore {
     return await getDoc(docRef);
   }
   // arguments condition is serverTimeStamp, region, searchTerm
-  async getOrderedSearchTerm(searchTerm, region) {
-    const response = [];
+  async getOrderedSearchTerm(searchTerm, userRegion) {
+    const data = [];
+    const regExp = `/${searchTerm}/gi`;
     const collectionRef = collection(firebaseStore, 'article');
 
-    return response;
+    const timeStampQuery = query(
+      collectionRef,
+      where('workProgress', '==', true),
+      orderBy('uploaded')
+    );
+    const querySnapshot = await getDocs(timeStampQuery);
+
+    // 여기서는 쿼리필터링된 값을 배열로 만들어서 리턴함.
+    querySnapshot.forEach((snapshot) => {
+      data.push({ articleId: snapshot.id, ...snapshot.data() });
+    });
+
+    // 1차필터링한 값을 다시 다른 조건으로 필터링 api없이 직접구현
+    // 검색하고자하는 단어의 반복이 많을 수록 우선순위가 된다.
+    return data.reduce((prev, curr, idx) => {
+      const { title, description } = curr;
+      if (title.includes(searchTerm) && description.includes(searchTerm)) {
+        console.log(typeof regExp);
+        console.log(title.match(regExp));
+        return [...prev, curr];
+      } else {
+        return [...prev];
+      }
+    }, []);
+    // return response;
   }
 }
 
