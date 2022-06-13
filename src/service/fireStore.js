@@ -123,8 +123,7 @@ class FireStore {
   }
   // arguments condition is serverTimeStamp, region, searchTerm
   async getOrderedSearchTerm(searchTerm, userRegion) {
-    const data = [];
-    const regExp = `/${searchTerm}/gi`;
+    const articles = [];
     const collectionRef = collection(firebaseStore, 'article');
 
     const timeStampQuery = query(
@@ -136,22 +135,81 @@ class FireStore {
 
     // 여기서는 쿼리필터링된 값을 배열로 만들어서 리턴함.
     querySnapshot.forEach((snapshot) => {
-      data.push({ articleId: snapshot.id, ...snapshot.data() });
+      articles.push({ articleId: snapshot.id, ...snapshot.data() });
     });
 
+    const sortByTermRepeat = (propertyName, searchTerm, array) => {
+      const regExp = new RegExp(`${searchTerm}`, 'g');
+
+      return array
+        .reduce((acc, curr, index) => {
+          if (curr[propertyName].includes(searchTerm)) {
+            return acc.concat({
+              index,
+              termRepeat: curr[propertyName].match(regExp).length,
+            });
+          }
+          return acc;
+        }, [])
+        .sort((a, b) => b.termRepeat - a.termRepeat);
+    };
+    // title, description 소트를 두번한다. 그리고 결과값을 concat으로 이어붙인다.
+    // 그후에 index가 곂칠경우 뒤에 위치한 인덱스를 누적하지 않는다.
+    const sortedTitle = sortByTermRepeat('title', searchTerm, articles);
+    const sortedDescription = sortByTermRepeat(
+      'description',
+      searchTerm,
+      articles
+    );
+    const sortedArticle = sortedTitle.concat(sortedDescription);
+
+    const removedSameArticle = sortedArticle.reduce((acc, curr) => {
+      if (acc.length === 0 || acc[acc.length - 1].index !== curr.index) {
+        acc.push(curr);
+      }
+      return acc;
+    }, []);
+
+    const sortedByTerm = removedSameArticle.map((el) => articles[el.index]);
+
+    console.log(sortByTermRepeat('title', searchTerm, articles));
+    console.log(sortByTermRepeat('description', searchTerm, articles));
+    console.log(sortedArticle);
+    console.log(removedSameArticle);
+    console.log(sortedByTerm);
+
+    const sortedByTerm_Region = sortedByTerm
+      .reduce((acc, curr, index) => {
+        let depth = 1;
+        const maxDepth = 4;
+
+        if (curr.region_B.code === userRegion.code) {
+          return acc.concat({ index, depthMatchCount: maxDepth });
+        }
+
+        while (depth <= maxDepth) {
+          const propertyName = `region_${depth}depth_name`;
+          if (
+            curr.region_B[propertyName] &&
+            userRegion[propertyName] &&
+            curr.region_B[propertyName] !== userRegion[propertyName]
+          ) {
+            return acc.concat({ index, depthMatchCount: depth - 1 });
+          }
+          depth++;
+        }
+        return acc;
+      }, [])
+      .sort((a, b) => b.depthMatchCount - a.depthMatchCount);
+    const result = sortedByTerm_Region.map((el) => sortedByTerm[el.index]);
+    console.log(result);
     // 1차필터링한 값을 다시 다른 조건으로 필터링 api없이 직접구현
     // 검색하고자하는 단어의 반복이 많을 수록 우선순위가 된다.
-    return data.reduce((prev, curr, idx) => {
-      const { title, description } = curr;
-      if (title.includes(searchTerm) && description.includes(searchTerm)) {
-        console.log(typeof regExp);
-        console.log(title.match(regExp));
-        return [...prev, curr];
-      } else {
-        return [...prev];
-      }
-    }, []);
-    // return response;
+    // 지역 정보는 총 4depth까지 나뉘어져있음.
+    // 나와 가까운 지역일수록 depth name의 숫자가 커짐.
+    // 일치하는 depthCount를 측정하고 depthCount가 높을 수록 상위 인덱스
+
+    return result;
   }
 }
 

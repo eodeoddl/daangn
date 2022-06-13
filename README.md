@@ -1,3 +1,57 @@
+## 2022\-06\-13
+
+array.prototype.reduce 함수의 accumulator 역할을하는 첫번째 인자는 계속 새로운 reference를 생성해줘야 제대로 값이 누적이된다.  
+push메서드로 값을 return 하게되면 기존의 reference를 그대로 유지하기때문에 작업후의 값이 제대로 누적되지않는다.  
+=> 확실치않음. 내 코드상에선 push 메서드로는 제대로 누적되지않고 concat으로 새로운 ref를 만들어줘야 제대로 누적됨.. 제대로 알아보기.
+
+array.prototype.sort 함수의 compareFunction은 배열내의 요소마다 여러번 호출 될 수 있다. compareFunction이 복잡해지고 정렬할 요소가 많아질 경우, array.prototype.map을 이용한 정렬을 고려해보는것이좋다. 이방법은 임시 배열을 만들어서 여기에 실제 정렬할 값만 뽑아서 넣어 정렬하고, 그 결과를 바탕으로 실제정렬을 하는것이다.
+
+reduce함수로 배열을 만든다. 배열은 객체를 배열의 요소를 갖고있는데 reduce함수의 리턴값으로 만든다. reduce 함수로 리턴을 할때 기존 객체를 그대로 리턴하는것이아닌 단어의 반복을 나타내는 termIntitle, termIndescription 필드와 articleIndex를 필드로 갖는다.  
+그리고 title description필드 순으로 sort함수로 반복하여 값을 리턴, 리턴된 값을 다시 map으로 순차적으로 탐색하여 index로 return하면 원하는 값이 나온다.
+
+```javaScript
+// ... searchTerm 정렬 코드는 중략 아래의 sortedByTerm의 값임.
+// 필요한 정보를 전부 들고있지않고 배열의 index로만 기억한다.
+// 정렬에 필요한 필드를만들고 그 필드를 이용해 sort메서드로 정렬을한다.
+// return 되는 값은 index를 갖고있기떄문에 원본배열의 index에 접근하여 map함수로 순차적으로 리턴한다.
+const sortedByTerm_Region = sortedByTerm
+      .reduce((acc, curr, index) => {
+        let depth = 1;
+        const maxDepth = 4;
+        // 여기서 정렬에 필요한것은 depthMatchCount의 값만 필요. 굳이 다른 정보들까지 기억할 필요 x
+        if (curr.region_B.code === userRegion.code) {
+          return acc.concat({ index, depthMatchCount: maxDepth });
+        }
+
+        while (depth <= maxDepth) {
+          const propertyName = `region_${depth}depth_name`;
+          if (
+            curr.region_B[propertyName] &&
+            userRegion[propertyName] &&
+            curr.region_B[propertyName] !== userRegion[propertyName]
+          ) {
+            return acc.concat({ index, depthMatchCount: depth - 1 });
+          }
+          depth++;
+        }
+        return acc;
+      }, [])
+      .sort((a, b) => b.depthMatchCount - a.depthMatchCount);
+    // reduce로 정렬에 필요한 값을 카운팅했던 배열에 다시 접근하여 소트된 array에 기억해둔 index에 따라 순차적으로 data array를 만들어 return
+    const result = sortedByTerm_Region.map((el) => sortedByTerm[el.index]);
+```
+
+현재 구현된 소트 우선순위.
+
+1. 내 위치와 가까운곳부터
+1. title에 serachTerm의 반복이 많을 수록
+1. description에 searchTerm 반복이 많을 수록
+1. article이 게시된 시간순으로
+
+todolist  
+search.jsx > searchResult.jsx의 검색했을때 json-server api로 값을 가져와 보여주는 코드를 fireStore로 가져와 보여주는 코드로 바꾼다.  
+searchResult.jsx의 link router로 연결되는 ./components/datails/article.jsx의 json-server 코드도 fireStore코드로 대체한다.
+
 ## 2022\-06\-10
 
 기본적으로 fireStore 쿼리는 조건에 맞는 모든문서를 문서 ID에 따라 오름차순으로 정렬한다.  
@@ -22,7 +76,7 @@ api정렬은 timeStamp, workProgress 값으로 먼저 정렬했고, 사용자가
 
 1. 단어로 정렬 후에 사용자의 위치와 가까운 곳에서 부터 다시정렬
 
-1. if문의 중첩이 많기 때문에 코드 가독성을 높이는 코드 작성의 필요성. 아직까진 고려할 사항은 아닌듯 로직먼저 완성을 하되 머리속에 염두는 하면서 작성하기.
+1. if문의 중첩이 많기 때문에 가독성을 높이는 코드 작성의 필요성. 아직까진 고려할 사항은 아닌듯 로직먼저 완성을 하되 머리속에 염두는 하면서 작성하기.
 
 ## 2022\-06\-09
 
