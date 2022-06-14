@@ -103,73 +103,49 @@ const Container = styled.section`
   }
 `;
 
-const SearchResult = ({ match, searchedItem }) => {
-  const [itemList, setItemList] = useState(searchedItem);
-  const [loadingIdx, setLoadingIdx] = useState(6);
-  const [loading, setLoading] = useState(false);
-
+const SearchResult = ({ match, searchedItem, handleLoading, loadingState }) => {
+  console.log('ordered item', searchedItem);
   console.log('match.params.searchTerm :', match.params.searchTerm);
-  console.log('itemList : ', itemList);
-  console.log('searchResult render');
-
-  // 검색리스트 업데이트시에 최신 목록 6개 보여주기
-  useEffect(() => {
-    setItemList(searchedItem.slice(0, loadingIdx));
-  }, [searchedItem, loadingIdx]);
-
-  // searchTerm이 바뀌었을때 idx값 초기값으로 설정
-  useEffect(() => {
-    setLoadingIdx(6);
-  }, [searchedItem]);
-
-  let timer = (timeout) => {
-    return new Promise((resolve) => {
-      setTimeout(resolve, timeout);
-    });
-  };
-
-  // 새로운 목록6개씩 로딩(idx값 증가)
-  const handleLoading = async () => {
-    setLoading(true);
-    await timer(1000).then(() => {
-      setLoadingIdx((prevIdx) => prevIdx + 6);
-    });
-    setLoading(false);
-  };
 
   return (
     <Container>
       <div className='result'>
         <p className='title'>중고거래</p>
         <div className='wrapper'>
-          {itemList &&
-            itemList.map((item, i) => {
+          {searchedItem &&
+            searchedItem.map((article, i) => {
               return (
                 <article className='item' key={i}>
                   <Link
                     className='anchor'
                     to={{
-                      pathname: `/article/${item.id}`,
+                      pathname: `/article/${article.articleId}`,
                       state: {
-                        data: item,
+                        data: article,
                       },
                     }}
                   >
                     <div className='imgWrapper'>
-                      <img src={item.img} alt='item-img' className='img' />
+                      <img
+                        src={article.image[0]}
+                        alt='item-img'
+                        className='img'
+                      />
                     </div>
                     <div className='article_info'>
-                      <p className='item_title'>{item.item_title}</p>
-                      <p className='item_desc'>{item.item_desc}</p>
-                      <p className='item_region'>{item.street}</p>
-                      <p className='item_price'>3333333원</p>
+                      <p className='item_title'>{article.title}</p>
+                      <p className='item_desc'>{article.description}</p>
+                      <p className='item_region'>
+                        {article.region_B.address_name}
+                      </p>
+                      <p className='item_price'>{article.price}원</p>
                     </div>
                   </Link>
                 </article>
               );
             })}
         </div>
-        <MoreButton handleLoading={handleLoading} loadingState={loading} />
+        <MoreButton handleLoading={handleLoading} loadingState={loadingState} />
       </div>
     </Container>
   );

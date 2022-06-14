@@ -122,7 +122,7 @@ class FireStore {
     return await getDoc(docRef);
   }
   // arguments condition is serverTimeStamp, region, searchTerm
-  async getOrderedSearchTerm(searchTerm, userRegion) {
+  async getOrderedArticle(searchTerm) {
     const articles = [];
     const collectionRef = collection(firebaseStore, 'article');
 
@@ -172,44 +172,13 @@ class FireStore {
 
     const sortedByTerm = removedSameArticle.map((el) => articles[el.index]);
 
-    console.log(sortByTermRepeat('title', searchTerm, articles));
-    console.log(sortByTermRepeat('description', searchTerm, articles));
-    console.log(sortedArticle);
-    console.log(removedSameArticle);
-    console.log(sortedByTerm);
-
-    const sortedByTerm_Region = sortedByTerm
-      .reduce((acc, curr, index) => {
-        let depth = 1;
-        const maxDepth = 4;
-
-        if (curr.region_B.code === userRegion.code) {
-          return acc.concat({ index, depthMatchCount: maxDepth });
-        }
-
-        while (depth <= maxDepth) {
-          const propertyName = `region_${depth}depth_name`;
-          if (
-            curr.region_B[propertyName] &&
-            userRegion[propertyName] &&
-            curr.region_B[propertyName] !== userRegion[propertyName]
-          ) {
-            return acc.concat({ index, depthMatchCount: depth - 1 });
-          }
-          depth++;
-        }
-        return acc;
-      }, [])
-      .sort((a, b) => b.depthMatchCount - a.depthMatchCount);
-    const result = sortedByTerm_Region.map((el) => sortedByTerm[el.index]);
-    console.log(result);
     // 1차필터링한 값을 다시 다른 조건으로 필터링 api없이 직접구현
     // 검색하고자하는 단어의 반복이 많을 수록 우선순위가 된다.
     // 지역 정보는 총 4depth까지 나뉘어져있음.
     // 나와 가까운 지역일수록 depth name의 숫자가 커짐.
     // 일치하는 depthCount를 측정하고 depthCount가 높을 수록 상위 인덱스
 
-    return result;
+    return sortedByTerm;
   }
 }
 

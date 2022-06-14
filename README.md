@@ -1,3 +1,57 @@
+## 2022\-06\-14
+
+로그인 상태에서만 유저의 위치를 가져와서 지역에 맞는 매칭을 할 수 있음. 로그인을 하지않고 검색을 할때는 지역에 따른 sort를 하지않는다.  
+때문에 기존 검색어로 정렬하는 코드의 api요청은 fireStore.js에서 요청을 하되 로그인 여부를 판별하고 가져온 값을 바탕으로 다시 region우선 순위로 정렬하는 것은 search.jsx에서 한다.
+
+기존코드를 로그인정보가 있는지에 따라 state를 다시 업데이트 하는 코드를 작성중 이전state를 기준으로 state를 sort하므로 re-render가 계속 반복되는 상황발생. 기존 useState코드 대신 useReducer 코드로 작성하기로 함.
+
+useEffect 내부에서 의존을 줄이기위해 reducer의 dispatch함수로 업데이트를 진행하고 이전 코드를 바탕으로 실질적 업데이트 코드는 reduce함수 내에서 실행하기때문에 useEffect 의존배열값을 필요한 값으로만 최소화 할 수 있음.
+
+```javaScript
+// 아래코드는 state를 관리하는 reduce함수의 일부와 state를 fetching 하는 useEffect함수이다
+// useEffect 내부에서 업데이트를 실행하지않고 dispatch 함수로 필요한 값을 전달하여 reduce함수 안에서 업데이트를 실행하므로
+// useEffect 의존배열에서 state에 대한 의존이 없는 것을 볼 수있다.
+case 'orderByRegion':
+      const sortedByRegion = state
+        .reduce((acc, curr, index) => {
+          let depth = 1;
+          const maxDepth = 4;
+          if (curr.region_B.code === action.region_B.code) {
+            return acc.concat({ index, depthMatchCount: maxDepth });
+          }
+
+          while (depth <= maxDepth) {
+            const propertyName = `region_${depth}depth_name`;
+            if (
+              curr.region_B[propertyName] &&
+              action.region_B[propertyName] &&
+              curr.region_B[propertyName] !== action.region_B[propertyName]
+            ) {
+              return acc.concat({ index, depthMatchCount: depth - 1 });
+            }
+            depth++;
+          }
+          return acc.concat({ index, depthMatchCount: 0 });
+        }, [])
+        .sort((a, b) => b.depthMatchCount - a.depthMatchCount);
+      const result = sortedByRegion.map((el) => state[el.index]);
+      return [...result];
+
+useEffect(() => {
+    const getArticle = async () => {
+      const res = await fireStore.getOrderedArticle(searchTerm);
+      dispatch({ type: 'getArticleByTerm', articles: res });
+      if (!userInfo.region_B) return;
+      dispatch({ type: 'orderByRegion', region_B: userInfo.region_B });
+      dispatch({ type: 'editArticle', loadIdx });
+    };
+    getArticle();
+  }, [fireStore, loadIdx, searchTerm, userInfo.region_B]);
+```
+
+기존 searchResult.jsx 에서 관리하던 state는 부모component인 search.jsx의 state와 곂치는 것이 많기때문에 state를 search.jsx로 끌어올리려 props로 전달하는 코드로 바꿧다.  
+search.jsx와 searchResult.jsx json-server 코드를 fireStore코드로 바꾸는것 완료.
+
 ## 2022\-06\-13
 
 array.prototype.reduce 함수의 accumulator 역할을하는 첫번째 인자는 계속 새로운 reference를 생성해줘야 제대로 값이 누적이된다.  
