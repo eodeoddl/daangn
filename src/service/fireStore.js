@@ -119,7 +119,8 @@ class FireStore {
   async getArticleById(articleId) {
     // const collectionRef = collection(firebaseStore, 'article')
     const docRef = doc(firebaseStore, 'article', articleId);
-    return await getDoc(docRef);
+    const article = await getDoc(docRef);
+    return article.data();
   }
   // arguments condition is serverTimeStamp, region, searchTerm
   async getOrderedArticle(searchTerm) {
@@ -135,7 +136,10 @@ class FireStore {
 
     // 여기서는 쿼리필터링된 값을 배열로 만들어서 리턴함.
     querySnapshot.forEach((snapshot) => {
-      articles.push({ articleId: snapshot.id, ...snapshot.data() });
+      articles.push({
+        articleId: snapshot.id,
+        ...snapshot.data(),
+      });
     });
 
     const sortByTermRepeat = (propertyName, searchTerm, array) => {

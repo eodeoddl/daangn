@@ -47,21 +47,6 @@ const Search = ({
     });
     setLoadingState(false);
   };
-  // 현재는 json-server를 이용한 통신하고 있음
-  // // fireStore api로 대체
-  // useEffect(() => {
-  //   const item = () => {
-  //     itemDataApi
-  //       .onSearch(searchTerm || location.pathname.split('/').pop())
-  //       .then((res) => {
-  //         const data = res.data.filter(
-  //           (item) => item.cartegory === 'flea market'
-  //         );
-  //         setSearchedItem(data);
-  //       });
-  //   };
-  //   item();
-  // }, [itemDataApi, searchTerm, location]);
 
   return (
     <>

@@ -246,7 +246,6 @@ function App({
             latestItemList={latestItemList}
             searchTerm={searchTerm}
             userInfo={userInfo}
-            itemDataApi={itemDataApi}
             fireStore={fireStore}
             handleLoading={handleLoading}
             moreLoading={moreLoading}
@@ -254,8 +253,8 @@ function App({
         </Route>
         <Route exact path='/article/:articleId'>
           <Article
+            fireStore={fireStore}
             latestItemList={latestItemList}
-            // itemDataApi={itemDataApi}
             handleShowModal={handleShowModal}
           />
         </Route>

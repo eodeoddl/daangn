@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import styled from 'styled-components';
 import { MoreButton } from '../publicStyle/moreButton.jsx';
+import { AiOutlineHeart } from 'react-icons/ai';
 
 const Container = styled.section`
   & {
@@ -75,12 +76,31 @@ const Container = styled.section`
             margin-top: 6px;
           }
 
-          .item_price {
+          .layout-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 6px;
+            // margin
             color: ${({ theme }) => theme.colors.lightOrange};
             font-weight: 600;
             font-size: 15px;
-            margin-top: 6px;
             line-height: 18px;
+          }
+
+          .subscribe-info {
+            display: flex;
+            align-items: center;
+          }
+
+          .subscribe-info span {
+            color: ${({ theme }) => theme.colors.black};
+            font-size: 13px;
+          }
+
+          .subscribe-info svg {
+            margin-right: 3px;
+            alignment-baseline: baseline;
           }
         }
       }
@@ -138,7 +158,15 @@ const SearchResult = ({ match, searchedItem, handleLoading, loadingState }) => {
                       <p className='item_region'>
                         {article.region_B.address_name}
                       </p>
-                      <p className='item_price'>{article.price}원</p>
+                      <div className='layout-container'>
+                        <p className='item_price'>{article.price}원</p>
+                        <div className='subscribe-info'>
+                          <AiOutlineHeart />
+                          <span>
+                            {article.subscribe ? article.subscribe : 0}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </Link>
                 </article>

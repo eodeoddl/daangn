@@ -96,96 +96,83 @@ const Container = styled.div`
   }
 `;
 
-const Carosual = forwardRef(
-  ({ handleShowModal, itemDataApi, imgSrc, slideIdx, id, showModal }, ref) => {
-    let query = UseQuery();
-    const slideContainerRef = useRef(null);
-    const slideTrackRef = useRef(null);
-    const [img, setImg] = useState(imgSrc);
+const Carosual = forwardRef(({ imgSrc, slideIdx, id, showModal }, ref) => {
+  // let query = UseQuery();
+  const slideContainerRef = useRef(null);
+  const slideTrackRef = useRef(null);
+  // const [img, setImg] = useState(imgSrc);
 
-    console.log('img', img);
-    console.log('imgSrc', imgSrc);
-    console.log('query id', query.get('object_id'));
-    console.log('query index', query.get('image_index'));
-    console.log('id', id);
-    console.log('slideIdx', slideIdx);
-    console.log('getItemData', itemDataApi.getItemById(query.get('object_id')));
-    console.log('dd', itemDataApi.getItemById(1));
-
-    useImperativeHandle(ref, () => {
-      const slideTrack = slideTrackRef.current;
-      return {
-        addTransition: () =>
-          (slideTrack.style.transition = 'transform 0.5s ease-in-out'),
-        addTransForm: () =>
-          (slideTrack.style.transform = `translateX(${
-            -slideIdx * slideContainerRef.current.clientWidth
-          }px)`),
-      };
-    });
-
-    useEffect(() => {
-      console.log('useEffect modal controll');
-      console.log('showModal', showModal);
-      showModal &&
-        (async () =>
-          await itemDataApi.getItemById(query.get('object_id')).then((res) => {
-            const { img } = res.data[0];
-            console.log(img);
-            setImg([
-              img,
-              'http://placeimg.com/500/800/animals',
-              'http://placeimg.com/640/480/animals',
-            ]);
-          }))();
-      console.log(itemDataApi.getItemById(1));
-      console.log(img);
-    }, [showModal, itemDataApi, query]);
-
-    useEffect(() => {
-      console.log(slideTrackRef.current);
-    }, [ref]);
-
-    //controll translateX
-    useEffect(() => {
-      console.log('useEffect transform');
-      slideTrackRef.current.style.transform = `translateX(${
-        -slideIdx * slideContainerRef.current.clientWidth
-      }px)`;
-    }, [ref, slideIdx]);
-
-    // controll container width
-    useEffect(() => {
-      console.log('useEffect sizing cotainer');
-      slideTrackRef.current.style.width =
-        slideContainerRef.current.clientWidth * img.length + 'px';
-    }, [img, ref]);
-
-    const transitionEnd = () => {
-      slideTrackRef.current.style.transition = 'none';
+  useImperativeHandle(ref, () => {
+    const slideTrack = slideTrackRef.current;
+    return {
+      addTransition: () =>
+        (slideTrack.style.transition = 'transform 0.5s ease-in-out'),
+      addTransForm: () =>
+        (slideTrack.style.transform = `translateX(${
+          -slideIdx * slideContainerRef.current.clientWidth
+        }px)`),
     };
+  });
 
-    const onClickDot = () => {
-      console.log('dot click');
-    };
+  useEffect(() => {
+    console.log(slideTrackRef.current);
+  }, [ref]);
 
-    // active carosual modal code
-    const onClickLink = () => {
-      console.log('click link');
-      // handleShowModal();
-    };
+  //controll translateX
+  useEffect(() => {
+    console.log('useEffect transform');
+    slideTrackRef.current.style.transform = `translateX(${
+      -slideIdx * slideContainerRef.current.clientWidth
+    }px)`;
+  }, [ref, slideIdx]);
 
-    return (
-      <Container ref={slideContainerRef}>
-        <div
-          className='slide-track'
-          ref={slideTrackRef}
-          onTransitionEnd={transitionEnd}
-        >
-          {img &&
-            img.map((img, i) => {
-              return showModal ? (
-                <div className='slide-wrap' key={i}>
+  // controll container width
+  useEffect(() => {
+    console.log('useEffect sizing cotainer');
+    slideTrackRef.current.style.width =
+      slideContainerRef.current.clientWidth * imgSrc.length + 'px';
+  }, [imgSrc.length]);
+
+  const transitionEnd = () => {
+    slideTrackRef.current.style.transition = 'none';
+  };
+
+  const onClickDot = () => {
+    console.log('dot click');
+  };
+
+  // active carosual modal code
+  const onClickLink = () => {
+    console.log('click link');
+    // handleShowModal();
+  };
+
+  return (
+    <Container ref={slideContainerRef}>
+      <div
+        className='slide-track'
+        ref={slideTrackRef}
+        onTransitionEnd={transitionEnd}
+      >
+        {imgSrc &&
+          imgSrc.map((img, i) => {
+            return showModal ? (
+              <div className='slide-wrap' key={i}>
+                <div className='img-wrap'>
+                  <img alt='상품이미지' className='slide-img' src={`${img}`} />
+                </div>
+              </div>
+            ) : (
+              <div className='slide-wrap' key={i}>
+                <Link
+                  className='anchor'
+                  to={{
+                    pathname: '/image',
+                    search: `?image_index=${i}&object_id=${id}`,
+                    state: {},
+                  }}
+                  // onClick={onClickLink}
+                >
                   <div className='img-wrap'>
                     <img
                       alt='상품이미지'
@@ -193,43 +180,23 @@ const Carosual = forwardRef(
                       src={`${img}`}
                     />
                   </div>
-                </div>
-              ) : (
-                <div className='slide-wrap' key={i}>
-                  <Link
-                    className='anchor'
-                    to={{
-                      pathname: '/image',
-                      search: `?image_index=${i}&object_id=${id}`,
-                      state: {},
-                    }}
-                    // onClick={onClickLink}
-                  >
-                    <div className='img-wrap'>
-                      <img
-                        alt='상품이미지'
-                        className='slide-img'
-                        src={`${img}`}
-                      />
-                    </div>
-                  </Link>
-                </div>
-              );
-            })}
-        </div>
-        <ul className='slide-dots'>
-          {img &&
-            img.map((_, i) => {
-              return (
-                <li key={i} onClick={onClickDot}>
-                  <button>{i}</button>
-                </li>
-              );
-            })}
-        </ul>
-      </Container>
-    );
-  }
-);
+                </Link>
+              </div>
+            );
+          })}
+      </div>
+      <ul className='slide-dots'>
+        {imgSrc &&
+          imgSrc.map((_, i) => {
+            return (
+              <li key={i} onClick={onClickDot}>
+                <button>{i}</button>
+              </li>
+            );
+          })}
+      </ul>
+    </Container>
+  );
+});
 
 export default Carosual;

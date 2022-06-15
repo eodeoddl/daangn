@@ -1,3 +1,18 @@
+## 2022\-06\-15
+
+searchResult.jsx 컴포넌트에 구독하기 버튼, 댓글달기, 채팅 기능 구현하기  
+article.jsx 컴포넌트에서 userInfo의 displayName, profile-image, subscribeCount가 필요하기때문에 fireStore.js의 article 업로드 api에서 해당정보도 저장하도록 바꾼다.  
+components/details/article.jsx json-server api를 fireStore api 로 대체하기 완료  
+aritcle.jsx에서 보이는 정보는 serverTimestamp와 유저가 aritcle을 탐색한 시점의 시간을 비교하여 언제게시된 article인지 알 수 있게 나타내야한다.
+
+당근마켓에서 물품을 검색했을때 썸네일, 제목, 지역, 가격, 구독하기(하트아이콘)이 존재한다.
+해당물품의 썸네일 정보를 보여주는 카드를 클릭하게 되면 물품의 상세정보 페이지로 이동하게된다.
+상세정보 페이지는 물품의 사진의 개수에따라 carousel로 보여주고 탐색하고 있는 article을 구독할 수 있는 버튼이있어야 한다.
+
+js date 객체로 경과시간 검색 및 date 객체를 바탕으로 경과 시간, 경과 일 수로 나타내어 사용자가 쉽게 알아볼 수 있게한다.
+
+carousel.jsx 컴포넌트화 하여 필요한 다른 컴포넌트에서도 import 하여 사용할 수 있게 만든다. 현재 로직은 구현되어있으나 최적화와 state를 효율적으로 관리할 수 있도록 만들어야한다.
+
 ## 2022\-06\-14
 
 로그인 상태에서만 유저의 위치를 가져와서 지역에 맞는 매칭을 할 수 있음. 로그인을 하지않고 검색을 할때는 지역에 따른 sort를 하지않는다.  
@@ -49,8 +64,8 @@ useEffect(() => {
   }, [fireStore, loadIdx, searchTerm, userInfo.region_B]);
 ```
 
-기존 searchResult.jsx 에서 관리하던 state는 부모component인 search.jsx의 state와 곂치는 것이 많기때문에 state를 search.jsx로 끌어올리려 props로 전달하는 코드로 바꿧다.  
-search.jsx와 searchResult.jsx json-server 코드를 fireStore코드로 바꾸는것 완료.
+기존 searchResult.jsx 에서 관리하던 state는 부모component인 search.jsx의 state와 곂치는 것이 많기때문에 state를 search.jsx로 끌어올리고 props로 전달하는 코드로 바꿧다.  
+search.jsx와 searchResult.jsx 컴포넌트의 json-server 코드를 fireStore코드로 바꾸는 작업 완료.
 
 ## 2022\-06\-13
 

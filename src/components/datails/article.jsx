@@ -148,41 +148,28 @@ const Container = styled.article`
   }
 `;
 
-const Article = ({ match, location, latestItemList, handleShowModal }) => {
+const Article = ({ fireStore, latestItemList, handleShowModal }) => {
   const [slideIdx, setSlideIdx] = useState(0);
   const [articleData, setArticleData] = useState(null);
   const slideTrackRef = useRef(null);
-  const [imgSrc, setImgSrc] = useState(null);
+  // const [imgSrc, setImgSrc] = useState(null);
 
   const { articleId } = useParams();
   console.log(articleId);
+  // const
 
-  // data 초기값설정.. data는 location.state.data or useParams의 articleId를 이용해서 fireStore로 직접가져오기.
   useEffect(() => {
-    const data = location.state.data;
-    // const data = location.state.data || 'fireStoreApi';
-    const { id, img, city, street, item_title, item_desc } = data;
-    console.log('id', id);
-    setArticleData({
-      id,
-      img,
-      city,
-      street,
-      item_title,
-      item_desc,
-    });
-
-    setImgSrc([
-      img,
-      'http://placeimg.com/500/800/animals',
-      'http://placeimg.com/640/480/animals',
-    ]);
-  }, [location.state.data]);
+    const fetchingData = async () => {
+      const data = await fireStore.getArticleById(articleId);
+      console.log(data);
+      const { uploaded } = data;
+      console.log(uploaded.toDate());
+      setArticleData(data);
+    };
+    fetchingData();
+  }, [articleId, fireStore]);
 
   console.log('slideTrackRef', slideTrackRef);
-  console.log('match.params.articleId :', match.params.articleId);
-  console.log('location.state.data :', location.state.data);
-  console.log('match', match);
   console.log('slideIdx', slideIdx);
 
   const onClickDot = () => {
@@ -192,7 +179,7 @@ const Article = ({ match, location, latestItemList, handleShowModal }) => {
   const onClickNext = () => {
     console.log('next');
     setSlideIdx((prevIdx) => {
-      if (prevIdx >= imgSrc.length - 1) return 0;
+      if (prevIdx >= articleData.image.length - 1) return 0;
       // else slideTrackRef.current.style.transition = 'transform 0.5s ease-in-out';
       else slideTrackRef.current.addTransition();
       return prevIdx + 1;
@@ -201,16 +188,12 @@ const Article = ({ match, location, latestItemList, handleShowModal }) => {
 
   const onClickPrev = () => {
     setSlideIdx((prevIdx) => {
-      if (prevIdx <= 0) return imgSrc.length - 1;
+      if (prevIdx <= 0) return articleData.image.length - 1;
       // else slideTrackRef.current.style.transition = 'transform 0.5s ease-in out';
       else slideTrackRef.current.addTransition();
       return prevIdx - 1;
     });
   };
-  //  이걸 쓴 이유? ㅋ
-  // useEffect(() => {
-  //   setSlideIdx(0);
-  // }, []);
 
   return (
     articleData && (
@@ -227,11 +210,10 @@ const Article = ({ match, location, latestItemList, handleShowModal }) => {
       </Route> */}
         <section className='article-image'>
           <Carosual
-            imgSrc={imgSrc}
+            imgSrc={articleData.image}
             id={articleData.id}
             slideIdx={slideIdx}
             handleShowModal={handleShowModal}
-            // itemDataApi={itemDataApi}
             ref={slideTrackRef}
           />
           <button className='prev-btn' onClick={onClickPrev} />
@@ -245,8 +227,14 @@ const Article = ({ match, location, latestItemList, handleShowModal }) => {
                   <img alt='사용자 닉네임' src='/logo192.png' />
                 </div>
                 <div className='profile-left'>
-                  <div className='nickname'>닉네임</div>
-                  <div className='region-name'>{`${articleData.city} ${articleData.street}`}</div>
+                  <div className='nickname'>
+                    {articleData.displayName
+                      ? articleData.displayName
+                      : '닉네임'}
+                  </div>
+                  <div className='region-name'>
+                    {articleData.region_B.address_name}
+                  </div>
                 </div>
               </div>
               <div className='profile-right'>오른쪽 아이콘</div>
@@ -254,11 +242,11 @@ const Article = ({ match, location, latestItemList, handleShowModal }) => {
           </Link>
         </section>
         <section className='article-description'>
-          <h1 className='title'>{articleData.item_title}</h1>
-          <p className='cartegory'>아이템 분류</p>
-          <p className='price'>333333원</p>
+          <h1 className='title'>{articleData.title}</h1>
+          <p className='cartegory'>{articleData.cartegory}</p>
+          <p className='price'>{articleData.price}원</p>
           <div className='detail'>
-            <p>{articleData.item_desc}</p>
+            <p>{articleData.description}</p>
           </div>
         </section>
         <section className='more-item'>
