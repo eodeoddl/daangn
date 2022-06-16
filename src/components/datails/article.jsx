@@ -2,11 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { withRouter, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import ArticleFooter from '../footer/articleFooter';
 import Carosual from '../publicStyle/carosual';
 import LatestItem from '../search/latestItem';
 
 const Container = styled.article`
   margin-top: 100px;
+  position: relative;
 
   .article-image {
     margin: 0 auto;
@@ -156,7 +158,6 @@ const Article = ({ fireStore, latestItemList, handleShowModal }) => {
 
   const { articleId } = useParams();
   console.log(articleId);
-  // const
 
   useEffect(() => {
     const fetchingData = async () => {
@@ -224,13 +225,14 @@ const Article = ({ fireStore, latestItemList, handleShowModal }) => {
             <div className='space-between'>
               <div>
                 <div className='profile-image'>
-                  <img alt='사용자 닉네임' src='/logo192.png' />
+                  <img
+                    alt='사용자 닉네임'
+                    src={articleData.profileImg || '/logo192.png'}
+                  />
                 </div>
                 <div className='profile-left'>
                   <div className='nickname'>
-                    {articleData.displayName
-                      ? articleData.displayName
-                      : '닉네임'}
+                    {articleData.displayName || '닉네임'}
                   </div>
                   <div className='region-name'>
                     {articleData.region_B.address_name}
@@ -244,7 +246,7 @@ const Article = ({ fireStore, latestItemList, handleShowModal }) => {
         <section className='article-description'>
           <h1 className='title'>{articleData.title}</h1>
           <p className='cartegory'>{articleData.cartegory}</p>
-          <p className='price'>{articleData.price}원</p>
+          {/* <p className='price'>{articleData.price}원</p> */}
           <div className='detail'>
             <p>{articleData.description}</p>
           </div>
@@ -252,6 +254,7 @@ const Article = ({ fireStore, latestItemList, handleShowModal }) => {
         <section className='more-item'>
           <LatestItem latestItemList={latestItemList} />
         </section>
+        <ArticleFooter price={articleData.price} />
       </Container>
     )
   );

@@ -180,7 +180,7 @@ class FireStore {
     // 검색하고자하는 단어의 반복이 많을 수록 우선순위가 된다.
     // 지역 정보는 총 4depth까지 나뉘어져있음.
     // 나와 가까운 지역일수록 depth name의 숫자가 커짐.
-    // 일치하는 depthCount를 측정하고 depthCount가 높을 수록 상위 인덱스
+    // 일치하는 depthCount를 측정하고 depthCount가 높을수록 상위 인덱스
 
     return sortedByTerm;
   }

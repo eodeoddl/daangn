@@ -218,11 +218,7 @@ const fileTypes = [
 const PostingForm = ({ userInfo, fireStorage }) => {
   const [fileImg, setFileImg] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [formData, dispatch] = useReducer(
-    reducer,
-    { workProgress: false, subscribe: 0, comments: null },
-    init
-  );
+  const [formData, dispatch] = useReducer(reducer, {}, init);
   const history = useHistory();
   const priceLabel = useRef(null);
   const fileInputRef = useRef(null);
@@ -297,7 +293,6 @@ const PostingForm = ({ userInfo, fireStorage }) => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    // console.log(formRef.current);
     const { files } = fileInputRef.current;
     const urlArr = [];
 
@@ -416,14 +411,7 @@ const PostingForm = ({ userInfo, fireStorage }) => {
           >
             취소
           </button>
-          <button
-            type='submit'
-            // onClick={(e) => {
-            //   onSubmit(e);
-            // }}
-          >
-            글쓰기
-          </button>
+          <button type='submit'>글쓰기</button>
         </div>
       </Form>
       <Portal idSelector='posting-form-modal'>
@@ -462,6 +450,14 @@ const reducer = (state, action) => {
 };
 
 const init = (userInfo) => {
-  const { uid, region_B } = userInfo;
-  return { uid, region_B };
+  const { uid, region_B, displayName, photoURL } = userInfo;
+  return {
+    uid,
+    region_B,
+    displayName,
+    profileImg: photoURL,
+    workProgress: false,
+    subscribe: 0,
+    comments: null,
+  };
 };

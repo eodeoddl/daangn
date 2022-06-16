@@ -1,8 +1,21 @@
+## 2022\-06\-16
+
+redux-saga 사용의 필요성.
+
+articleFooter 컴포넌트 추가했고, 이 컴포넌트에서는 해당 article에대한 구독하기버튼과 가격 제안하기, 채팅하기 버튼이있다.
+
+가격 제안하기는 router link /negotiation/:articleId로 경로를 만들어주고 해당경로가 요청됬을때 해당페이지에서 portal을 이용해 negotiation.jsx를 띄워준다.  
+해당 컴포넌트는 가격을 제안할 수 있고 너무 적은 금액은 네고가 불가능하게 구현해야함. 가격제의가 들어오면 aritcle게시자에게 알림이 가도록 만들어준다.
+
+article검색하는 사용자는 subscribe 버튼으로 article의 게시자가 가격을 바꿧을때 알림이가도록 구현해야한다.
+
+채팅은 아직 구상중이고 subscribe, negotiation 관련된 fireStore 자료구조를 구상해봐야할듯. 그리고 redux-saga내용 추가로 더 정리하기.
+
 ## 2022\-06\-15
 
+components/details/article.jsx json-server api를 fireStore api 로 대체하기 완료  
 searchResult.jsx 컴포넌트에 구독하기 버튼, 댓글달기, 채팅 기능 구현하기  
 article.jsx 컴포넌트에서 userInfo의 displayName, profile-image, subscribeCount가 필요하기때문에 fireStore.js의 article 업로드 api에서 해당정보도 저장하도록 바꾼다.  
-components/details/article.jsx json-server api를 fireStore api 로 대체하기 완료  
 aritcle.jsx에서 보이는 정보는 serverTimestamp와 유저가 aritcle을 탐색한 시점의 시간을 비교하여 언제게시된 article인지 알 수 있게 나타내야한다.
 
 당근마켓에서 물품을 검색했을때 썸네일, 제목, 지역, 가격, 구독하기(하트아이콘)이 존재한다.
