@@ -256,6 +256,7 @@ function App({
             fireStore={fireStore}
             latestItemList={latestItemList}
             handleShowModal={handleShowModal}
+            userInfo={userInfo}
           />
         </Route>
         <Route path='/user/:displayName'>

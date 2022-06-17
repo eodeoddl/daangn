@@ -1,3 +1,23 @@
+## 2022\-06\-17
+
+구독하기 버튼에 마우스 오버시에 안내 텍스트 작업완료.  
+article footer 디테일한 css작업 완료.   
+article footer에서 구독하기 버튼기능에 필요한 state, store 자료구조, effect 구상완료
+
+fireStore는 app을 사용하는 유저정보를 root의 users collection에 저장하고있음.  
+users collection은 authentication을 제공해주는 업체로 부터 uid값을 가져와 users 컬렉션의 document의 id로 사용하고있음.  
+users 컬렉션의 하위 document의 필드값인 aritcles는 해당유저가 게시했던 게시물의 id를 갖고 있다.  
+이것으로 해당유저의 게시물을 검색할때 store root의 article collection에서 게시물의 id로 유저의 게시물을 검색해온다.
+
+또 다른 필드값인 subscribeList는 해당유저가 구독했던 다른 사용자의 게시물의 id를 갖고있어 해당 게시물의 가격이 변동될시에 구독했던 유저에게 알림이 가도록 구현한다. priceChange의 기본값은 false  
+ex) [ {articleId, priceChange: true or false}, ...etc ]
+
+=> 객체로 이루어진 객체를 만들 수 없음. 객체로 이루어진 객체로 수정(확정아님)  
+ex) { {articleId, priceChange: true or false}, ...etc }  
+혹은 document의 참조자체를 저장하는 방법도 고려..
+
+store root의 aritcle collection은 모든 유저들이 포스팅한 게시물들이 저장되는 곳이고 id 값은 firestore에서 자동으로 생성해주는 값으로 사용한다. 이곳에선 subscribe기능을 제공하기위한 subscribe 필드를 가지고 있고 유저가 해당게시물을 수정할때 price 필드도 변경하게 되면 subscribe.uid 객체의 값을 읽어와 해당 유저를 찾고 위에 설계한 subscribeList의 priceChange 값을 바꿔준다. 최종적으로 priceChange값이 true가 되면 해당유저에게 알림이 가도록 만들어준다.
+
 ## 2022\-06\-16
 
 redux-saga 사용의 필요성.

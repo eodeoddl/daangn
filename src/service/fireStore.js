@@ -11,6 +11,7 @@ import {
   serverTimestamp,
   updateDoc,
   orderBy,
+  arrayUnion,
 } from 'firebase/firestore';
 
 class FireStore {
@@ -183,6 +184,22 @@ class FireStore {
     // 일치하는 depthCount를 측정하고 depthCount가 높을수록 상위 인덱스
 
     return sortedByTerm;
+  }
+  // 유저가 구독버튼을 눌렀을때 user > subcribeList 업데이트
+  async addSubscribeList(uid, articleId, state) {
+    console.log(uid, articleId, state);
+
+    // 여기서 만약 유저 필드가 인자로 받은 구독상태와 똑같을 경우는 업데이트를 진행하지않고 함수종료
+
+    const userRef = doc(firebaseStore, 'users', uid);
+    const docSnap = await getDoc(userRef);
+
+    if (docSnap.exists()) {
+      console.log(docSnap.data().subscribeList);
+    }
+    // await updateDoc(userRef, {
+    //   aa: arrayUnion({ articleId, priceChange: state }),
+    // });
   }
 }
 

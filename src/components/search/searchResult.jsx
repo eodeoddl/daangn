@@ -34,6 +34,9 @@ const Container = styled.section`
       .item {
         width: 30%;
         margin-bottom: 40px;
+        box-shadow: 3px 3px 4px 5px rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+        padding: 5px;
 
         .anchor {
           text-decoration: none;

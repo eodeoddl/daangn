@@ -150,7 +150,7 @@ const Container = styled.article`
   }
 `;
 
-const Article = ({ fireStore, latestItemList, handleShowModal }) => {
+const Article = ({ fireStore, latestItemList, handleShowModal, userInfo }) => {
   const [slideIdx, setSlideIdx] = useState(0);
   const [articleData, setArticleData] = useState(null);
   const slideTrackRef = useRef(null);
@@ -158,6 +158,7 @@ const Article = ({ fireStore, latestItemList, handleShowModal }) => {
 
   const { articleId } = useParams();
   console.log(articleId);
+  console.log(userInfo);
 
   useEffect(() => {
     const fetchingData = async () => {
@@ -254,7 +255,11 @@ const Article = ({ fireStore, latestItemList, handleShowModal }) => {
         <section className='more-item'>
           <LatestItem latestItemList={latestItemList} />
         </section>
-        <ArticleFooter price={articleData.price} />
+        <ArticleFooter
+          price={articleData.price}
+          fireStore={fireStore}
+          uid={userInfo.uid}
+        />
       </Container>
     )
   );
