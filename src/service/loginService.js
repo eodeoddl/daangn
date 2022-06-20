@@ -5,6 +5,7 @@ import {
   signOut,
   onAuthStateChanged,
 } from 'firebase/auth';
+import { MdTurnedInNot } from 'react-icons/md';
 
 import { firebaseAuth } from './firebase.js';
 
@@ -25,29 +26,27 @@ class LoginService {
       });
   }
 
-  observeAuthState(fireStore, setLoginState, dispatch) {
+  observeAuthState() {
+    const userInfo = {};
     onAuthStateChanged(firebaseAuth, (user) => {
+      // console.log(user.providerData);
+      // const { displayName, email, photoURL, uid } = user;
       if (user) {
-        const { displayName, email, photoURL, uid } = user;
-        dispatch({
-          type: 'setUserInfo',
-          userInfo: {
-            fireStore,
-            displayName,
-            email,
-            photoURL,
-            uid,
-          },
+        console.log('userExist');
+        user.providerData.forEach((profile) => {
+          const { displayName, email, photoURL, uid } = profile;
+          userInfo.displayName = displayName;
+          userInfo.email = email;
+          userInfo.photoURL = photoURL;
+          userInfo.uid = uid;
+          userInfo.fetching = true;
         });
-        // setUserInfo((prevState) => {
-        //   return { ...prevState, displayName, email, photoURL, uid, fireStore };
-        // });
-        setLoginState(true);
       } else {
-        setLoginState(false);
-        dispatch({ type: 'reset' });
+        console.log('no userExist');
+        userInfo.fetching = false;
       }
     });
+    return userInfo;
   }
 
   logOut() {

@@ -33,7 +33,7 @@ function App({
   const [moreLoading, setMoreLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [loginState, setLoginState] = useState(false);
-  const [userInfo, dispatch] = useReducer(reducer, {}, resetInfo);
+  const [userInfo, dispatch] = useReducer(reducer, { subscribeList: [] });
 
   const itemIdxRef = useRef(0);
 
@@ -184,8 +184,26 @@ function App({
 
   // 로그인 정보만 auth 정보.
   useEffect(() => {
-    loginService.observeAuthState(fireStore, setLoginState, dispatch);
-  }, [fireStore, loginService]);
+    console.log('1111111');
+    const fetchingUserInfo = async () => {
+      loginService.observeAuthState();
+      // console.log(loginService.observAuthState());
+    };
+    const userAuth = fetchingUserInfo();
+    if (userAuth.fetching) {
+      console.log('444');
+      dispatch({
+        type: 'setUserInfo',
+        userInfo: userAuth,
+      });
+      // setLoginState(true);
+    } else {
+      console.log('5555');
+      dispatch({ type: 'reset' });
+      // setLoginState(false);
+    }
+    setLoginState(userAuth.fetching);
+  }, [loginService]);
 
   // 유저가 있을때 dispatch로 정보업데이트
   useEffect(() => {

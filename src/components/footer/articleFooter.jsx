@@ -107,11 +107,11 @@ const ArticleFooter = ({
   const [subscribe, setSubscribe] = useState(false);
   const subscribeGuide = useRef(null);
   const { articleId } = useParams();
+  // const subscribeList = new Map();
 
   useEffect(() => {
     // 여기서는 article을 탐색하고있는 사용자가 해당 article의 구독여부를 확인하고 subscibe state를 변경한다.
-    // props로 넘어오는 값은 useSubscrive list이고 list 배열에 해당 article의 id가 있으면 subscribe state를 true로 변경해준다.
-    console.log('subscribe Effect');
+    // props로 넘어오는 값은 userSubscribe list이고 list 배열에 해당 article의 id가 있으면 subscribe state를 true로 변경해준다.
     // if (userSubcribeList.includes(articleId)) setSubscribe(true);
     subcribeList.forEach((list) => {
       if (list.articleId === articleId) setSubscribe(true);
@@ -119,11 +119,17 @@ const ArticleFooter = ({
   }, [articleId, subcribeList]);
 
   useEffect(() => {
+    // 유저로그인 여부 체크하고 로그인 하지않았을시 함수실행 x.
+    if (!uid) return;
     fireStore.addSubscribeList(uid, articleId, subscribe);
   }, [articleId, fireStore, subscribe, uid]);
 
   const onSubscribe = () => {
     // 여기서 fireStore subscribe count 증가
+    if (!uid) {
+      alert('로그인이 필요한 서비스입니다.');
+      return;
+    }
     setSubscribe(!subscribe);
   };
 

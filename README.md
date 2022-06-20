@@ -1,7 +1,42 @@
+## 2022\-06\-20
+
+firestore자료구조가 객체안의 배열을 가질수 있는지 체크 => 안됨.
+firestore 자료구조 수정 => [ 구독한 artilce의 refernce, ... ] 이 방식으로.
+fireStore 자료 구조로 map객체를 이용해서 저장할 수 있음.
+
+map 객체 정리  
+for...of 루프를 사용해서 iteration 가능하고, 또는 iteration method인 foreEach를 사용해서 순회가능.
+
+static prorperty : get Map\[@@species]  
+배열object를 인자로 받아서 새로운 map 객체를 생성한다. constructor fucntion
+
+instance property : Map.prototype.size
+key/value 쌍의 갯수를 return
+
+instance methods
+
+map.prototype.clear() => remove all key/value pairs  
+map.prototype.get(key) => returns key or undefined  
+map.prototype.has(key) => returns boolean  
+map.prototype.set(key, value) => set map object
+
+iteration methods  
+Object prototype method와 사용법 같음.
+
+map.prototype.keys()  
+map.prototype.values()  
+map.prototype.entries()  
+map.prototype.forEach(callbackFn)
+
+Map객체 대신 article의 reference를 저장하기로 결정. fireStore에서 권장하는 경로인 collectionName(article)/docId(articleId)로 저장함.
+유저의 기본적인 data세팅을 해주려고하는데 현재 필요한 값은 초기값인 userList: [] 상태의 값이 필요함.  
+authStateChange 관찰자 함수로는 값을 리턴할수 없어서 authStateChange안에서 data의 초기값을 설정해주어야 함.  
+또 현재 유저의 정보를 fireStore로 업데이트 하는 메서드가 없기때문에 이것도 만들어야함. -> 유저가 구독을 했을때 user정보를 저장하는 store도 같이 업데이트.
+
 ## 2022\-06\-17
 
 구독하기 버튼에 마우스 오버시에 안내 텍스트 작업완료.  
-article footer 디테일한 css작업 완료.   
+article footer 디테일한 css작업 완료.  
 article footer에서 구독하기 버튼기능에 필요한 state, store 자료구조, effect 구상완료
 
 fireStore는 app을 사용하는 유저정보를 root의 users collection에 저장하고있음.  
@@ -12,7 +47,7 @@ users 컬렉션의 하위 document의 필드값인 aritcles는 해당유저가 �
 또 다른 필드값인 subscribeList는 해당유저가 구독했던 다른 사용자의 게시물의 id를 갖고있어 해당 게시물의 가격이 변동될시에 구독했던 유저에게 알림이 가도록 구현한다. priceChange의 기본값은 false  
 ex) [ {articleId, priceChange: true or false}, ...etc ]
 
-=> 객체로 이루어진 객체를 만들 수 없음. 객체로 이루어진 객체로 수정(확정아님)  
+=> 객체로 이루어진 배열을 만들 수 없음. 객체로 이루어진 객체로 수정(확정아님)  
 ex) { {articleId, priceChange: true or false}, ...etc }  
 혹은 document의 참조자체를 저장하는 방법도 고려..
 

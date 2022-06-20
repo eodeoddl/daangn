@@ -12,6 +12,7 @@ import {
   updateDoc,
   orderBy,
   arrayUnion,
+  arrayRemove,
 } from 'firebase/firestore';
 
 class FireStore {
@@ -186,20 +187,23 @@ class FireStore {
     return sortedByTerm;
   }
   // 유저가 구독버튼을 눌렀을때 user > subcribeList 업데이트
+  // 유저가 로그인을 하지않았을경우는 실행할 수 없음.
   async addSubscribeList(uid, articleId, state) {
-    console.log(uid, articleId, state);
+    const articleRef = doc(firebaseStore, 'article', articleId);
 
-    // 여기서 만약 유저 필드가 인자로 받은 구독상태와 똑같을 경우는 업데이트를 진행하지않고 함수종료
-
+    // state가 true 값이 넘어왔을때만 업데이트 실행하고 만약 false 값이 넘어온다면 해당 구독정보를 삭제한다.
     const userRef = doc(firebaseStore, 'users', uid);
     const docSnap = await getDoc(userRef);
 
     if (docSnap.exists()) {
-      console.log(docSnap.data().subscribeList);
+      state
+        ? await updateDoc(userRef, {
+            subscribeList: arrayUnion(articleRef.path),
+          })
+        : await updateDoc(userRef, {
+            subscribeList: arrayRemove(articleRef.path),
+          });
     }
-    // await updateDoc(userRef, {
-    //   aa: arrayUnion({ articleId, priceChange: state }),
-    // });
   }
 }
 
