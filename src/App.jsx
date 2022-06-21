@@ -33,7 +33,7 @@ function App({
   const [moreLoading, setMoreLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [loginState, setLoginState] = useState(false);
-  const [userInfo, dispatch] = useReducer(reducer, { subscribeList: [] });
+  const [userInfo, dispatch] = useReducer(reducer, {});
 
   const itemIdxRef = useRef(0);
 
@@ -182,62 +182,25 @@ function App({
     });
   }, [itemDataApi]);
 
-  // 로그인 정보만 auth 정보.
+  // user auth state를 관찰하는 함수실행.
+  // 관찰하는 함수이기 때문에 한번 실행하면 알아서 코드실행
   useEffect(() => {
-    console.log('1111111');
-    const fetchingUserInfo = async () => {
-      loginService.observeAuthState();
-      // console.log(loginService.observAuthState());
-    };
-    const userAuth = fetchingUserInfo();
-    if (userAuth.fetching) {
-      console.log('444');
-      dispatch({
-        type: 'setUserInfo',
-        userInfo: userAuth,
-      });
-      // setLoginState(true);
-    } else {
-      console.log('5555');
-      dispatch({ type: 'reset' });
-      // setLoginState(false);
-    }
-    setLoginState(userAuth.fetching);
-  }, [loginService]);
+    loginService.observeAuthState(
+      dispatch,
+      setLoginState,
+      kakaoMapAPI,
+      fireStore
+    );
+  }, [fireStore, kakaoMapAPI, loginService]);
 
-  // 유저가 있을때 dispatch로 정보업데이트
+  // 유저가 외부업체auth로 로그인에 성공했을때 dispatch로 정보업데이트
   useEffect(() => {
     if (!loginState) return;
     fireStore.getUserHistory(userInfo.uid).then((res) => {
       dispatch({ type: 'setHistory', history: res });
     });
+    // fireStore.setUserData1(userInfo);
   }, [fireStore, loginState, userInfo.uid]);
-
-  // 유저상태 관찰후 바뀔경우 useInfo업데이트
-  // geolocation 좌표가져와서 userInfo 업데이트
-  useEffect(() => {
-    const boundedAdressAPI = kakaoMapAPI.getAddress.bind(kakaoMapAPI);
-
-    const success = (position) => {
-      boundedAdressAPI(
-        position.coords.longitude,
-        position.coords.latitude
-      ).then((res) => {
-        const [B, H] = res.documents;
-        dispatch({ type: 'setAddress', address: { region_B: B, region_H: H } });
-      });
-    };
-
-    const error = () => {
-      console.log('not surpported on your device');
-    };
-
-    if ('geolocation' in navigator) {
-      navigator.geolocation.getCurrentPosition(success, error);
-    } else {
-      console.log('error');
-    }
-  }, [kakaoMapAPI, loginService]);
 
   return (
     <>
@@ -303,7 +266,7 @@ export default App;
 const reducer = (state, action) => {
   switch (action.type) {
     case 'reset':
-      return resetInfo();
+      return {};
     case 'setHistory':
       return {
         ...state,
@@ -316,7 +279,4 @@ const reducer = (state, action) => {
     default:
       throw new Error();
   }
-};
-const resetInfo = () => {
-  return {};
 };

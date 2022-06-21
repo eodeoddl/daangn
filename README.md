@@ -1,3 +1,22 @@
+## 2022\-06\-21
+
+유저가 정상적인 방법으로 로그인성공하고 fireStore에 userData를 업데이트 할때 유저가 기존에 존재하는 유저일때와 새로 가입한 유저인지를 먼저 파악을 해야한다.
+
+user의 documnet의 manner필드는 key와 value를 가진 객체이다.  
+manner 필드의 key는 매너종류, value는 number type값으로 초기값을 0으로 가진다.
+
+user document는 필드로 userArticles와 reviews를 가진다.
+
+userArticles는 유저가 판매하는 물품을 갖고있는 필드이고 query를 사용하여 해당유저 article의 참조를 배열로 저장한다.
+
+reviews는 해당유저의 게시글에 달린 다른 유저들의 댓글을 가져올수 있어야한다.  
+리뷰정보는 유저 정보의 comments collection에 저장되고 해당컬렉션은 자동생성 id를 식별자로 가진 document를 가지고있다.  
+해당 document는 댓글이 달린 시간을 나타내는 serverTimeStamp필드, 댓글이 달린 articleId필드, comment, 댓글을 달았던 유저의 uid필드를 가진다.
+
+fireStore에 getComments 함수를 만들어서 article한개를 유저가 검색할때 reviews 컬렉션의 articleId 필드값으로 쿼리하고 serverTimeStamp로 정렬해서 해당article 컴포넌트에서 보여질수 있게한다.
+
+app.jsx 의 dispatch로 userInfo를 업데이트 하고난뒤 firestore로 push 하던 로직을 authState change에서 먼저 fireStore로 push하고난뒤 fireStore에 저장됬던 값을 다시 읽어오는 것으로 대체하기로함. fireStore.setUserData에서 기존유저와 신규유저 업데이트 로직을 분기처리 하기로함.
+
 ## 2022\-06\-20
 
 firestore자료구조가 객체안의 배열을 가질수 있는지 체크 => 안됨.
@@ -30,8 +49,8 @@ map.prototype.forEach(callbackFn)
 
 Map객체 대신 article의 reference를 저장하기로 결정. fireStore에서 권장하는 경로인 collectionName(article)/docId(articleId)로 저장함.
 유저의 기본적인 data세팅을 해주려고하는데 현재 필요한 값은 초기값인 userList: [] 상태의 값이 필요함.  
-authStateChange 관찰자 함수로는 값을 리턴할수 없어서 authStateChange안에서 data의 초기값을 설정해주어야 함.  
-또 현재 유저의 정보를 fireStore로 업데이트 하는 메서드가 없기때문에 이것도 만들어야함. -> 유저가 구독을 했을때 user정보를 저장하는 store도 같이 업데이트.
+authStateChange 관찰자 함수로는 값을 리턴할수 없어서 authStateChange안에서 state 변화를 설정해주어야 함.  
+또 현재 유저의 정보를 fireStore로 업데이트 하는 메서드가 사용이되지않는것같음. -> 유저가 구독을 했을때 user정보를 저장하는 store도 같이 업데이트.
 
 ## 2022\-06\-17
 

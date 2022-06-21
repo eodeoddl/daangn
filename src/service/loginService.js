@@ -5,8 +5,6 @@ import {
   signOut,
   onAuthStateChanged,
 } from 'firebase/auth';
-import { MdTurnedInNot } from 'react-icons/md';
-
 import { firebaseAuth } from './firebase.js';
 
 class LoginService {
@@ -26,27 +24,45 @@ class LoginService {
       });
   }
 
-  observeAuthState() {
-    const userInfo = {};
+  observeAuthState(dispatch, setLoginState, kakaoMapAPI, fireStore) {
+    const boundedAddressAPI = kakaoMapAPI.getAddress.bind(kakaoMapAPI);
+
+    const success = async (position) => {
+      const address = await boundedAddressAPI(
+        position.coords.longitude,
+        position.coords.latitude
+      );
+      const [region_B, region_H] = address.documents;
+      dispatch({ type: 'setAddress', address: { region_B, region_H } });
+    };
+
+    const error = () => {
+      console.log('not surpported on your device');
+    };
+
+    // if ('geolocation' in navigator) {
+    //   navigator.geolocation.getCurrentPosition(success, error);
+    // } else {
+    //   console.log('error');
+    // }
+
+    // 이곳에서 uid가 기존에 존재하는 uid인지 파악하고 신규 유저라면 users collection에 정보를 저장하는 작업도 수행한다.
     onAuthStateChanged(firebaseAuth, (user) => {
-      // console.log(user.providerData);
-      // const { displayName, email, photoURL, uid } = user;
-      if (user) {
-        console.log('userExist');
-        user.providerData.forEach((profile) => {
-          const { displayName, email, photoURL, uid } = profile;
-          userInfo.displayName = displayName;
-          userInfo.email = email;
-          userInfo.photoURL = photoURL;
-          userInfo.uid = uid;
-          userInfo.fetching = true;
+      if (user && 'geolocation' in navigator) {
+        const { uid, displayName, photoURL } = user;
+        navigator.geolocation.getCurrentPosition(success, error);
+        dispatch({
+          type: 'setUserInfo',
+          userInfo: { uid, displayName, photoURL },
         });
+        fireStore.setUserData1({ uid, displayName, photoURL });
+        setLoginState(true);
       } else {
-        console.log('no userExist');
-        userInfo.fetching = false;
+        // geolocation 객체를 사용할 수 없거나 user정보가없을경우
+        dispatch({ type: 'reset' });
+        setLoginState(false);
       }
     });
-    return userInfo;
   }
 
   logOut() {

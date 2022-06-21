@@ -54,6 +54,26 @@ class FireStore {
       console.log(e);
     }
   }
+  // 기존에 존재하는 유저인지 검사후 신규일경우에만 업데이트
+  async setUserData1(data) {
+    const userRef = doc(firebaseStore, 'users', data.uid);
+    const docSnap = await getDoc(userRef);
+
+    if (docSnap.exists()) {
+      console.log('이미존재하는 유저입니다.');
+      const articleCollection = collection(firebaseStore, 'article');
+      const q = query(articleCollection, where('uid', '==', data.uid));
+      const querySnapshot = await getDocs(q);
+
+      querySnapshot.forEach((doc) => {
+        updateDoc(userRef, {
+          userArticles: arrayUnion(doc.ref.path),
+        });
+      });
+    } else {
+      console.log('존재하지않는 유저입니다.');
+    }
+  }
 
   // get all user article
   async getUserArticle(uid, setArticle) {
@@ -67,12 +87,19 @@ class FireStore {
     setArticle(dataArr);
   }
 
+  async readRefs(path) {}
+
   async getUserHistory(userId) {
+    // 여기서 거래후기, 매너칭찬, 판매물품을 검색해서 세팅해줌.
+    // 거래후기, 매너칭찬, 판매물품 모두 컬렉션이고 컬렉션 식별자는 review, manner, userArticles로 한다.
+    // 위 컬렉션들은 document로 참조경로를 가지고있다.
     console.log(userId);
     const docRef = doc(firebaseStore, 'users', userId);
+    // const collectionRef = collection();
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
+      console.log(docSnap.data());
       return docSnap.data().history;
     } else {
       console.log('no data');
