@@ -14,7 +14,6 @@ class LoginService {
       .then((res) => {
         const credential = GoogleAuthProvider.credentialFromResult(res);
         const token = credential.accessToken;
-        console.log(token);
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -26,6 +25,7 @@ class LoginService {
 
   observeAuthState(dispatch, setLoginState, kakaoMapAPI, fireStore) {
     const boundedAddressAPI = kakaoMapAPI.getAddress.bind(kakaoMapAPI);
+    const addressData = {};
 
     const success = async (position) => {
       const address = await boundedAddressAPI(
@@ -33,7 +33,8 @@ class LoginService {
         position.coords.latitude
       );
       const [region_B, region_H] = address.documents;
-      dispatch({ type: 'setAddress', address: { region_B, region_H } });
+      addressData.region_B = region_B;
+      addressData.region_H = region_H;
     };
 
     const error = () => {
@@ -55,7 +56,12 @@ class LoginService {
           type: 'setUserInfo',
           userInfo: { uid, displayName, photoURL },
         });
-        fireStore.setUserData1({ uid, displayName, photoURL });
+        fireStore.setUserData1({
+          uid,
+          displayName,
+          photoURL,
+          address: addressData,
+        });
         setLoginState(true);
       } else {
         // geolocation 객체를 사용할 수 없거나 user정보가없을경우

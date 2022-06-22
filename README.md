@@ -1,8 +1,15 @@
+## 2022\-06\-22
+
+유저 로그인auth 정보 state 업데이트 끝나고 auth 의 uid로 해당유저의 document를 가져오고 최종적으로 state 업데이트하는 방식으로 바꿈.
+불필요한 dispatch 호출이 줄어들어서 re-rendering 최소화
+
+현재 userInfo.jsx에서 기존코드는 store와 연동이 되지않았는데 연동하는 코드로 바꾸느작업중.
+
 ## 2022\-06\-21
 
 유저가 정상적인 방법으로 로그인성공하고 fireStore에 userData를 업데이트 할때 유저가 기존에 존재하는 유저일때와 새로 가입한 유저인지를 먼저 파악을 해야한다.
 
-user의 documnet의 manner필드는 key와 value를 가진 객체이다.  
+user의 document의 manner필드는 key와 value를 가진 객체이다.  
 manner 필드의 key는 매너종류, value는 number type값으로 초기값을 0으로 가진다.
 
 user document는 필드로 userArticles와 reviews를 가진다.

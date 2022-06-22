@@ -84,6 +84,9 @@ const InfoCard = styled.section`
 const UserInfo = ({ userInfo, fireStore, fireStorage }) => {
   let { url } = useRouteMatch();
   let query = UseQuery();
+  console.log(userInfo);
+  const kkk = { manner: userInfo.manner, userArticles: userInfo.userArticles };
+  console.log(kkk);
 
   const [activeHistory, setActiveHistory] = useState({
     data: {},
@@ -94,9 +97,13 @@ const UserInfo = ({ userInfo, fireStore, fireStorage }) => {
   const components = {
     매너칭찬: <UserManner data={activeHistory.data} />,
     판매물품: <UserArticles fireStore={fireStore} uid={userInfo.uid} />,
-    거래후기: <UserReview data={activeHistory.data} />,
+    // 거래후기: <UserReview data={activeHistory.data} />,
     '게시글 작성': (
-      <PostingForm userInfo={userInfo} fireStorage={fireStorage} />
+      <PostingForm
+        userInfo={userInfo}
+        fireStorage={fireStorage}
+        fireStore={fireStore}
+      />
     ),
   };
 

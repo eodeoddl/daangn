@@ -196,10 +196,12 @@ function App({
   // 유저가 외부업체auth로 로그인에 성공했을때 dispatch로 정보업데이트
   useEffect(() => {
     if (!loginState) return;
-    fireStore.getUserHistory(userInfo.uid).then((res) => {
-      dispatch({ type: 'setHistory', history: res });
-    });
-    // fireStore.setUserData1(userInfo);
+    const getUser = async () => {
+      console.log('fetching');
+      const userData = await fireStore.getUserInfo(userInfo.uid);
+      dispatch({ type: 'setUserInfo1', userData });
+    };
+    getUser();
   }, [fireStore, loginState, userInfo.uid]);
 
   return (
@@ -267,15 +269,10 @@ const reducer = (state, action) => {
   switch (action.type) {
     case 'reset':
       return {};
-    case 'setHistory':
-      return {
-        ...state,
-        history: action.history,
-      };
     case 'setUserInfo':
       return { ...state, ...action.userInfo };
-    case 'setAddress':
-      return { ...state, ...action.address };
+    case 'setUserInfo1':
+      return { ...state, ...action.userData };
     default:
       throw new Error();
   }

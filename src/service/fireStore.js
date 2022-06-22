@@ -55,14 +55,17 @@ class FireStore {
     }
   }
   // 기존에 존재하는 유저인지 검사후 신규일경우에만 업데이트
-  async setUserData1(data) {
-    const userRef = doc(firebaseStore, 'users', data.uid);
+  async setUserData1(userData) {
+    console.log(userData.address);
+    const userRef = doc(firebaseStore, 'users', userData.uid);
     const docSnap = await getDoc(userRef);
 
     if (docSnap.exists()) {
       console.log('이미존재하는 유저입니다.');
+
+      // 유저가 올린 게시물 업데이트
       const articleCollection = collection(firebaseStore, 'article');
-      const q = query(articleCollection, where('uid', '==', data.uid));
+      const q = query(articleCollection, where('uid', '==', userData.uid));
       const querySnapshot = await getDocs(q);
 
       querySnapshot.forEach((doc) => {
@@ -70,8 +73,61 @@ class FireStore {
           userArticles: arrayUnion(doc.ref.path),
         });
       });
+
+      // 유저의 comments collection 업데이트
+      // const collectionRef = collection(userRef, 'comments');
+      // const q2 = query()
+
+      // await addDoc(collectionRef, {
+      //   timeStamp: null,
+      //   articleId: null,
+      //   commnet: null,
+      //   uid: null,
+      // });
     } else {
       console.log('존재하지않는 유저입니다.');
+
+      await setDoc(userRef, {
+        address: userData.address,
+        displayName: userData.displayName,
+        photoURL: userData.photoURL,
+        uid: userData.uid,
+        manner: {
+          '시간을 잘지켜요': { count: 0 },
+          '친절하고 매너가 좋아요': { count: 0 },
+          '응답이 빨라요': { count: 0 },
+          '상품상태가 설명한것과 같아요': { count: 0 },
+          '좋은 상품을 저렴하게 판매해요': { count: 0 },
+        },
+        history: {
+          판매물품: {},
+          거래후기: {
+            아이디1: { comments: '좋아여' },
+            아이디2: { comments: '좋아여' },
+            아이디3: { comments: '좋아여' },
+            아이디4: { comments: '좋아여' },
+            아이디5: { comments: '좋아여' },
+            아이디6: { comments: '좋아여' },
+            아이디7: { comments: '좋아여' },
+          },
+          매너칭찬: {
+            '시간을 잘지켜요': { count: 0 },
+            '친절하고 매너가 좋아요': { count: 10 },
+            '응답이 빨라요': { count: 9 },
+            '상품상태가 설명한것과 같아요': { count: 11 },
+            '좋은 상품을 저렴하게 판매해요': { count: 6 },
+          },
+        },
+      });
+    }
+  }
+
+  async getUserInfo(uid) {
+    const userRef = doc(firebaseStore, 'users', uid);
+    const docSnap = await getDoc(userRef);
+
+    if (docSnap.exists()) {
+      return docSnap.data();
     }
   }
 
@@ -88,23 +144,6 @@ class FireStore {
   }
 
   async readRefs(path) {}
-
-  async getUserHistory(userId) {
-    // 여기서 거래후기, 매너칭찬, 판매물품을 검색해서 세팅해줌.
-    // 거래후기, 매너칭찬, 판매물품 모두 컬렉션이고 컬렉션 식별자는 review, manner, userArticles로 한다.
-    // 위 컬렉션들은 document로 참조경로를 가지고있다.
-    console.log(userId);
-    const docRef = doc(firebaseStore, 'users', userId);
-    // const collectionRef = collection();
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      console.log(docSnap.data());
-      return docSnap.data().history;
-    } else {
-      console.log('no data');
-    }
-  }
 
   // make user > artilce collection & getCollection by document id
   async setUserArticle(uid) {
@@ -127,11 +166,16 @@ class FireStore {
   }
 
   // data arg comes from postingForm.jsx
-  async setArticle(data) {
+  async setArticle(data, uid) {
+    const userRef = doc(firebaseStore, 'users', uid);
     const collectionRef = collection(firebaseStore, 'article');
     const docRef = await addDoc(collectionRef, {
       ...data,
       uploaded: serverTimestamp(),
+    });
+    // 여기서 유저 document도 업데이트
+    updateDoc(userRef, {
+      userArticles: arrayUnion(docRef.path),
     });
     return docRef.id;
   }
@@ -151,6 +195,7 @@ class FireStore {
     const article = await getDoc(docRef);
     return article.data();
   }
+  // 모든 article중에 필터링에 따라서 article요청
   // arguments condition is serverTimeStamp, region, searchTerm
   async getOrderedArticle(searchTerm) {
     const articles = [];

@@ -215,7 +215,7 @@ const fileTypes = [
   'image/x-icon',
 ];
 
-const PostingForm = ({ userInfo, fireStorage }) => {
+const PostingForm = ({ userInfo, fireStorage, fireStore }) => {
   const [fileImg, setFileImg] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [formData, dispatch] = useReducer(reducer, {}, init);
@@ -300,7 +300,7 @@ const PostingForm = ({ userInfo, fireStorage }) => {
     history.push('/');
 
     // this api return articleId asynchronously
-    const articleId = await userInfo.fireStore.setArticle(formData);
+    const articleId = await fireStore.setArticle(formData, userInfo.uid);
 
     // uploadFile api needs arguments & run asynchronously & return file download url
     for (let file of files) {
@@ -311,7 +311,7 @@ const PostingForm = ({ userInfo, fireStorage }) => {
       );
       urlArr.push(url);
     }
-    userInfo.fireStore.updateImageUrl(articleId, urlArr);
+    fireStore.updateImageUrl(articleId, urlArr);
   };
 
   const onChangeValue = useCallback((e) => {
