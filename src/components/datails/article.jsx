@@ -154,11 +154,8 @@ const Article = ({ fireStore, latestItemList, handleShowModal, userInfo }) => {
   const [slideIdx, setSlideIdx] = useState(0);
   const [articleData, setArticleData] = useState(null);
   const slideTrackRef = useRef(null);
-  // const [imgSrc, setImgSrc] = useState(null);
 
   const { articleId } = useParams();
-  console.log(articleId);
-  console.log(userInfo);
 
   useEffect(() => {
     const fetchingData = async () => {

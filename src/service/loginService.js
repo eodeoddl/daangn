@@ -54,9 +54,9 @@ class LoginService {
         navigator.geolocation.getCurrentPosition(success, error);
         dispatch({
           type: 'setUserInfo',
-          userInfo: { uid, displayName, photoURL },
+          data: { uid, displayName, photoURL },
         });
-        fireStore.setUserData1({
+        fireStore.setUserData({
           uid,
           displayName,
           photoURL,

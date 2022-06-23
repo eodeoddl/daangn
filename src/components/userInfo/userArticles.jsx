@@ -8,35 +8,31 @@ const Section = styled.section`
   display: flex;
   flex-wrap: wrap;
   justify-content: space-around;
-  
+
   .card-wrap {
-    margin: 0 auto;
-    width: calc(33% - 16px);
+    width: 30%;
+    margin-bottom: 40px;
+    box-shadow: 3px 3px 4px 5px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    padding: 5px;
   }
 
-  .card {
-    width: 100%;
-    margin-right: 16px;
-    margin-bottom: 56px; 
-  }
   .anchor {
     text-decoration: none;
     color: #212529;
   }
+
   .img-wrap {
-    position: relative;
-    padding-top : 100%;
+    width: 100%;
+    height: 200px;
+    max-height: 200px;
     overflow: hidden;
     border-radius: 12px;
   }
 
-  .img{ 
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    border-radius: 12px;
-    border: 1px solid black;
-    object-fit: cover;
+  .img {
+    width: 100%;
+    height: 100%;
   }
 
   .card-desc {
@@ -46,67 +42,62 @@ const Section = styled.section`
   .title {
     text-overflow: ellipsis;
     font-size: 16px;
-    color: color: #212529;
-    font-weight: normal;
-    margin-bottom: 4px;
+    color: #212529;
+    font-weight: 600;
+    margin-bottom: 6px;
   }
 
   .price {
-    font-size : 15px;
-    font-weight: 700;
-    margin-bottom: 4px;
+    font-size: 15px;
+    font-weight: 600;
+    color: ${({ theme }) => theme.colors.lightOrange};
+    // margin-bottom: px;
   }
 
   .region {
-    margin-bottom: 4px;
+    margin-bottom: 6px;
     font-size: 15px;
+    color: ${({ theme }) => theme.colors.darkGray};
   }
 `;
 
-const UserArticles = ({ fireStore, uid }) => {
-  const [article, setArticle] = useState(null); //
-  console.log(fireStore.getUserArticle);
-  console.log(uid);
+const UserArticles = ({ fireStore, data }) => {
+  const [article, setArticle] = useState(null);
+
   useEffect(() => {
-    fireStore.getUserArticle(uid, setArticle);
-  }, [fireStore, uid]);
+    const getArticleData = async () => {
+      const articleData = data.map((articlePath) => {
+        return fireStore.readRefs(articlePath);
+      });
+      const result = await Promise.all(articleData);
+      setArticle(result);
+    };
+    getArticleData();
+  }, [data, fireStore]);
+
   return (
     article && (
       <Section>
         {article.map((item) => {
           return (
             <div className='card-wrap' key={item.id}>
-              <div className='card'>
-                <Link
-                  className='anchor'
-                  to={{
-                    pathname: `/article/${item.id}`,
-                    state: {
-                      data: {
-                        id: item.id,
-                        img: 'http://placeimg.com/640/480/animals',
-                        city: '청주시',
-                        street: '흥덕구',
-                        item_title: item.data.title,
-                        item_desc: item.data.description,
-                      },
-                    },
-                  }}
-                >
-                  <div className='img-wrap'>
-                    <img
-                      src='http://placeimg.com/640/480/animals'
-                      alt='img'
-                      className='img'
-                    />
-                  </div>
-                  <div className='card-desc'>
-                    <p className='title'>{item.data.title}</p>
-                    <div className='price'>{item.data.price}원</div>
-                    <div className='region'>청주시 흥덕구</div>
-                  </div>
-                </Link>
-              </div>
+              {/* <div className='card'> */}
+              <Link
+                className='anchor'
+                to={{
+                  pathname: `/article/${item.id}`,
+                }}
+              >
+                <div className='img-wrap'>
+                  <img src={item.image[0]} alt='img' className='img' />
+                </div>
+                <div className='card-desc'>
+                  <p className='title'>{item.title}</p>
+                  <div className='region'>{item.region_B.address_name}</div>
+                  <div className='price'>{item.price}원</div>
+                </div>
+              </Link>
+              {/* </div> */}
             </div>
           );
         })}

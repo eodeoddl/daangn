@@ -1,3 +1,7 @@
+## 2022\-06\-23
+
+userInfo.jsx, firStore.js, userManner.jsx, userArticles.jsx firStore api와 연동작업 완료함.
+
 ## 2022\-06\-22
 
 유저 로그인auth 정보 state 업데이트 끝나고 auth 의 uid로 해당유저의 document를 가져오고 최종적으로 state 업데이트하는 방식으로 바꿈.

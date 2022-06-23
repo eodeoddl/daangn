@@ -16,47 +16,8 @@ import {
 } from 'firebase/firestore';
 
 class FireStore {
-  async setUserData(userData) {
-    console.log(userData);
-    try {
-      const userRef = doc(firebaseStore, 'users', userData.uid);
-      await setDoc(
-        userRef,
-        {
-          address: userData.address,
-          displayName: userData.displayName,
-          email: userData.email,
-          photoURL: userData.photoURL,
-          uid: userData.uid,
-          history: {
-            판매물품: {},
-            거래후기: {
-              아이디1: { comments: '좋아여' },
-              아이디2: { comments: '좋아여' },
-              아이디3: { comments: '좋아여' },
-              아이디4: { comments: '좋아여' },
-              아이디5: { comments: '좋아여' },
-              아이디6: { comments: '좋아여' },
-              아이디7: { comments: '좋아여' },
-            },
-            매너칭찬: {
-              '시간을 잘지켜요': { count: 0 },
-              '친절하고 매너가 좋아요': { count: 10 },
-              '응답이 빨라요': { count: 9 },
-              '상품상태가 설명한것과 같아요': { count: 11 },
-              '좋은 상품을 저렴하게 판매해요': { count: 6 },
-            },
-          },
-        },
-        { merge: true }
-      );
-    } catch (e) {
-      console.log(e);
-    }
-  }
   // 기존에 존재하는 유저인지 검사후 신규일경우에만 업데이트
-  async setUserData1(userData) {
-    console.log(userData.address);
+  async setUserData(userData) {
     const userRef = doc(firebaseStore, 'users', userData.uid);
     const docSnap = await getDoc(userRef);
 
@@ -99,25 +60,6 @@ class FireStore {
           '상품상태가 설명한것과 같아요': { count: 0 },
           '좋은 상품을 저렴하게 판매해요': { count: 0 },
         },
-        history: {
-          판매물품: {},
-          거래후기: {
-            아이디1: { comments: '좋아여' },
-            아이디2: { comments: '좋아여' },
-            아이디3: { comments: '좋아여' },
-            아이디4: { comments: '좋아여' },
-            아이디5: { comments: '좋아여' },
-            아이디6: { comments: '좋아여' },
-            아이디7: { comments: '좋아여' },
-          },
-          매너칭찬: {
-            '시간을 잘지켜요': { count: 0 },
-            '친절하고 매너가 좋아요': { count: 10 },
-            '응답이 빨라요': { count: 9 },
-            '상품상태가 설명한것과 같아요': { count: 11 },
-            '좋은 상품을 저렴하게 판매해요': { count: 6 },
-          },
-        },
       });
     }
   }
@@ -131,23 +73,17 @@ class FireStore {
     }
   }
 
-  // get all user article
-  async getUserArticle(uid, setArticle) {
-    const collectionRef = collection(firebaseStore, 'users', uid, 'articles');
-    console.log(collectionRef);
-    const querySnapshot = await getDocs(collectionRef);
-    const dataArr = [];
-    querySnapshot.forEach((article) => {
-      dataArr.push({ id: article.id, data: article.data() });
-    });
-    setArticle(dataArr);
+  async readRefs(path) {
+    const articleRef = doc(firebaseStore, path);
+    const docSnap = await getDoc(articleRef);
+
+    if (docSnap.exists()) {
+      return { ...docSnap.data(), id: docSnap.id };
+    }
   }
 
-  async readRefs(path) {}
-
-  // make user > artilce collection & getCollection by document id
+  // make user > artilce collection & getCollection by document id in components/details article.jsx
   async setUserArticle(uid) {
-    console.log(uid);
     // query
     const articleRef = collection(firebaseStore, 'articles');
     const q = query(articleRef, where('uid', '==', uid));

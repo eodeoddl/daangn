@@ -127,9 +127,6 @@ const Container = styled.section`
 `;
 
 const SearchResult = ({ match, searchedItem, handleLoading, loadingState }) => {
-  console.log('ordered item', searchedItem);
-  console.log('match.params.searchTerm :', match.params.searchTerm);
-
   return (
     <Container>
       <div className='result'>

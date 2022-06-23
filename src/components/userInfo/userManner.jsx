@@ -26,8 +26,6 @@ const Ol = styled.ol`
 `;
 
 const UserManner = ({ data }) => {
-  console.log('userManner data', data);
-
   return (
     <Ol>
       {data &&
@@ -38,7 +36,6 @@ const UserManner = ({ data }) => {
             .reverse();
           return sortedArr.map((item, i) => {
             const [manner, data] = item;
-            console.log(manner, data);
             return (
               <li className='manner' key={i}>
                 <p className='manner-comments'>{manner}</p>

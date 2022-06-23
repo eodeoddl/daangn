@@ -5,11 +5,11 @@ import UseQuery from '../../customHook/useQuery';
 import PostingForm from './postingForm';
 import UserArticles from './userArticles';
 import UserManner from './userManner';
-import UserReview from './userReview';
+// import UserReview from './userReview';
 
 const InfoCard = styled.section`
   margin: 80px auto 0 auto;
-  width: 677px;
+  width: 750px;
 
   .user-profile {
     margin: 30px 0;
@@ -77,6 +77,7 @@ const InfoCard = styled.section`
     }
 
     .content {
+      margin: 0 5px;
     }
   }
 `;
@@ -84,19 +85,19 @@ const InfoCard = styled.section`
 const UserInfo = ({ userInfo, fireStore, fireStorage }) => {
   let { url } = useRouteMatch();
   let query = UseQuery();
-  console.log(userInfo);
-  const kkk = { manner: userInfo.manner, userArticles: userInfo.userArticles };
-  console.log(kkk);
-
-  const [activeHistory, setActiveHistory] = useState({
-    data: {},
-  });
+  const [userHistory, setUserHistory] = useState(null);
+  const [activeHistory, setActiveHistory] = useState({});
 
   const staticMenu = ['게시글 작성'];
 
   const components = {
-    매너칭찬: <UserManner data={activeHistory.data} />,
-    판매물품: <UserArticles fireStore={fireStore} uid={userInfo.uid} />,
+    매너칭찬: <UserManner data={activeHistory} />,
+    판매물품: (
+      <UserArticles
+        fireStore={fireStore}
+        data={Object.values(activeHistory)[0]}
+      />
+    ),
     // 거래후기: <UserReview data={activeHistory.data} />,
     '게시글 작성': (
       <PostingForm
@@ -109,7 +110,7 @@ const UserInfo = ({ userInfo, fireStore, fireStorage }) => {
 
   // 유저정보보기 style 함수
   const toggleActiveStyle = (key) => {
-    if (key === Object.keys(activeHistory.data)[0]) return 'active';
+    if (key === Object.keys(activeHistory)[0]) return 'active';
     else return '';
   };
 
@@ -118,18 +119,26 @@ const UserInfo = ({ userInfo, fireStore, fireStorage }) => {
     // static 메뉴는 value값이 undefined
     // static 메뉴의 value 값이 필요할 경우 여기서 처리
     setActiveHistory({
-      data: { [key]: userInfo.history[key] },
+      [key]: userHistory[key],
     });
   };
 
   useEffect(() => {
-    if (query.get('kind')) return;
-    const first_key = Object.keys(userInfo.history)[0];
-    const first_value = userInfo.history[first_key];
-    setActiveHistory({
-      data: { [first_key]: first_value },
+    setUserHistory({
+      매너칭찬: userInfo.manner,
+      판매물품: userInfo.userArticles,
     });
-  }, [query, userInfo.history]);
+  }, [userInfo.manner, userInfo.userArticles]);
+
+  useEffect(() => {
+    if (query.get('kind')) return;
+    if (!userHistory) return;
+    const first_key = Object.keys(userHistory)[0];
+    const first_value = userHistory[first_key];
+    setActiveHistory({
+      [first_key]: first_value,
+    });
+  }, [query, userHistory]);
 
   return (
     <>
@@ -151,8 +160,8 @@ const UserInfo = ({ userInfo, fireStore, fireStorage }) => {
         <div className='user-history'>
           <div className='filter'>
             <ul>
-              {activeHistory &&
-                Object.keys(userInfo.history).map((menu, i) => {
+              {userHistory &&
+                Object.keys(userHistory).map((menu, i) => {
                   const search = i === 0 ? '' : `?kind=${menu}`;
                   return (
                     <li
@@ -192,7 +201,7 @@ const UserInfo = ({ userInfo, fireStore, fireStorage }) => {
             </ul>
           </div>
           <div className='content'>
-            {components[Object.keys(activeHistory.data)[0]]}
+            {components[Object.keys(activeHistory)[0]]}
           </div>
         </div>
       </InfoCard>

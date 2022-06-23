@@ -197,9 +197,8 @@ function App({
   useEffect(() => {
     if (!loginState) return;
     const getUser = async () => {
-      console.log('fetching');
-      const userData = await fireStore.getUserInfo(userInfo.uid);
-      dispatch({ type: 'setUserInfo1', userData });
+      const data = await fireStore.getUserInfo(userInfo.uid);
+      dispatch({ type: 'setUserInfo', data });
     };
     getUser();
   }, [fireStore, loginState, userInfo.uid]);
@@ -270,9 +269,9 @@ const reducer = (state, action) => {
     case 'reset':
       return {};
     case 'setUserInfo':
-      return { ...state, ...action.userInfo };
-    case 'setUserInfo1':
-      return { ...state, ...action.userData };
+      return { ...state, ...action.data };
+    // case 'setUserInfo1':
+    //   return { ...state, ...action.userData };
     default:
       throw new Error();
   }
