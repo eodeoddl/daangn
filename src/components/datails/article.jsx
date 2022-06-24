@@ -3,7 +3,8 @@ import { withRouter, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import ArticleFooter from '../footer/articleFooter';
-import Carosual from '../publicStyle/carosual';
+import Carousel from '../publicStyle/carousel';
+import Demo from '../publicStyle/demoCarousel';
 import LatestItem from '../search/latestItem';
 
 const Container = styled.article`
@@ -208,7 +209,8 @@ const Article = ({ fireStore, latestItemList, handleShowModal, userInfo }) => {
         </Portal>
       </Route> */}
         <section className='article-image'>
-          <Carosual
+          <Demo images={articleData.image} />
+          {/* <Carousel
             imgSrc={articleData.image}
             id={articleData.id}
             slideIdx={slideIdx}
@@ -216,7 +218,7 @@ const Article = ({ fireStore, latestItemList, handleShowModal, userInfo }) => {
             ref={slideTrackRef}
           />
           <button className='prev-btn' onClick={onClickPrev} />
-          <button className='next-btn' onClick={onClickNext} />
+          <button className='next-btn' onClick={onClickNext} /> */}
         </section>
         <section className='article-profile'>
           <Link to={'aaa'}>

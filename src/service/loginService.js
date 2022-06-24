@@ -65,14 +65,16 @@ class LoginService {
         setLoginState(true);
       } else {
         // geolocation 객체를 사용할 수 없거나 user정보가없을경우
-        dispatch({ type: 'reset' });
         setLoginState(false);
       }
     });
   }
 
-  logOut() {
-    return signOut(firebaseAuth);
+  async logOut(dispatch) {
+    // signout api는 promise객체를 리턴.
+    // 작업이 에러없이 완료되면 undefined 값을 반환.
+    await signOut(firebaseAuth);
+    dispatch({ type: 'reset' });
   }
 
   getProvider(providerName) {

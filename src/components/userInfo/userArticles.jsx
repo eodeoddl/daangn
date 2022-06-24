@@ -1,6 +1,7 @@
 import React, { useState, useEffect, memo } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import { AiOutlineHeart } from 'react-icons/ai';
 // import { ThemeProvider } from 'styled-components';
 
 const Section = styled.section`
@@ -51,13 +52,36 @@ const Section = styled.section`
     font-size: 15px;
     font-weight: 600;
     color: ${({ theme }) => theme.colors.lightOrange};
-    // margin-bottom: px;
   }
 
   .region {
     margin-bottom: 6px;
     font-size: 15px;
     color: ${({ theme }) => theme.colors.darkGray};
+  }
+
+  .layout-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: ${({ theme }) => theme.colors.lightOrange};
+    font-weight: 600;
+    font-size: 15px;
+    line-height: 18px;
+  }
+
+  .subscribe-info {
+    display: flex;
+    align-items: center;
+
+    svg {
+      margin-right: 3px;
+    }
+
+    span {
+      font-size: 13px;
+      color: ${({ theme }) => theme.colors.black};
+    }
   }
 `;
 
@@ -94,7 +118,13 @@ const UserArticles = ({ fireStore, data }) => {
                 <div className='card-desc'>
                   <p className='title'>{item.title}</p>
                   <div className='region'>{item.region_B.address_name}</div>
-                  <div className='price'>{item.price}원</div>
+                  <div className='layout-container'>
+                    <div className='price'>{item.price}원</div>
+                    <div className='subscribe-info'>
+                      <AiOutlineHeart />
+                      <span>{item.subscribeCount || 0}</span>
+                    </div>
+                  </div>
                 </div>
               </Link>
               {/* </div> */}

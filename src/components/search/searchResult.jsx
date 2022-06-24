@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import styled from 'styled-components';
 import { MoreButton } from '../publicStyle/moreButton.jsx';
@@ -84,7 +84,6 @@ const Container = styled.section`
             justify-content: space-between;
             align-items: center;
             margin-top: 6px;
-            // margin
             color: ${({ theme }) => theme.colors.lightOrange};
             font-weight: 600;
             font-size: 15px;
@@ -126,7 +125,8 @@ const Container = styled.section`
   }
 `;
 
-const SearchResult = ({ match, searchedItem, handleLoading, loadingState }) => {
+const SearchResult = ({ searchedItem, handleLoading, loadingState }) => {
+  // console.log(match);
   return (
     <Container>
       <div className='result'>

@@ -1,3 +1,19 @@
+## 2022\-06\-24
+
+logout 에러코드 정리 => dispatch type reset 하는 타이밍.  
+userArtcles.jsx css 마무리.  
+components/datails/article.jsx carousel코드 컴포넌트로 분리하기. carousel 사진 탐색하는 onClickDot 이벤트 ui 완성하기  
+carousel 이미지 클릭시 확대해서 보는 기능 -> portal로 이미지만 더 자세히 볼수있게만들기 이것도 carousel
+
+자잘한 부분으로 article.jsx 올린 시간 사용자가 알아보기 쉽게 얼마전에 포스팅한 글인지 알려주기.
+auth가 발급된 유저만 이용할수 있는 컨텐츠에서의 로직고민해보기. history.push('/') 해주는데 auth상태를 어떻게 구분할것인지.
+
+carousel.jsx의 이동버튼도 따로 component화 해서 필요한 곳에서만 import 해서 사용.
+
+components/details/article.jsx 에서 렌더링되는 carousel 컴포넌트를 기존코드는 forWardRef, article.jsx 컴포넌트의 state와 엮여있어서 독립된 컴포넌트로 작동하기 힘든 코드였음. 때문에 carousel-btn.jsx demoCarousel.jsx를 추가하고 독립된 컴포넌트 코드로 만드는 작업중.
+
+carousel 만들때 되도록이면 useRef를 사용하지 않고하려는데 방법을 모르겠음. 이미지를 가로 정렬하려는데 이미지를 감싸고있는 부모요소가 이미지가 가로로 쌓이면서 옆으로 width값이 늘어나게만들어야 함.
+
 ## 2022\-06\-23
 
 userInfo.jsx, firStore.js, userManner.jsx, userArticles.jsx firStore api와 연동작업 완료함.

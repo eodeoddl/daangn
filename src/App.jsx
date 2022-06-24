@@ -162,6 +162,10 @@ function App({
     setShowModal(!showModal);
   };
 
+  const logout = () => {
+    loginService.logOut(dispatch);
+  };
+
   // 검색여부에따라서 url 요청
   useEffect(() => {
     if (didSearch) {
@@ -191,7 +195,7 @@ function App({
       kakaoMapAPI,
       fireStore
     );
-  }, [fireStore, kakaoMapAPI, loginService]);
+  }, [fireStore, history, kakaoMapAPI, loginService]);
 
   // 유저가 외부업체auth로 로그인에 성공했을때 dispatch로 정보업데이트
   useEffect(() => {
@@ -210,7 +214,7 @@ function App({
         handleShowModal={handleShowModal}
         userInfo={userInfo}
         loginState={loginState}
-        logout={loginService.logOut}
+        logout={logout}
       />
       <Switch>
         <Route exact path='/'>
