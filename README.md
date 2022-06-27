@@ -1,9 +1,20 @@
+## 2022\-06\-27
+
+button안에 svg 형식의 이미지를 사용하고있음. svg 이미지에 transform scale css를 적용할때 일반적인 img 태그와 svg이미지의 작동방식이다름. transform oringin의 좌표의 기본값이 서로다른기때문에 svg 와 img의 scale변경이 다른 방식으로 보여짐.
+css property로 origin 값을 직접변경 보단 translateY로 먼저 당겨 주고 scale적용으로 해결
+
+carousel 컴포넌트는 경우에 따라 button이 필요한 경우와 필요가 없는 경우가 있음. button의 렌더링 여부는 해당 carousel을 렌더링 할때 withButton props값이 true, false인지에 따라 결정함. 또 button을 absolute로 포지셔닝할때 부모가 relative요소 일때의 컨테이닝 블록이결정되기도 하지만 transform 속성이 none이 아닌 가장 가까운 조상값인 carousel container 블록에 포지셔닝 된다는 사실을 알게됨. 때문에 button 컴포넌트는 carousel container block의 바깥에서 렌더링하기로함.
+
+현재 fireStore 참조경로를 바로 img태그의 src로 삽입할경우 첫렌더링시에 보이는 img 태그만 제대로 사진이 보이고 carousel로 숨겨진 img 태그의 src가 작동하지않음..carousel의 image index를 변화시켜 화면을 이동시킬시 빈 화면만 보임.
+fireStore에 image가 저장된 storage 참조경로를 getDownload url로 읽어와서 img태그의 attribute로 세팅해서 테스트 해보기.
+fireStorage documentation getDouwloadURL() 참고하기. fireStore에 저장된 참조자체를 src연결하는것이 아니라 참조를 통해 blob데이터를 만들고 src로 연결하는듯.
+
 ## 2022\-06\-24
 
-logout 에러코드 정리 => dispatch type reset 하는 타이밍.  
-userArtcles.jsx css 마무리.  
-components/datails/article.jsx carousel코드 컴포넌트로 분리하기. carousel 사진 탐색하는 onClickDot 이벤트 ui 완성하기  
-carousel 이미지 클릭시 확대해서 보는 기능 -> portal로 이미지만 더 자세히 볼수있게만들기 이것도 carousel
+logout 에러코드 정리 => dispatch type reset 하는 타이밍 완.  
+userArtcles.jsx css 마무리 완.  
+components/datails/article.jsx carousel코드 컴포넌트로 분리하기. carousel 사진 탐색하는 onClickDot 이벤트 ui 완성하기완.  
+carousel 이미지 클릭시 확대해서 보는 기능 -> portal로 이미지만 더 자세히 볼수있게만들기 이것도 carousel 컴포넌트를 포탈안에서 부르기만 하면됨.
 
 자잘한 부분으로 article.jsx 올린 시간 사용자가 알아보기 쉽게 얼마전에 포스팅한 글인지 알려주기.
 auth가 발급된 유저만 이용할수 있는 컨텐츠에서의 로직고민해보기. history.push('/') 해주는데 auth상태를 어떻게 구분할것인지.

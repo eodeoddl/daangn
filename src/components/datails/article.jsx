@@ -9,48 +9,47 @@ import LatestItem from '../search/latestItem';
 
 const Container = styled.article`
   margin-top: 100px;
-  position: relative;
 
   .article-image {
     margin: 0 auto;
     width: 729px;
     height: 500px;
     position: relative;
-
-    .next-btn {
-      position: absolute;
-      right: 0;
-      top: 240px;
-      border: none;
-      background: url(https://d1unjqcospf8gs.cloudfront.net/assets/home/articles/icon-slider-right-134c53f44716c3bef227ec30da385b4b09c9c068d339a617a23093718f379d02.svg)
-        no-repeat;
-      width: 11px;
-      height: 21px;
-    }
-
-    .next-btn:hover {
-      transform: scale(1.15);
-      background: url(https://d1unjqcospf8gs.cloudfront.net/assets/home/articles/icon-slider-right-hover-c71a5a4d1745bf59f056660eadc57e451f619b5bddaff0c9fdf2f8e3b4d955f8.svg)
-        no-repeat;
-    }
-
-    .prev-btn {
-      position: absolute;
-      left: 0;
-      top: 240px;
-      border: none;
-      background: url(https://d1unjqcospf8gs.cloudfront.net/assets/home/articles/icon-slider-left-4c0e713bfa2cd12bd959e6dd9ef456cd6fc094953c41e605f6b9a59bc1680686.svg)
-        no-repeat;
-      width: 11px;
-      height: 21px;
-    }
-
-    .prev-btn:hover {
-      transform: scale(1.15);
-      background: url(https://d1unjqcospf8gs.cloudfront.net/assets/home/articles/icon-slider-left-hover-bbda49cc160e798261c2dd4894cc623d0118a701fbb705546fc06de658ce3996.svg)
-        no-repeat;
-    }
   }
+
+  //   .next-btn {
+  //     position: absolute;
+  //     right: 0;
+  //     top: 240px;
+  //     border: none;
+  //     background: url(https://d1unjqcospf8gs.cloudfront.net/assets/home/articles/icon-slider-right-134c53f44716c3bef227ec30da385b4b09c9c068d339a617a23093718f379d02.svg)
+  //       no-repeat;
+  //     width: 11px;
+  //     height: 21px;
+  //   }
+
+  //   .next-btn:hover {
+  //     transform: scale(1.15);
+  //     background: url(https://d1unjqcospf8gs.cloudfront.net/assets/home/articles/icon-slider-right-hover-c71a5a4d1745bf59f056660eadc57e451f619b5bddaff0c9fdf2f8e3b4d955f8.svg)
+  //       no-repeat;
+  //   }
+
+  //   .prev-btn {
+  //     position: absolute;
+  //     left: 0;
+  //     top: 240px;
+  //     border: none;
+  //     background: url(https://d1unjqcospf8gs.cloudfront.net/assets/home/articles/icon-slider-left-4c0e713bfa2cd12bd959e6dd9ef456cd6fc094953c41e605f6b9a59bc1680686.svg)
+  //       no-repeat;
+  //     width: 11px;
+  //     height: 21px;
+  //   }
+
+  //   .prev-btn:hover {
+  //     transform: scale(1.15);
+  //     background: url(https://d1unjqcospf8gs.cloudfront.net/assets/home/articles/icon-slider-left-hover-bbda49cc160e798261c2dd4894cc623d0118a701fbb705546fc06de658ce3996.svg)
+  //       no-repeat;
+  //   }
 
   .article-profile {
     width: 677px;
@@ -209,7 +208,7 @@ const Article = ({ fireStore, latestItemList, handleShowModal, userInfo }) => {
         </Portal>
       </Route> */}
         <section className='article-image'>
-          <Demo images={articleData.image} />
+          <Demo images={articleData.image} widthButton={true} />
           {/* <Carousel
             imgSrc={articleData.image}
             id={articleData.id}
