@@ -5,8 +5,8 @@ import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from 'react-icons/md';
 const CarouselContainer = styled.div`
   width: 100%;
   height: 100%;
-  overflow: hidden;
   display: flex;
+  transform: translateX(-100%);
   transition: transform 0.5s ease-in-out;
 
   .slide {
@@ -45,9 +45,47 @@ const Button = styled.button`
   }
 `;
 
-const Demo = ({ images, widthButton }) => {
-  // console.log(widthButton);
-  console.log(images);
+const DotsContainer = styled.div`
+  position: absolute;
+  bottom: 0;
+  background-image: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.5),
+    rgba(0, 0, 0, 0)
+  );
+  width: 100%;
+  height: 10%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .dot {
+    display: inline-block;
+    margin: 0 7px;
+    cursor: pointer;
+  }
+
+  .dot:before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: ${({ theme }) => theme.colors.black};
+    opacity: 0.5;
+    display: block;
+  }
+
+  .active:before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: ${({ theme }) => theme.colors.white};
+    display: block;
+  }
+`;
+
+const Demo = ({ images, withButton }) => {
   const [slideIdx, setSlideIdx] = useState(0);
   const slideContainerRef = useRef(null);
 
@@ -66,41 +104,81 @@ const Demo = ({ images, widthButton }) => {
   };
 
   const moveDot = (index) => {
-    setSlideIdx(index);
+    setSlideIdx((prevIdx) => {
+      if (prevIdx === index) return prevIdx;
+      else return index;
+    });
+  };
+
+  const transitionEnd = (e) => {
+    console.log('transitionEnd');
+
+    // console.log(slideIdx === images.length - 1 || slideIdx === 0);
+    // if (slideIdx === images.length - 1 || slideIdx === 0) {
+    //   console.log('if block ');
+    //   slideContainerRef.current.style.transition = 'none';
+    // }
+    // console.log('else block ');
+    // slideContainerRef.current.style.transition = 'transform 0.5s ease-in-out';
   };
 
   useEffect(() => {
-    // if (slideIdx === 0) return;
+    // click next & point images first index
+    // sif (slideIdx === 0)
+    //   // slideContainerRef.current.style.transform = `translateX(-100%)`;
+    //   slideContainerRef.current.style.tra
+    // // click prev & point images last index
+    // else if (slideIdx === images.length - 1) {
+    //   // slideContainerRef.current.style.transform = `translateX(${
+    //   //   -(slideIdx - 1) * 100
+    //   // }%)`;
+    // } else
+    if (slideIdx === 0) return;
     slideContainerRef.current.style.transform = `translateX(${
       -slideIdx * 100
     }%)`;
   }, [slideIdx]);
 
-  useEffect(() => {}, []);
+  // useEffect(() => {
+  // }, [slideIdx]);
 
   return (
     <>
-      <CarouselContainer ref={slideContainerRef}>
-        {images.map((image, i) => {
-          console.log(image);
-          return (
-            <div key={i} className={slideIdx === i ? 'slide active' : 'slide'}>
-              <img alt={`data-index-${i}`} src={image} />
+      <CarouselContainer
+        ref={slideContainerRef}
+        onTransitionEnd={(e) => transitionEnd(e)}
+      >
+        {images && (
+          <>
+            <div className='slide'>
+              <img alt='cloned-lastImg' src={images[images.length - 1]} />
             </div>
-          );
-        })}
-
-        <div className='container-dots'>
-          {Array.from({ length: images.length }).map((_, i) => (
-            <div
-              key={i}
-              className={slideIdx === i ? 'dot active' : 'dot'}
-              onClick={(i) => moveDot(i)}
-            ></div>
-          ))}
-        </div>
+            {images.map((image, i) => {
+              return (
+                <div
+                  key={i}
+                  className={slideIdx === i ? 'slide active' : 'slide'}
+                >
+                  <img alt={`data-index-${i}`} src={image} />
+                </div>
+              );
+            })}
+            <div className='slide'>
+              <img alt='firstImg' src={images[0]} />
+            </div>
+          </>
+        )}
       </CarouselContainer>
-      {widthButton && (
+      <DotsContainer>
+        {Array.from({ length: images.length }).map((_, i) => (
+          <div
+            key={i}
+            className={slideIdx === i ? 'dot active' : 'dot'}
+            onClick={() => moveDot(i)}
+          ></div>
+        ))}
+      </DotsContainer>
+      {withButton && (
         <>
           <Button className='prev-btn' onClick={onPrevBtn}>
             <MdKeyboardArrowLeft />

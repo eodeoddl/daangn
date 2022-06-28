@@ -1,6 +1,15 @@
+## 2022\-06\-28
+
+img src 안보이던 이유는 overflow 먹인 element를 잘못설정;; 처음에 생각했던대로 url만 src에 연결해주면됨.
+현재 carousel.jsx 독립된 컴포넌트화 작업 완료. 무한슬라이드로 만들어야하는 로직에 대해고민중.
+
+[무한스크롤 참고링크](https://ye-yo.github.io/react/2022/01/21/infinite-carousel.html)
+
+이해가 완전히 가지는않지만 이번엔 꼭 완성한다... 무한 슬라이드 트릭
+
 ## 2022\-06\-27
 
-button안에 svg 형식의 이미지를 사용하고있음. svg 이미지에 transform scale css를 적용할때 일반적인 img 태그와 svg이미지의 작동방식이다름. transform oringin의 좌표의 기본값이 서로다른기때문에 svg 와 img의 scale변경이 다른 방식으로 보여짐.
+button안에 svg 형식의 이미지를 사용하고있음. svg 이미지에 transform scale css를 적용할때 일반적인 img 태그와 svg이미지의 작동방식이다름. transform oringin의 좌표의 기본값이 서로 다르기 때문에 svg 와 img의 scale변경이 다른 방식으로 보여짐.
 css property로 origin 값을 직접변경 보단 translateY로 먼저 당겨 주고 scale적용으로 해결
 
 carousel 컴포넌트는 경우에 따라 button이 필요한 경우와 필요가 없는 경우가 있음. button의 렌더링 여부는 해당 carousel을 렌더링 할때 withButton props값이 true, false인지에 따라 결정함. 또 button을 absolute로 포지셔닝할때 부모가 relative요소 일때의 컨테이닝 블록이결정되기도 하지만 transform 속성이 none이 아닌 가장 가까운 조상값인 carousel container 블록에 포지셔닝 된다는 사실을 알게됨. 때문에 button 컴포넌트는 carousel container block의 바깥에서 렌더링하기로함.

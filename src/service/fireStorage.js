@@ -13,7 +13,18 @@ class FireStorage {
     return url;
   }
 
-  getFileFromRef(ref) {}
+  // async upload(articleRef, path, file) {
+  //   const storageRef = ref(
+  //     firebaseStorage,
+  //     `${articleRef}/${path}/${file.name}`
+  //   );
+  //   const snapshot = await uploadBytes(storageRef, file);
+  //   return snapshot.ref;
+  // }
+
+  // getFileFromUrl(url) {
+
+  // }
 }
 
 export default FireStorage;

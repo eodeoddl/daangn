@@ -94,6 +94,7 @@ const UserArticles = ({ fireStore, data }) => {
         return fireStore.readRefs(articlePath);
       });
       const result = await Promise.all(articleData);
+      // console.log(result);
       setArticle(result);
     };
     getArticleData();

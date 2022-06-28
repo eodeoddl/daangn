@@ -223,6 +223,8 @@ const PostingForm = ({ userInfo, fireStorage, fireStore }) => {
   const priceLabel = useRef(null);
   const fileInputRef = useRef(null);
 
+  console.log(userInfo);
+
   useEffect(() => {
     dispatch({ type: 'onLoad', userInfo });
   }, [userInfo]);
@@ -309,6 +311,7 @@ const PostingForm = ({ userInfo, fireStorage, fireStore }) => {
         makeStoragePath(file),
         file
       );
+
       urlArr.push(url);
     }
     fireStore.updateImageUrl(articleId, urlArr);
@@ -450,7 +453,8 @@ const reducer = (state, action) => {
 };
 
 const init = (userInfo) => {
-  const { uid, region_B, displayName, photoURL } = userInfo;
+  const { uid, address, displayName, photoURL } = userInfo;
+  const region_B = address.region_B;
   return {
     uid,
     region_B,

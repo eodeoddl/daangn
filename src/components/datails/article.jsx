@@ -15,6 +15,8 @@ const Container = styled.article`
     width: 729px;
     height: 500px;
     position: relative;
+    overflow: hidden;
+    border-radius: 10px;
   }
 
   //   .next-btn {
@@ -208,7 +210,7 @@ const Article = ({ fireStore, latestItemList, handleShowModal, userInfo }) => {
         </Portal>
       </Route> */}
         <section className='article-image'>
-          <Demo images={articleData.image} widthButton={true} />
+          <Demo images={articleData.image} withButton={true} />
           {/* <Carousel
             imgSrc={articleData.image}
             id={articleData.id}
@@ -220,7 +222,7 @@ const Article = ({ fireStore, latestItemList, handleShowModal, userInfo }) => {
           <button className='next-btn' onClick={onClickNext} /> */}
         </section>
         <section className='article-profile'>
-          <Link to={'aaa'}>
+          <Link to={`/user/${articleData.displayName}`}>
             <div className='space-between'>
               <div>
                 <div className='profile-image'>
