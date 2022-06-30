@@ -1,202 +1,240 @@
-import React, {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useRef,
-  useState,
-} from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
-import UseQuery from '../../customHook/useQuery';
+import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from 'react-icons/md';
 
-const Container = styled.div`
-  overflow: hidden;
+const CarouselContainer = styled.div`
+  width: 100%;
   height: 100%;
-  position: relative;
+  display: flex;
 
-  .slide-track {
-    display: flex;
+  .slide {
+    min-width: 100%;
     height: 100%;
   }
 
-  .slide-wrap {
+  .slide img {
     width: 100%;
-
-    .anchor {
-      width: 100%;
-      height: 100%;
-      min-height: 1px;
-      display: inline-block;
-    }
-
-    .img-wrap {
-      position: relative;
-      margin: 0 auto;
-      width: 94%;
-      height: 100%;
-      border-radius: 8px;
-      overflow: hidden;
-
-      .slide-img {
-        width: 100%;
-        height: inherit;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        color: transparent;
-        display: inline-block;
-        object-fit: fill;
-      }
-    }
-  }
-
-  .slide-dots {
-    position: absolute;
-    left: 3%;
-    bottom: 0;
-    list-style: none;
-    width: 94%;
-    padding: 16px 0;
-    border-radius: 8px;
-    text-align: center;
-    background-image: linear-gradient(
-      to top,
-      rgba(0, 0, 0, 0.5),
-      rgba(0, 0, 0, 0)
-    );
-    background-blend-mode: multiply;
-
-    li {
-      cursor: pointer;
-      display: inline-block;
-      position: relative;
-
-      button {
-        margin: 0 4px;
-        width: 8px;
-        background-color: transparent;
-        color: transparent;
-        border: none;
-        postion: relative;
-      }
-
-      button:before {
-        content: '';
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background-color: #fff;
-        opacity: 0.3;
-        display: block;
-        position: absolute;
-        bottom: 0;
-      }
-    }
+    height: 100%;
+    object-fit: contain;
   }
 `;
 
-const Carosual = forwardRef(({ imgSrc, slideIdx, id, showModal }, ref) => {
-  // let query = UseQuery();
+const Button = styled.button`
+  position: absolute;
+  top: 50%;
+  width: 35px;
+  height: 35px;
+  font-size: 35px;
+  background-color: transparent;
+  border: none;
+  transform: translateY(-50%);
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.lightOrange};
+    transform: translateY(-50%) scale(1.5);
+  }
+
+  &.prev-btn {
+    left: 0;
+  }
+
+  &.next-btn {
+    right: 0;
+  }
+`;
+
+const DotsContainer = styled.div`
+  position: absolute;
+  bottom: 0;
+  background-image: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.5),
+    rgba(0, 0, 0, 0)
+  );
+  width: 100%;
+  height: 10%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .dot {
+    display: inline-block;
+    margin: 0 5px;
+    padding: 4px;
+    cursor: pointer;
+  }
+
+  .dot:before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.3);
+    opacity: 0.8;
+    display: block;
+  }
+
+  .active:before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #fff;
+    display: block;
+    opacity: 1;
+  }
+`;
+
+const Carousel = ({ images, withButton }) => {
+  const [slideIdx, setSlideIdx] = useState(0);
   const slideContainerRef = useRef(null);
-  const slideTrackRef = useRef(null);
-  // const [img, setImg] = useState(imgSrc);
+  const transitionDuration = 500;
+  // infinite carousel 효과를 주기위해 배열의 양끝에 추가될 복제할 데이터 개수.
+  const cloneItemCount = 1;
 
-  useImperativeHandle(ref, () => {
-    const slideTrack = slideTrackRef.current;
-    return {
-      addTransition: () =>
-        (slideTrack.style.transition = 'transform 0.5s ease-in-out'),
-      addTransForm: () =>
-        (slideTrack.style.transform = `translateX(${
-          -slideIdx * slideContainerRef.current.clientWidth
-        }px)`),
+  const debounceFunction = (callback, delay) => {
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => callback(...args), delay);
     };
-  });
-
-  useEffect(() => {
-    console.log(slideTrackRef.current);
-  }, [ref]);
-
-  //controll translateX
-  useEffect(() => {
-    console.log('useEffect transform');
-    slideTrackRef.current.style.transform = `translateX(${
-      -slideIdx * slideContainerRef.current.clientWidth
-    }px)`;
-  }, [ref, slideIdx]);
-
-  // controll container width
-  useEffect(() => {
-    console.log('useEffect sizing cotainer');
-    slideTrackRef.current.style.width =
-      slideContainerRef.current.clientWidth * imgSrc.length + 'px';
-  }, [imgSrc.length]);
-
-  const transitionEnd = () => {
-    slideTrackRef.current.style.transition = 'none';
   };
 
-  const onClickDot = () => {
-    console.log('dot click');
+  const getOriginIndex = (clonedIndex, originItems) => {
+    const originIndex = clonedIndex - cloneItemCount;
+    // 복제배열의 첫번째 값에서 cloneItemCount값을 뺏을때 음수값이 나오면 원본배열의 첫번째 index
+    // 복제배열의 마지막 값에서 cloneItemCount값을 빼면 원본배열의 마지막 index
+
+    if (originIndex < 0) return originItems.length - 1;
+    if (originIndex >= originItems.length - 1) return 0;
+    return originIndex;
   };
 
-  // active carosual modal code
-  const onClickLink = () => {
-    console.log('click link');
-    // handleShowModal();
+  const makeCloneImages = (originalItem) => {
+    const clonedFirst = [];
+    const clonedLast = [];
+    let index = 0;
+
+    while (index < cloneItemCount) {
+      clonedLast.push(originalItem[index % originalItem.length]);
+      clonedFirst.unshift(
+        originalItem[originalItem.length - 1 - (index % originalItem.length)]
+      );
+      index++;
+    }
+    return [...clonedFirst, ...originalItem, ...clonedLast];
   };
+
+  // const throttleFunction = (callback, delay) => {
+  //   let timer;
+  //   return () => {
+  //     if (timer) return;
+  //     timer = setTimeout(() => {
+  //       callback();
+  //       // timer = null;
+  //       clearTimeout(timer);
+  //     }, delay);
+  //   };
+  // };
+
+  const onPrevBtn = debounceFunction(() => {
+    setSlideIdx(slideIdx - 1);
+  }, transitionDuration);
+
+  const onNextBtn = debounceFunction(() => {
+    setSlideIdx(slideIdx + 1);
+  }, transitionDuration);
+
+  const moveDot = (index) => {
+    setSlideIdx((prevIdx) => {
+      if (prevIdx === index) return prevIdx;
+      else return index;
+    });
+  };
+
+  const transitionEnd = (e) => {
+    console.log(slideIdx);
+    if (slideIdx < 0) {
+      console.log(
+        '원본 배열보다 작아질때 트랜지션 효과를 없애고 slideIdx값을 원본배열의 index로 state 재설정'
+      );
+      e.target.style.transition = '';
+      setSlideIdx(getOriginIndex(slideIdx, images));
+    }
+    if (slideIdx > images.length - 1) {
+      console.log(
+        '원본 배열보다 커질때 트랜지션 효과를 없애고 slideIdx값을 원본배열의 index로 state 재설정'
+      );
+      e.target.style.transition = '';
+      setSlideIdx(getOriginIndex(slideIdx, images));
+    }
+  };
+
+  useEffect(() => {
+    if (slideContainerRef.current.style.transition === '') {
+      console.log('트랜지션이 없으면 다시설정하는 useEffect의 if block입니다.');
+      setTimeout(() => {
+        slideContainerRef.current.style.transition = `transform ${transitionDuration}ms ease-in-out`;
+      }, transitionDuration);
+    }
+    slideContainerRef.current.style.transform = `translateX(${
+      -(slideIdx + cloneItemCount) * 100
+    }%)`;
+  }, [slideIdx]);
 
   return (
-    <Container ref={slideContainerRef}>
-      <div
-        className='slide-track'
-        ref={slideTrackRef}
-        onTransitionEnd={transitionEnd}
+    <>
+      <CarouselContainer
+        ref={slideContainerRef}
+        onTransitionEnd={(e) => transitionEnd(e)}
       >
-        {imgSrc &&
-          imgSrc.map((img, i) => {
-            return showModal ? (
-              <div className='slide-wrap' key={i}>
-                <div className='img-wrap'>
-                  <img alt='상품이미지' className='slide-img' src={`${img}`} />
-                </div>
-              </div>
-            ) : (
-              <div className='slide-wrap' key={i}>
-                <Link
-                  className='anchor'
-                  to={{
-                    pathname: '/image',
-                    search: `?image_index=${i}&object_id=${id}`,
-                    state: {},
-                  }}
-                  // onClick={onClickLink}
-                >
-                  <div className='img-wrap'>
-                    <img
-                      alt='상품이미지'
-                      className='slide-img'
-                      src={`${img}`}
-                    />
-                  </div>
-                </Link>
-              </div>
-            );
-          })}
-      </div>
-      <ul className='slide-dots'>
-        {imgSrc &&
-          imgSrc.map((_, i) => {
-            return (
-              <li key={i} onClick={onClickDot}>
-                <button>{i}</button>
-              </li>
-            );
-          })}
-      </ul>
-    </Container>
+        {makeCloneImages(images).map((image, clonedIndex) => {
+          return (
+            <div
+              key={clonedIndex}
+              className={slideIdx === clonedIndex ? 'slide active' : 'slide'}
+            >
+              <img alt={`data-index-${clonedIndex}`} src={image} />
+            </div>
+          );
+        })}
+      </CarouselContainer>
+      <DotsContainer>
+        {Array.from({ length: images.length }).map((_, i) => (
+          <div
+            key={i}
+            className={slideIdx === i ? 'dot active' : 'dot'}
+            onClick={(e) => {
+              e.stopPropagation();
+              moveDot(i);
+            }}
+          ></div>
+        ))}
+      </DotsContainer>
+      {withButton && (
+        <>
+          <Button
+            className='prev-btn'
+            onClick={(e) => {
+              e.stopPropagation();
+              onPrevBtn(e);
+            }}
+          >
+            <MdKeyboardArrowLeft />
+          </Button>
+          <Button
+            className='next-btn'
+            onClick={(e) => {
+              e.stopPropagation();
+              onNextBtn();
+            }}
+          >
+            <MdKeyboardArrowRight />
+          </Button>
+        </>
+      )}
+    </>
   );
-});
+};
 
-export default Carosual;
+export default Carousel;

@@ -13,9 +13,15 @@ import {
   orderBy,
   arrayUnion,
   arrayRemove,
+  limit,
+  startAt,
 } from 'firebase/firestore';
 
 class FireStore {
+  constructor() {
+    this.queryCursor = null;
+  }
+
   // 기존에 존재하는 유저인지 검사후 신규일경우에만 업데이트
   async setUserData(userData) {
     const userRef = doc(firebaseStore, 'users', userData.uid);
@@ -194,6 +200,7 @@ class FireStore {
 
     return sortedByTerm;
   }
+
   // 유저가 구독버튼을 눌렀을때 user > subcribeList 업데이트
   // 유저가 로그인을 하지않았을경우는 실행할 수 없음.
   async addSubscribeList(uid, articleId, state) {
@@ -212,6 +219,35 @@ class FireStore {
             subscribeList: arrayRemove(articleRef.path),
           });
     }
+  }
+
+  // 스타트 커서 인자는 이전 검색했던 문서의 snapshot이다.
+  async getLatestArticle(limitCount) {
+    const articleRef = collection(firebaseStore, 'article');
+    const q = query(articleRef, orderBy('uploaded', 'desc'), limit(limitCount));
+    const querySnapshot = await getDocs(q);
+    // let docsnapCount = 0;
+    const result = [];
+
+    console.log('query cursor ', this.queryCursor);
+    console.log(
+      'query snapshot docs[limitCount -1].id',
+      querySnapshot.docs[limitCount - 1].id
+    );
+
+    console.log('querysnapShot ', querySnapshot);
+
+    querySnapshot.forEach((snapshot) => {
+      console.log(snapshot.id === querySnapshot.docs[limitCount - 1].id);
+      if (snapshot.id === querySnapshot.docs[limitCount - 1].id)
+        this.queryCursor = snapshot;
+      result.push(snapshot.data());
+    });
+    return result;
+  }
+
+  bb() {
+    console.log(this.queryCursor);
   }
 }
 

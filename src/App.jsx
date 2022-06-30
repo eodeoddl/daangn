@@ -11,12 +11,8 @@ import HomeMainTop from './components/homeSection/mainContentTop';
 import HotArticles from './components/hot_articles/article';
 import LoginForm from './components/login/loginForm';
 import Portal from './components/portal/portal';
-// import Carosual from './components/publicStyle/carosual';
 import Search from './components/search/search';
-// import UserArticles from './components/userInfo/userArticles';
 import UserInfo from './components/userInfo/userInfo';
-// import UpdateInfo from './customHook/updateUser';
-// import useGeolocation from './customHook/useGeolocation';
 
 function App({
   itemDataApi,
@@ -36,6 +32,15 @@ function App({
   const [userInfo, dispatch] = useReducer(reducer, {});
 
   const itemIdxRef = useRef(0);
+
+  useEffect(() => {
+    const fetchingData = async () => {
+      const latestArticles = await fireStore.getLatestArticle(6);
+      fireStore.bb();
+      console.log(latestArticles);
+    };
+    fetchingData();
+  }, [fireStore]);
 
   const [hotItems, setHotItems] = useState([
     {
@@ -180,11 +185,11 @@ function App({
   }, [didSearch, history, searchTerm]);
 
   // 최신 물품보여주기용 api 호출
-  useEffect(() => {
-    itemDataApi.getLatestList(itemIdxRef.current, 6).then((res) => {
-      setLatestItemList(res.data);
-    });
-  }, [itemDataApi]);
+  // useEffect(() => {
+  //   itemDataApi.getLatestList(itemIdxRef.current, 6).then((res) => {
+  //     setLatestItemList(res.data);
+  //   });
+  // }, [itemDataApi]);
 
   // user auth state를 관찰하는 함수실행.
   // 관찰하는 함수이기 때문에 한번 실행하면 알아서 코드실행
@@ -254,14 +259,14 @@ function App({
         </Route>
       </Switch>
       <Footer />
-      <Portal idSelector='login-form-modal'>
-        {showModal && (
+      {showModal && (
+        <Portal idSelector='login-form-modal'>
           <LoginForm
             handleShowModal={handleShowModal}
             loginService={loginService}
           />
-        )}
-      </Portal>
+        </Portal>
+      )}
     </>
   );
 }

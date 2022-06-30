@@ -1,11 +1,4 @@
-import {
-  useState,
-  useReducer,
-  useRef,
-  useCallback,
-  useEffect,
-  useMemo,
-} from 'react';
+import { useState, useReducer, useRef, useCallback, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { MdAddAPhoto, MdClose } from 'react-icons/md';
@@ -417,15 +410,15 @@ const PostingForm = ({ userInfo, fireStorage, fireStore }) => {
           <button type='submit'>글쓰기</button>
         </div>
       </Form>
-      <Portal idSelector='posting-form-modal'>
-        {showModal && (
+      {showModal && (
+        <Portal idSelector='posting-form-modal'>
           <Cartegory
             setShowModal={setShowModal}
             cartegory={cartegory}
             dispatch={dispatch}
           />
-        )}
-      </Portal>
+        </Portal>
+      )}
     </>
   );
 };

@@ -1,4 +1,32 @@
+## 2022\-06\-30
+
+infinite carousel 독립된 컴포넌트화 작업완료.
+마지막남은 json server api 최근에 업로드된 article 목록 가져와서 보여주는 로직 fireStore로 대체하기.
+
+infinite carousel완성.. 버튼이동으로 state값이 변경되는데 transition 기간동안 state가 여러번 바뀌지 않도록하기위해 debounce 함수를 만들어서 이벤트 함수에 적용함.
+
+article.jsx의 image carousel의 현재 보여지는 image를 눌렀을때 더 큰 화면으로 carousel을 띄워주는 portal만들어 주었음.
+
+깨달은점.. 로직의 원리자체가 이해가 가면 굳이 남의 코드와 유사한 구조로 작성할 필요는 없다.. 이해가 정 가지 않으면 그때 다른 사람의 코드를 이해하려고 해도 늦지않는다. 일단 내방식대로 구현해보고 그래도 안될때 다른 사람의 코드를 이해해서 내껄로 적용해보는 절차가 필요한것같다.
+
+최근 목록가져와서 보여주기. -> 내림차순 정렬 orderBy('정렬할 필드이름','desc') 오름차순 정렬은 기본값.
+itemIdxRef로 데이터의 끝 index를 특정한다. 그리고 데이터를 다시 로딩하는 시작점은 이전에 fetching 해서 state로 보관하는 데이터 배열의 length - 1 값이된다. 이걸통해서 fireStore의 쿼리커서를 이용한 사용자가 발생시킨 event 작동시에 필요한 data만 fetching 할 수 있다.
+firestore documentation의 쿼리 커서와 데이터 페이지화 키워드로 검색하여 참고함.
+
+todolist
+
+쿼리커서를 이용해서 data fetching 효율적으로 하기. firestore class의 constructor this.queryCursor 값으로 startAt의 snapshot값을 기억해서 쿼리커서가 필요한경우 this.queryCursor 값을 이용해서 구현할 계획.
+
 ## 2022\-06\-29
+
+실제 원본배열에 사진 data 가 있음.
+infinite carousel을 구현하기위해선 원본배열의 양끝에 실제 이동을 한듯한 효과를 위한 원본배열의 첫번째와 마지막 item이 필요함.
+
+1. 첫번째 렌더링시에는 clone된 item이 image component의 제일 처음에 위치하기때문에 위치조정이 clone된 item이 아니라 원본배열의 첫번째 item으로 x축 조정이 필요함.
+
+1. 첫렌더링이 끝난후 캐러셀의 container의 x축 길이는 (원본배열의 길이 + 트릭을 위해 클론된 이미지 개수 ) \* 부모로 부터 상속받은 width값이 된다.
+
+1.
 
 ## 2022\-06\-28
 

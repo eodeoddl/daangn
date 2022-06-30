@@ -1,11 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { withRouter, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import ArticleFooter from '../footer/articleFooter';
+import Portal from '../portal/portal';
 import Carousel from '../publicStyle/carousel';
-import Demo from '../publicStyle/demoCarousel';
 import LatestItem from '../search/latestItem';
+import { CgClose } from 'react-icons/cg';
 
 const Container = styled.article`
   margin-top: 100px;
@@ -17,41 +18,8 @@ const Container = styled.article`
     position: relative;
     overflow: hidden;
     border-radius: 10px;
+    cursor: pointer;
   }
-
-  //   .next-btn {
-  //     position: absolute;
-  //     right: 0;
-  //     top: 240px;
-  //     border: none;
-  //     background: url(https://d1unjqcospf8gs.cloudfront.net/assets/home/articles/icon-slider-right-134c53f44716c3bef227ec30da385b4b09c9c068d339a617a23093718f379d02.svg)
-  //       no-repeat;
-  //     width: 11px;
-  //     height: 21px;
-  //   }
-
-  //   .next-btn:hover {
-  //     transform: scale(1.15);
-  //     background: url(https://d1unjqcospf8gs.cloudfront.net/assets/home/articles/icon-slider-right-hover-c71a5a4d1745bf59f056660eadc57e451f619b5bddaff0c9fdf2f8e3b4d955f8.svg)
-  //       no-repeat;
-  //   }
-
-  //   .prev-btn {
-  //     position: absolute;
-  //     left: 0;
-  //     top: 240px;
-  //     border: none;
-  //     background: url(https://d1unjqcospf8gs.cloudfront.net/assets/home/articles/icon-slider-left-4c0e713bfa2cd12bd959e6dd9ef456cd6fc094953c41e605f6b9a59bc1680686.svg)
-  //       no-repeat;
-  //     width: 11px;
-  //     height: 21px;
-  //   }
-
-  //   .prev-btn:hover {
-  //     transform: scale(1.15);
-  //     background: url(https://d1unjqcospf8gs.cloudfront.net/assets/home/articles/icon-slider-left-hover-bbda49cc160e798261c2dd4894cc623d0118a701fbb705546fc06de658ce3996.svg)
-  //       no-repeat;
-  //   }
 
   .article-profile {
     width: 677px;
@@ -142,9 +110,6 @@ const Container = styled.article`
       letter-spacing: -0.6px;
       margin-top: 4px;
     }
-
-    .cartegory {
-    }
   }
   .more-item {
     width: 677px;
@@ -152,11 +117,39 @@ const Container = styled.article`
   }
 `;
 
-const Article = ({ fireStore, latestItemList, handleShowModal, userInfo }) => {
-  const [slideIdx, setSlideIdx] = useState(0);
-  const [articleData, setArticleData] = useState(null);
-  const slideTrackRef = useRef(null);
+const ModalContainer = styled.section`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: ${({ theme }) => theme.colors.black};
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
 
+  .image-container {
+    width: 80%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .close-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 7em;
+    background-color: transparent;
+    border: none;
+    appearance: none;
+    color: ${({ theme }) => theme.colors.darkGray};
+  }
+`;
+
+const Article = ({ fireStore, latestItemList, userInfo }) => {
+  const [articleData, setArticleData] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   const { articleId } = useParams();
 
   useEffect(() => {
@@ -170,97 +163,71 @@ const Article = ({ fireStore, latestItemList, handleShowModal, userInfo }) => {
     fetchingData();
   }, [articleId, fireStore]);
 
-  console.log('slideTrackRef', slideTrackRef);
-  console.log('slideIdx', slideIdx);
-
-  const onClickDot = () => {
-    console.log('dot click');
-  };
-
-  const onClickNext = () => {
-    console.log('next');
-    setSlideIdx((prevIdx) => {
-      if (prevIdx >= articleData.image.length - 1) return 0;
-      // else slideTrackRef.current.style.transition = 'transform 0.5s ease-in-out';
-      else slideTrackRef.current.addTransition();
-      return prevIdx + 1;
-    });
-  };
-
-  const onClickPrev = () => {
-    setSlideIdx((prevIdx) => {
-      if (prevIdx <= 0) return articleData.image.length - 1;
-      // else slideTrackRef.current.style.transition = 'transform 0.5s ease-in out';
-      else slideTrackRef.current.addTransition();
-      return prevIdx - 1;
-    });
-  };
-
   return (
     articleData && (
-      <Container>
-        {/* <Route exact path='/image'>
-        <Portal idSelector='image-madal-container'>
-          <Carosual
-            imgSrc={imgSrc}
-            id={id}
-            slideIdx={slideIdx}
-            ref={slideTrackRef}
-          />
-        </Portal>
-      </Route> */}
-        <section className='article-image'>
-          <Demo images={articleData.image} withButton={true} />
-          {/* <Carousel
-            imgSrc={articleData.image}
-            id={articleData.id}
-            slideIdx={slideIdx}
-            handleShowModal={handleShowModal}
-            ref={slideTrackRef}
-          />
-          <button className='prev-btn' onClick={onClickPrev} />
-          <button className='next-btn' onClick={onClickNext} /> */}
-        </section>
-        <section className='article-profile'>
-          <Link to={`/user/${articleData.displayName}`}>
-            <div className='space-between'>
-              <div>
-                <div className='profile-image'>
-                  <img
-                    alt='사용자 닉네임'
-                    src={articleData.profileImg || '/logo192.png'}
-                  />
-                </div>
-                <div className='profile-left'>
-                  <div className='nickname'>
-                    {articleData.displayName || '닉네임'}
+      <>
+        <Container>
+          <section className='article-image' onClick={() => setShowModal(true)}>
+            <Carousel images={articleData.image} withButton={true} />
+          </section>
+          <section className='article-profile'>
+            <Link to={`/user/${articleData.displayName}`}>
+              <div className='space-between'>
+                <div>
+                  <div className='profile-image'>
+                    <img
+                      alt='사용자 닉네임'
+                      src={articleData.profileImg || '/logo192.png'}
+                    />
                   </div>
-                  <div className='region-name'>
-                    {articleData.region_B.address_name}
+                  <div className='profile-left'>
+                    <div className='nickname'>
+                      {articleData.displayName || '닉네임'}
+                    </div>
+                    <div className='region-name'>
+                      {articleData.region_B.address_name}
+                    </div>
                   </div>
                 </div>
+                <div className='profile-right'>오른쪽 아이콘</div>
               </div>
-              <div className='profile-right'>오른쪽 아이콘</div>
+            </Link>
+          </section>
+          <section className='article-description'>
+            <h1 className='title'>{articleData.title}</h1>
+            <p className='cartegory'>{articleData.cartegory}</p>
+            {/* <p className='price'>{articleData.price}원</p> */}
+            <div className='detail'>
+              <p>{articleData.description}</p>
             </div>
-          </Link>
-        </section>
-        <section className='article-description'>
-          <h1 className='title'>{articleData.title}</h1>
-          <p className='cartegory'>{articleData.cartegory}</p>
-          {/* <p className='price'>{articleData.price}원</p> */}
-          <div className='detail'>
-            <p>{articleData.description}</p>
-          </div>
-        </section>
-        <section className='more-item'>
-          <LatestItem latestItemList={latestItemList} />
-        </section>
-        <ArticleFooter
-          price={articleData.price}
-          fireStore={fireStore}
-          uid={userInfo.uid}
-        />
-      </Container>
+          </section>
+          <section className='more-item'>
+            <LatestItem latestItemList={latestItemList} />
+          </section>
+          <ArticleFooter
+            price={articleData.price}
+            fireStore={fireStore}
+            uid={userInfo.uid}
+          />
+        </Container>
+        {showModal && (
+          <Portal idSelector='carousel-modal'>
+            <ModalContainer>
+              <div className='image-container'>
+                <Carousel images={articleData.image} withButton={false} />
+                <button
+                  className='close-btn'
+                  onClick={() => {
+                    setShowModal(false);
+                  }}
+                >
+                  <CgClose />
+                </button>
+              </div>
+            </ModalContainer>
+          </Portal>
+        )}
+      </>
     )
   );
 };
