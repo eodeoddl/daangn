@@ -126,7 +126,6 @@ const Container = styled.section`
 `;
 
 const SearchResult = ({ searchedItem, handleLoading, loadingState }) => {
-  // console.log(match);
   return (
     <Container>
       <div className='result'>
@@ -140,9 +139,6 @@ const SearchResult = ({ searchedItem, handleLoading, loadingState }) => {
                     className='anchor'
                     to={{
                       pathname: `/article/${article.articleId}`,
-                      state: {
-                        data: article,
-                      },
                     }}
                   >
                     <div className='imgWrapper'>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useReducer } from 'react';
-import { withRouter, Route, Redirect } from 'react-router-dom';
+import { withRouter, Route, Redirect, useHistory } from 'react-router-dom';
 import HeaderMessage from './headerMessage';
 import NoResult from './noResult';
 import SearchResult from './searchResult';
@@ -15,7 +15,7 @@ const Search = ({
   const [searchedItem, dispatch] = useReducer(reducer, []);
   const [loadIdx, setLoadIdx] = useState(6);
   const [loadingState, setLoadingState] = useState(false);
-
+  // console.log('search component', history.location.pathname);
   // firestore
   useEffect(() => {
     const getArticle = async () => {

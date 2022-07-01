@@ -7,6 +7,7 @@ import Portal from '../portal/portal';
 import Carousel from '../publicStyle/carousel';
 import LatestItem from '../search/latestItem';
 import { CgClose } from 'react-icons/cg';
+import { MoreButton } from '../publicStyle/moreButton';
 
 const Container = styled.article`
   margin-top: 100px;
@@ -147,7 +148,13 @@ const ModalContainer = styled.section`
   }
 `;
 
-const Article = ({ fireStore, latestItemList, userInfo }) => {
+const Article = ({
+  fireStore,
+  latestItemList,
+  userInfo,
+  handleLoading,
+  moreLoading,
+}) => {
   const [articleData, setArticleData] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const { articleId } = useParams();
@@ -202,7 +209,12 @@ const Article = ({ fireStore, latestItemList, userInfo }) => {
             </div>
           </section>
           <section className='more-item'>
-            <LatestItem latestItemList={latestItemList} />
+            <LatestItem latestItemList={latestItemList}>
+              <MoreButton
+                handleLoading={handleLoading}
+                loadingState={moreLoading}
+              />
+            </LatestItem>
           </section>
           <ArticleFooter
             price={articleData.price}

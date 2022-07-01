@@ -54,6 +54,8 @@ const Container = styled.div`
 
       .article_region {
         color: ${({ theme }) => theme.colors.darkGray};
+        white-space: nowrap;
+        text-overflow: ellipsis;
         font-size: 14px;
         margin-top: 6px;
         line-height: 18px;
@@ -75,31 +77,30 @@ const Container = styled.div`
 
 // 인기중고 대체..
 const LatestItem = ({ latestItemList, children }) => {
-  console.log(latestItemList);
+  // console.log(latestItemList.forEach());
+  latestItemList.forEach((item) => {
+    // return conso
+    console.log(item.uploaded.toDate());
+  });
   return (
     <Container>
       <p className='article_kind'>인기 중고</p>
       <div className='flex-box'>
-        {latestItemList.map((item, i) => (
-          <article className='article' key={i}>
+        {latestItemList.map((item) => (
+          <article className='article' key={item.id}>
             <Link
               className='anchor'
               to={{
                 pathname: `/article/${item.id}`,
-                state: {
-                  data: item,
-                },
               }}
             >
               <div className='img_wrapper'>
-                <img alt='dd' src={item.img} className='img' />
+                <img alt='dd' src={item.image[0]} className='img' />
               </div>
               <div className='article_info'>
-                <p className='article_title'>{item.item_title}</p>
-                <p className='article_region'>
-                  {item.city} {item.street}
-                </p>
-                <p className='article_price'>333333원</p>
+                <p className='article_title'>{item.title}</p>
+                <p className='article_region'>{item.region_B.address_name}</p>
+                <p className='article_price'>{item.price}원</p>
               </div>
             </Link>
           </article>

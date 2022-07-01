@@ -223,31 +223,30 @@ class FireStore {
 
   // 스타트 커서 인자는 이전 검색했던 문서의 snapshot이다.
   async getLatestArticle(limitCount) {
-    const articleRef = collection(firebaseStore, 'article');
-    const q = query(articleRef, orderBy('uploaded', 'desc'), limit(limitCount));
-    const querySnapshot = await getDocs(q);
-    // let docsnapCount = 0;
     const result = [];
+    const articleRef = collection(firebaseStore, 'article');
+    const q = this.queryCursor
+      ? query(
+          articleRef,
+          orderBy('uploaded', 'desc'),
+          startAt(this.queryCursor),
+          limit(limitCount)
+        )
+      : query(articleRef, orderBy('uploaded', 'desc'), limit(limitCount));
 
-    console.log('query cursor ', this.queryCursor);
-    console.log(
-      'query snapshot docs[limitCount -1].id',
-      querySnapshot.docs[limitCount - 1].id
-    );
-
-    console.log('querysnapShot ', querySnapshot);
+    const querySnapshot = await getDocs(q);
+    this.queryCursor = querySnapshot.docs[limitCount - 1];
 
     querySnapshot.forEach((snapshot) => {
-      console.log(snapshot.id === querySnapshot.docs[limitCount - 1].id);
-      if (snapshot.id === querySnapshot.docs[limitCount - 1].id)
-        this.queryCursor = snapshot;
-      result.push(snapshot.data());
+      result.push({ id: snapshot.id, ...snapshot.data() });
     });
+
     return result;
   }
 
-  bb() {
+  async initializeCursor() {
     console.log(this.queryCursor);
+    this.queryCursor = null;
   }
 }
 

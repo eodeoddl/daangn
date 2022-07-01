@@ -1,9 +1,21 @@
+## 2022\-07\-01
+
+query cursor로 데이터 페이지화 된 api 요청하는 컴포넌트 수정
+페이지화 된 데이터를 사용된 컴포넌트는 Search.jsx > noResult.jsx , Article.jsx 임.
+위에 사용된 컴포넌트는 실질적으로 LatestItem.jsx 컴포넌트를 임포트해서 렌더링 함.
+
+결국 LatestItem.jsx 컴포넌트를 임포트해서 사용하는 부모컴포넌트까지 props를 전달해야함.
+lastestItem을 한버 부르고. 다른곳에서 다시 부르는곳에 갔을때 쿼리커서가 초기화 되야함.
+
+app.jsx에서 history.loaction.pathname 값 변경감지해서 firestore에서 this.queryCursor 값 초기화해주어야함.
+현재 나의 앱에서 react-router-dom 의 버전은 5.2.0 -> 최신버전 v6에서 생각보다 많이 바뀌었는데 코드를 버전에 맞춰서 다시 고쳐야할듯
+
 ## 2022\-06\-30
 
 infinite carousel 독립된 컴포넌트화 작업완료.
 마지막남은 json server api 최근에 업로드된 article 목록 가져와서 보여주는 로직 fireStore로 대체하기.
 
-infinite carousel완성.. 버튼이동으로 state값이 변경되는데 transition 기간동안 state가 여러번 바뀌지 않도록하기위해 debounce 함수를 만들어서 이벤트 함수에 적용함.
+infinite carousel에서 버튼의 click event로 state값이 변경되는데 transition 기간동안 setState가 여러번 호출되지 않도록하기위해 debounce 함수를 만들어서 이벤트 함수에 적용함.
 
 article.jsx의 image carousel의 현재 보여지는 image를 눌렀을때 더 큰 화면으로 carousel을 띄워주는 portal만들어 주었음.
 

@@ -14,13 +14,7 @@ import Portal from './components/portal/portal';
 import Search from './components/search/search';
 import UserInfo from './components/userInfo/userInfo';
 
-function App({
-  itemDataApi,
-  loginService,
-  fireStore,
-  fireStorage,
-  kakaoMapAPI,
-}) {
+function App({ loginService, fireStore, fireStorage, kakaoMapAPI }) {
   const history = useHistory();
 
   const [didSearch, setDidSearch] = useState(false);
@@ -31,16 +25,25 @@ function App({
   const [loginState, setLoginState] = useState(false);
   const [userInfo, dispatch] = useReducer(reducer, {});
 
-  const itemIdxRef = useRef(0);
+  const limitCount = 6;
 
   useEffect(() => {
     const fetchingData = async () => {
-      const latestArticles = await fireStore.getLatestArticle(6);
-      fireStore.bb();
-      console.log(latestArticles);
+      const latestArticles = await fireStore.getLatestArticle(limitCount);
+      setLatestItemList((prevState) => {
+        return [...prevState, ...latestArticles];
+      });
     };
+
     fetchingData();
   }, [fireStore]);
+
+  // useEffect(() => {
+  //   console.log('useEffect history ', history.location.pathname);
+  //   // console.log(history.location.pathname === '/');
+  //   if (history.location.pathname === '/') return;
+  //   fireStore.initializeCursor();
+  // }, [fireStore, history.location.pathname]);
 
   const [hotItems, setHotItems] = useState([
     {
@@ -155,10 +158,11 @@ function App({
   };
 
   const handleLoading = async () => {
-    itemIdxRef.current += 6;
+    // itemIdxRef.current += 6;
     setMoreLoading(true);
-    await itemDataApi.getLatestList(itemIdxRef.current, 6).then((res) => {
-      setLatestItemList([...latestItemList, ...res.data]);
+    const latestArticles = await fireStore.getLatestArticle(limitCount);
+    setLatestItemList((prevState) => {
+      return [...prevState, ...latestArticles];
     });
     setMoreLoading(false);
   };
@@ -183,13 +187,6 @@ function App({
       setDidSearch(false);
     };
   }, [didSearch, history, searchTerm]);
-
-  // 최신 물품보여주기용 api 호출
-  // useEffect(() => {
-  //   itemDataApi.getLatestList(itemIdxRef.current, 6).then((res) => {
-  //     setLatestItemList(res.data);
-  //   });
-  // }, [itemDataApi]);
 
   // user auth state를 관찰하는 함수실행.
   // 관찰하는 함수이기 때문에 한번 실행하면 알아서 코드실행
@@ -248,6 +245,8 @@ function App({
             latestItemList={latestItemList}
             handleShowModal={handleShowModal}
             userInfo={userInfo}
+            handleLoading={handleLoading}
+            moreLoading={moreLoading}
           />
         </Route>
         <Route path='/user/:displayName'>
