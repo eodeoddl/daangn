@@ -6,6 +6,7 @@ const CarouselContainer = styled.div`
   width: 100%;
   height: 100%;
   display: flex;
+  // transition: transform 0.5s ease-in-out;
 
   .slide {
     min-width: 100%;
@@ -85,7 +86,8 @@ const DotsContainer = styled.div`
   }
 `;
 
-const Carousel = ({ images, withButton }) => {
+const Carousel = ({ images, withButton, articleId }) => {
+  console.log('rendering carousel');
   const [slideIdx, setSlideIdx] = useState(0);
   const slideContainerRef = useRef(null);
   const transitionDuration = 500;
@@ -171,16 +173,22 @@ const Carousel = ({ images, withButton }) => {
   };
 
   useEffect(() => {
+    slideContainerRef.current.style.transform = `translateX(${
+      -(slideIdx + cloneItemCount) * 100
+    }%)`;
+
     if (slideContainerRef.current.style.transition === '') {
       console.log('트랜지션이 없으면 다시설정하는 useEffect의 if block입니다.');
       setTimeout(() => {
         slideContainerRef.current.style.transition = `transform ${transitionDuration}ms ease-in-out`;
       }, transitionDuration);
     }
-    slideContainerRef.current.style.transform = `translateX(${
-      -(slideIdx + cloneItemCount) * 100
-    }%)`;
-  }, [slideIdx]);
+  }, [images.length, slideIdx]);
+
+  useEffect(() => {
+    setSlideIdx(0);
+    slideContainerRef.current.style.transition = '';
+  }, [articleId]);
 
   return (
     <>

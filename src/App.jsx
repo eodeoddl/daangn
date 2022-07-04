@@ -19,28 +19,26 @@ function App({ loginService, fireStore, fireStorage, kakaoMapAPI }) {
 
   const [didSearch, setDidSearch] = useState(false);
   const [searchTerm, setSearchTerm] = useState(null);
-  const [latestItemList, setLatestItemList] = useState([]);
-  const [moreLoading, setMoreLoading] = useState(false);
+  // const [latestItemList, setLatestItemList] = useState([]);
+  // const [moreLoading, setMoreLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [loginState, setLoginState] = useState(false);
   const [userInfo, dispatch] = useReducer(reducer, {});
 
-  const limitCount = 6;
+  // const limitCount = 6;
 
-  useEffect(() => {
-    const fetchingData = async () => {
-      const latestArticles = await fireStore.getLatestArticle(limitCount);
-      setLatestItemList((prevState) => {
-        return [...prevState, ...latestArticles];
-      });
-    };
-
-    fetchingData();
-  }, [fireStore]);
+  // useEffect(() => {
+  //   const fetchingData = async () => {
+  //     const latestArticles = await fireStore.getLatestArticle(limitCount);
+  //     setLatestItemList((prevState) => {
+  //       return [...prevState, ...latestArticles];
+  //     });
+  //   };
+  //   fetchingData();
+  // }, [fireStore]);
 
   // useEffect(() => {
   //   console.log('useEffect history ', history.location.pathname);
-  //   // console.log(history.location.pathname === '/');
   //   if (history.location.pathname === '/') return;
   //   fireStore.initializeCursor();
   // }, [fireStore, history.location.pathname]);
@@ -157,15 +155,15 @@ function App({ loginService, fireStore, fireStorage, kakaoMapAPI }) {
     setSearchTerm(searchTerm);
   };
 
-  const handleLoading = async () => {
-    // itemIdxRef.current += 6;
-    setMoreLoading(true);
-    const latestArticles = await fireStore.getLatestArticle(limitCount);
-    setLatestItemList((prevState) => {
-      return [...prevState, ...latestArticles];
-    });
-    setMoreLoading(false);
-  };
+  // const handleLoading = async () => {
+  //   // itemIdxRef.current += 6;
+  //   setMoreLoading(true);
+  //   const latestArticles = await fireStore.getLatestArticle(limitCount);
+  //   setLatestItemList((prevState) => {
+  //     return [...prevState, ...latestArticles];
+  //   });
+  //   setMoreLoading(false);
+  // };
 
   const handleShowModal = () => {
     setShowModal(!showModal);
@@ -231,22 +229,16 @@ function App({ loginService, fireStore, fireStorage, kakaoMapAPI }) {
         </Route>
         <Route path='/search'>
           <Search
-            latestItemList={latestItemList}
             searchTerm={searchTerm}
             userInfo={userInfo}
             fireStore={fireStore}
-            handleLoading={handleLoading}
-            moreLoading={moreLoading}
           />
         </Route>
         <Route exact path='/article/:articleId'>
           <Article
             fireStore={fireStore}
-            latestItemList={latestItemList}
             handleShowModal={handleShowModal}
             userInfo={userInfo}
-            handleLoading={handleLoading}
-            moreLoading={moreLoading}
           />
         </Route>
         <Route path='/user/:displayName'>

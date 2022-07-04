@@ -1,32 +1,43 @@
 import React, { useEffect, useState, useReducer } from 'react';
-import { withRouter, Route, Redirect, useHistory } from 'react-router-dom';
+import { withRouter, Route, Redirect } from 'react-router-dom';
 import HeaderMessage from './headerMessage';
+import LatestItem from './latestItem';
 import NoResult from './noResult';
 import SearchResult from './searchResult';
 
-const Search = ({
-  match,
-  fireStore,
-  userInfo,
-  latestItemList,
-  moreLoading,
-  searchTerm,
-}) => {
+const Search = ({ match, fireStore, userInfo, searchTerm }) => {
   const [searchedItem, dispatch] = useReducer(reducer, []);
   const [loadIdx, setLoadIdx] = useState(6);
   const [loadingState, setLoadingState] = useState(false);
-  // console.log('search component', history.location.pathname);
-  // firestore
+  const limitCount = 6;
+
   useEffect(() => {
+    fireStore.initializeCursor();
+
     const getArticle = async () => {
-      const res = await fireStore.getOrderedArticle(searchTerm);
+      const res = await fireStore.getOrderedArticle(searchTerm, limitCount);
       dispatch({ type: 'getArticleByTerm', articles: res });
       if (!userInfo.region_B) return;
       dispatch({ type: 'orderByRegion', region_B: userInfo.region_B });
-      dispatch({ type: 'editArticle', loadIdx });
+      // dispatch({ type: 'editArticle', loadIdx });
     };
-    getArticle();
-  }, [fireStore, loadIdx, searchTerm, userInfo.region_B]);
+
+    const aaa = async () => {
+      const res = await fireStore.testSearchItem(searchTerm, limitCount);
+      dispatch({ type: 'getArticleByTerm', articles: res });
+      if (!userInfo.region_B) return;
+      dispatch({ type: 'orderByRegion', region_B: userInfo.region_B });
+    };
+
+    const bbb = async () => {
+      const res = await fireStore.test2(searchTerm, limitCount);
+      console.log(res);
+    };
+
+    // getArticle();
+    aaa();
+    bbb();
+  }, [fireStore, searchTerm, userInfo.region_B]);
 
   // 검색어 바뀔시 idx 초기값으로 설정
   useEffect(() => {
@@ -58,16 +69,13 @@ const Search = ({
         {searchedItem.length ? (
           <SearchResult
             searchedItem={searchedItem}
-            moreLoading={moreLoading}
             handleLoading={handleLoading}
             loadingState={loadingState}
           />
         ) : (
-          <NoResult
-            latestItemList={latestItemList}
-            moreLoading={moreLoading}
-            handleLoading={handleLoading}
-          />
+          <NoResult fireStore={fireStore}>
+            <LatestItem fireStore={fireStore} />
+          </NoResult>
         )}
       </Route>
     </>

@@ -15,6 +15,7 @@ import {
   arrayRemove,
   limit,
   startAt,
+  startAfter,
 } from 'firebase/firestore';
 
 class FireStore {
@@ -137,16 +138,153 @@ class FireStore {
     const article = await getDoc(docRef);
     return article.data();
   }
+
+  async test2(searchTerm, limitCount) {
+    const collectionRef = collection(firebaseStore, 'article');
+    const result = [];
+
+    let count = 1;
+    while (result.length < limitCount) {
+      console.log('while loop count => ', count);
+      const q = this.queryCursor
+        ? query(
+            collectionRef,
+            where('workProgress', '==', true),
+            orderBy('uploaded', 'desc'),
+            startAfter(this.queryCursor),
+            limit(limitCount)
+          )
+        : query(
+            collectionRef,
+            where('workProgress', '==', true),
+            orderBy('uploaded', 'desc'),
+            limit(limitCount)
+          );
+      const querySnapshot = await getDocs(q);
+      console.log('querySnapshot', querySnapshot);
+      console.log('while querySnapshot block docs =>', querySnapshot.docs);
+      let snapCount = 0;
+      querySnapshot.forEach((snapshot) => {
+        console.log('snapcount ', snapCount);
+        const { title, description } = snapshot.data();
+        if (title.includes(searchTerm) || description.includes(searchTerm)) {
+          // console.log(snapshot.data());
+          result.push({
+            articleId: snapshot.id,
+            ...snapshot.data(),
+          });
+        }
+
+        if (result.length === limitCount) {
+          console.log(
+            'snapshot block result.length === limitCount ',
+            snapshot.id
+          );
+          this.queryCursor = snapshot;
+          return;
+        }
+        snapCount++;
+      });
+
+      count++;
+    }
+
+    return result;
+  }
+
+  async testSearchItem(searchTerm, limitCount) {
+    // console.log(' this.queryCursor ', this.queryCursor);
+    const collectionRef = collection(firebaseStore, 'article');
+    const regExp = new RegExp(`${searchTerm}`, 'g');
+    let sortedByTerm = []; // return value
+
+    const sortByTermRepeat = (propertyName, array) => {
+      return array
+        .reduce((acc, curr, index) => {
+          // console.log()
+          // if (index === 0) console.log('첫번째 루프', limitCount);
+          if (curr[propertyName].includes(searchTerm)) {
+            // console.log(' contains search Term count' , )
+            return acc.concat({
+              index,
+              termRepeat: curr[propertyName].match(regExp).length,
+            });
+          }
+          return acc;
+        }, [])
+        .sort((a, b) => b.termRepeat - a.termRepeat);
+    };
+
+    while (sortedByTerm.length <= limitCount) {
+      // console.log('in while block sortedByterm.length ', sortedByTerm.length);
+      // console.log('in while block this.queryCursor ', this.queryCursor);
+
+      const array = [];
+
+      let q = this.queryCursor
+        ? query(
+            collectionRef,
+            where('workProgress', '==', true),
+            orderBy('uploaded', 'desc'),
+            startAfter(this.queryCursor),
+            limit(limitCount)
+          )
+        : query(
+            collectionRef,
+            where('workProgress', '==', true),
+            orderBy('uploaded', 'desc'),
+            limit(limitCount)
+          );
+      const querySnapshot = await getDocs(q);
+
+      querySnapshot.forEach((snapshot) => {
+        const { title, description } = snapshot.data();
+        if (title.includes(searchTerm) || description.includes(searchTerm)) {
+          // console.log(snapshot.data());
+        }
+        array.push({
+          articleId: snapshot.id,
+          ...snapshot.data(),
+        });
+      });
+
+      const sortedTitle = sortByTermRepeat('title', array);
+      const sortedDescription = sortByTermRepeat('description', array);
+      const sortedArticle = sortedTitle.concat(sortedDescription);
+
+      const removedSameArticle = sortedArticle.reduce((acc, curr) => {
+        if (acc.length === 0 || acc[acc.length - 1].index !== curr.index) {
+          acc.push(curr);
+        }
+        return acc;
+      }, []);
+
+      sortedByTerm = sortedByTerm.concat(
+        removedSameArticle.map((el) => array[el.index])
+      );
+      // console.log('sortedByTerm ', sortedByTerm);
+
+      if (sortedByTerm.length < limitCount) {
+        this.queryCursor = querySnapshot.docs[limitCount - 1];
+      }
+    }
+
+    return sortedByTerm;
+  }
+
   // 모든 article중에 필터링에 따라서 article요청
   // arguments condition is serverTimeStamp, region, searchTerm
-  async getOrderedArticle(searchTerm) {
+  async getOrderedArticle(searchTerm, limitCount) {
     const articles = [];
     const collectionRef = collection(firebaseStore, 'article');
+    // ---------------------------아래코드부터는 loop를 도는데 return할 값인 sortedByTerm의 길이가 limitCount 값과
+    // 같아 질때까지 돌아야함.
 
     const timeStampQuery = query(
       collectionRef,
       where('workProgress', '==', true),
-      orderBy('uploaded')
+      orderBy('uploaded', 'desc'),
+      limit(limitCount)
     );
     const querySnapshot = await getDocs(timeStampQuery);
 
@@ -163,6 +301,7 @@ class FireStore {
 
       return array
         .reduce((acc, curr, index) => {
+          // if (index === 0) console.log('첫번째 루프', acc, curr === array[0]);
           if (curr[propertyName].includes(searchTerm)) {
             return acc.concat({
               index,
@@ -173,6 +312,7 @@ class FireStore {
         }, [])
         .sort((a, b) => b.termRepeat - a.termRepeat);
     };
+
     // title, description 소트를 두번한다. 그리고 결과값을 concat으로 이어붙인다.
     // 그후에 index가 곂칠경우 뒤에 위치한 인덱스를 누적하지 않는다.
     const sortedTitle = sortByTermRepeat('title', searchTerm, articles);
@@ -191,12 +331,7 @@ class FireStore {
     }, []);
 
     const sortedByTerm = removedSameArticle.map((el) => articles[el.index]);
-
-    // 1차필터링한 값을 다시 다른 조건으로 필터링 api없이 직접구현
     // 검색하고자하는 단어의 반복이 많을 수록 우선순위가 된다.
-    // 지역 정보는 총 4depth까지 나뉘어져있음.
-    // 나와 가까운 지역일수록 depth name의 숫자가 커짐.
-    // 일치하는 depthCount를 측정하고 depthCount가 높을수록 상위 인덱스
 
     return sortedByTerm;
   }
@@ -223,18 +358,19 @@ class FireStore {
 
   // 스타트 커서 인자는 이전 검색했던 문서의 snapshot이다.
   async getLatestArticle(limitCount) {
-    const result = [];
+    let result = [];
     const articleRef = collection(firebaseStore, 'article');
     const q = this.queryCursor
       ? query(
           articleRef,
           orderBy('uploaded', 'desc'),
-          startAt(this.queryCursor),
+          startAfter(this.queryCursor),
           limit(limitCount)
         )
       : query(articleRef, orderBy('uploaded', 'desc'), limit(limitCount));
 
     const querySnapshot = await getDocs(q);
+    // console.log('queryCursor ', querySnapshot.docs[limitCount - 1]);
     this.queryCursor = querySnapshot.docs[limitCount - 1];
 
     querySnapshot.forEach((snapshot) => {
@@ -244,7 +380,7 @@ class FireStore {
     return result;
   }
 
-  async initializeCursor() {
+  initializeCursor() {
     console.log(this.queryCursor);
     this.queryCursor = null;
   }

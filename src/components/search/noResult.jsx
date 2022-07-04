@@ -29,7 +29,7 @@ const Container = styled(ResultSection)`
   }
 `;
 
-const NoResult = ({ match, latestItemList, moreLoading, handleLoading }) => {
+const NoResult = ({ match, children }) => {
   return (
     <Container>
       <section className='empty_result'>
@@ -40,9 +40,7 @@ const NoResult = ({ match, latestItemList, moreLoading, handleLoading }) => {
         </p>
         <button className='research_btn'>다시 검색하기</button>
       </section>
-      <LatestItem latestItemList={latestItemList}>
-        <MoreButton handleLoading={handleLoading} loadingState={moreLoading} />
-      </LatestItem>
+      {children}
     </Container>
   );
 };

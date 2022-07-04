@@ -1,3 +1,32 @@
+## 2022\-07\-04
+
+렌더링시 state 설정 순서. 같은 컴포넌트가 unmount 되지않고 props만 변경되어 보여지는 data 값만 바뀔때 useState의 초기 설정은 두번째 렌더링시 초기화되지 않는다. 아래 코드는 렌더링 과정의 이해를 돕기위한 코드.
+
+```javascript
+// ------------
+// 첫 번째 렌더링
+// ------------
+useState('Mary'); // 1. 'Mary'라는 name state 변수를 선언합니다.
+useEffect(persistForm); // 2. 폼 데이터를 저장하기 위한 effect를 추가합니다.
+useState('Poppins'); // 3. 'Poppins'라는 surname state 변수를 선언합니다.
+useEffect(updateTitle); // 4. 제목을 업데이트하기 위한 effect를 추가합니다.
+
+// -------------
+// 두 번째 렌더링
+// -------------
+useState('Mary'); // 1. name state 변수를 읽습니다.(인자는 무시됩니다)
+useEffect(persistForm); // 2. 폼 데이터를 저장하기 위한 effect가 대체됩니다.
+useState('Poppins'); // 3. surname state 변수를 읽습니다.(인자는 무시됩니다)
+useEffect(updateTitle); // 4. 제목을 업데이트하기 위한 effect가 대체됩니다.
+
+// ...
+```
+
+search.jsx > searchResult.jsx의 데이터 페이지화. 이것또한 queryCursor를 이용해서 구현하기.
+
+fireStore getOrderedArticle함수에서 쿼리커서 적용하기
+getorderedArticle 함수의 기존 구조상 queryCursor를 특정하기 어려움. firestore.test2함수 작성완료하기.
+
 ## 2022\-07\-01
 
 query cursor로 데이터 페이지화 된 api 요청하는 컴포넌트 수정
@@ -5,7 +34,7 @@ query cursor로 데이터 페이지화 된 api 요청하는 컴포넌트 수정
 위에 사용된 컴포넌트는 실질적으로 LatestItem.jsx 컴포넌트를 임포트해서 렌더링 함.
 
 결국 LatestItem.jsx 컴포넌트를 임포트해서 사용하는 부모컴포넌트까지 props를 전달해야함.
-lastestItem을 한버 부르고. 다른곳에서 다시 부르는곳에 갔을때 쿼리커서가 초기화 되야함.
+lastestItem을 한번 부르고. 다른곳에서 렌더링할때는 쿼리커서가 초기화 되야함.
 
 app.jsx에서 history.loaction.pathname 값 변경감지해서 firestore에서 this.queryCursor 값 초기화해주어야함.
 현재 나의 앱에서 react-router-dom 의 버전은 5.2.0 -> 최신버전 v6에서 생각보다 많이 바뀌었는데 코드를 버전에 맞춰서 다시 고쳐야할듯

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import styled from 'styled-components';
-import { MoreButton } from '../publicStyle/moreButton.jsx';
 import { AiOutlineHeart } from 'react-icons/ai';
+import { MoreButton } from '../publicStyle/moreButton';
 
 const Container = styled.section`
   & {

@@ -1,6 +1,7 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import styled from 'styled-components';
+import { MoreButton } from '../publicStyle/moreButton';
 
 const Container = styled.div`
   .article_kind {
@@ -76,18 +77,40 @@ const Container = styled.div`
 `;
 
 // 인기중고 대체..
-const LatestItem = ({ latestItemList, children }) => {
-  // console.log(latestItemList.forEach());
-  latestItemList.forEach((item) => {
-    // return conso
-    console.log(item.uploaded.toDate());
-  });
+const LatestItem = ({ fireStore }) => {
+  const [latestItemList, setLatestItemList] = useState([]);
+  const [moreLoading, setMoreLoading] = useState(false);
+  const { searchTerm } = useParams();
+  const limitCount = 6;
+
+  useEffect(() => {
+    console.log('search Term이 바뀔때마다 실행되는 useEffect 입니다.');
+    setLatestItemList([]);
+    fireStore.initializeCursor();
+    const fetchingData = async () => {
+      const latestArticles = await fireStore.getLatestArticle(limitCount);
+      setLatestItemList((prevState) => {
+        return [...prevState, ...latestArticles];
+      });
+    };
+    fetchingData();
+  }, [searchTerm, fireStore]);
+
+  const handleLoading = async () => {
+    setMoreLoading(true);
+    const latestArticles = await fireStore.getLatestArticle(limitCount);
+    setLatestItemList((prevState) => {
+      return [...prevState, ...latestArticles];
+    });
+    setMoreLoading(false);
+  };
+
   return (
     <Container>
       <p className='article_kind'>인기 중고</p>
       <div className='flex-box'>
-        {latestItemList.map((item) => (
-          <article className='article' key={item.id}>
+        {latestItemList.map((item, i) => (
+          <article className='article' key={i}>
             <Link
               className='anchor'
               to={{
@@ -106,7 +129,7 @@ const LatestItem = ({ latestItemList, children }) => {
           </article>
         ))}
       </div>
-      {children}
+      <MoreButton handleLoading={handleLoading} loadingState={moreLoading} />
     </Container>
   );
 };
