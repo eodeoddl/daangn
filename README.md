@@ -1,3 +1,12 @@
+## 2022\-07\-05
+
+검색어 searching시에 검색어로 문서가 검색되지 않았을때 while 문 break 포인트 잡아줘야함..
+
+test2 api는 limitCount만큼의 searchTerm을 포함하고있는 article의 필드가 있을때만 loop를 빠져나오고 limitCount 만큼의 article의 배열을 만들어서 리턴함..
+그런데 문서를 탐색하면서 searchTerm을 포함하고있는 필드를 가진 article의 개수가 limitCount 보다 적거나 아예없는 경우의 수를 체크 해줘야함.
+
+현재 구상방안으로는 article collection의 document.size를 알아내고, while 문을 반복하면서 snapshot 의 탐색이 document.size 만큼 반복이 된다면 break 문으로 빠져 나오는 생각중임..
+
 ## 2022\-07\-04
 
 렌더링시 state 설정 순서. 같은 컴포넌트가 unmount 되지않고 props만 변경되어 보여지는 data 값만 바뀔때 useState의 초기 설정은 두번째 렌더링시 초기화되지 않는다. 아래 코드는 렌더링 과정의 이해를 돕기위한 코드.

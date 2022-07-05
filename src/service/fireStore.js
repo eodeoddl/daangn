@@ -21,6 +21,7 @@ import {
 class FireStore {
   constructor() {
     this.queryCursor = null;
+    this.documentCount = 0;
   }
 
   // 기존에 존재하는 유저인지 검사후 신규일경우에만 업데이트
@@ -139,13 +140,17 @@ class FireStore {
     return article.data();
   }
 
-  async test2(searchTerm, limitCount) {
+  async getOrderedBySearchTerm(searchTerm, limitCount) {
+    console.log('call test2 function');
     const collectionRef = collection(firebaseStore, 'article');
     const result = [];
+    const collectionSnapshot = await getDocs(collectionRef);
+    const maxDocCount = collectionSnapshot.size;
 
-    let count = 1;
-    while (result.length < limitCount) {
-      console.log('while loop count => ', count);
+    // let docCount = 0;
+    checkResult: while (result.length < limitCount) {
+      // console.log(docCount + limitCount);
+      // docCount = docCount + limitCount;
       const q = this.queryCursor
         ? query(
             collectionRef,
@@ -161,115 +166,35 @@ class FireStore {
             limit(limitCount)
           );
       const querySnapshot = await getDocs(q);
-      console.log('querySnapshot', querySnapshot);
-      console.log('while querySnapshot block docs =>', querySnapshot.docs);
-      let snapCount = 0;
-      querySnapshot.forEach((snapshot) => {
-        console.log('snapcount ', snapCount);
-        const { title, description } = snapshot.data();
+      // queryCursor가 있는 상태에서 검색할때 실질적인 docCount 값을 계산해야함.
+      // queryCursor의 index 값을 찾고,
+      // docCount = this.queryCursor ? null :  docCount + querySnapshot.size;
+      for (const doc of querySnapshot.docs) {
+        this.documentCount++;
+        const { title, description } = doc.data();
+        // 아래 if 문에 걸렸다는것은 6개의 searchTerm 검색이 완료되었음을 의미
+        if (result.length === limitCount) {
+          this.queryCursor = doc;
+          break checkResult;
+        }
         if (title.includes(searchTerm) || description.includes(searchTerm)) {
-          // console.log(snapshot.data());
           result.push({
-            articleId: snapshot.id,
-            ...snapshot.data(),
+            articleId: doc.id,
+            ...doc.data(),
           });
         }
-
-        if (result.length === limitCount) {
-          console.log(
-            'snapshot block result.length === limitCount ',
-            snapshot.id
-          );
-          this.queryCursor = snapshot;
-          return;
-        }
-        snapCount++;
-      });
-
-      count++;
+      }
+      console.log(this.documentCount >= maxDocCount);
+      if (this.documentCount >= collectionSnapshot.size) {
+        this.queryCursor = null;
+        this.documentCount = 0;
+        break;
+      }
+      console.log('this.documentCount ', this.documentCount);
+      console.log('res ', result);
     }
 
     return result;
-  }
-
-  async testSearchItem(searchTerm, limitCount) {
-    // console.log(' this.queryCursor ', this.queryCursor);
-    const collectionRef = collection(firebaseStore, 'article');
-    const regExp = new RegExp(`${searchTerm}`, 'g');
-    let sortedByTerm = []; // return value
-
-    const sortByTermRepeat = (propertyName, array) => {
-      return array
-        .reduce((acc, curr, index) => {
-          // console.log()
-          // if (index === 0) console.log('첫번째 루프', limitCount);
-          if (curr[propertyName].includes(searchTerm)) {
-            // console.log(' contains search Term count' , )
-            return acc.concat({
-              index,
-              termRepeat: curr[propertyName].match(regExp).length,
-            });
-          }
-          return acc;
-        }, [])
-        .sort((a, b) => b.termRepeat - a.termRepeat);
-    };
-
-    while (sortedByTerm.length <= limitCount) {
-      // console.log('in while block sortedByterm.length ', sortedByTerm.length);
-      // console.log('in while block this.queryCursor ', this.queryCursor);
-
-      const array = [];
-
-      let q = this.queryCursor
-        ? query(
-            collectionRef,
-            where('workProgress', '==', true),
-            orderBy('uploaded', 'desc'),
-            startAfter(this.queryCursor),
-            limit(limitCount)
-          )
-        : query(
-            collectionRef,
-            where('workProgress', '==', true),
-            orderBy('uploaded', 'desc'),
-            limit(limitCount)
-          );
-      const querySnapshot = await getDocs(q);
-
-      querySnapshot.forEach((snapshot) => {
-        const { title, description } = snapshot.data();
-        if (title.includes(searchTerm) || description.includes(searchTerm)) {
-          // console.log(snapshot.data());
-        }
-        array.push({
-          articleId: snapshot.id,
-          ...snapshot.data(),
-        });
-      });
-
-      const sortedTitle = sortByTermRepeat('title', array);
-      const sortedDescription = sortByTermRepeat('description', array);
-      const sortedArticle = sortedTitle.concat(sortedDescription);
-
-      const removedSameArticle = sortedArticle.reduce((acc, curr) => {
-        if (acc.length === 0 || acc[acc.length - 1].index !== curr.index) {
-          acc.push(curr);
-        }
-        return acc;
-      }, []);
-
-      sortedByTerm = sortedByTerm.concat(
-        removedSameArticle.map((el) => array[el.index])
-      );
-      // console.log('sortedByTerm ', sortedByTerm);
-
-      if (sortedByTerm.length < limitCount) {
-        this.queryCursor = querySnapshot.docs[limitCount - 1];
-      }
-    }
-
-    return sortedByTerm;
   }
 
   // 모든 article중에 필터링에 따라서 article요청
@@ -381,8 +306,14 @@ class FireStore {
   }
 
   initializeCursor() {
-    console.log(this.queryCursor);
+    // console.log(this.queryCursor);
+    console.log(' call initialize queryCursor ');
     this.queryCursor = null;
+  }
+
+  initializeDocCount() {
+    console.log(' call initialize Count ');
+    this.documentCount = 0;
   }
 }
 

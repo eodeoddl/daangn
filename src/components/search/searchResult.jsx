@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link, withRouter } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useParams, withRouter } from 'react-router-dom';
 import styled from 'styled-components';
 import { AiOutlineHeart } from 'react-icons/ai';
 import { MoreButton } from '../publicStyle/moreButton';
@@ -125,7 +125,17 @@ const Container = styled.section`
   }
 `;
 
-const SearchResult = ({ searchedItem, handleLoading, loadingState }) => {
+const SearchResult = ({
+  searchedItem,
+  handleLoading,
+  loadingState,
+  fireStore,
+}) => {
+  const params = useParams();
+  // useEffect(() => {
+  //   console.log(params.searchTerm);
+  //   fireStore.initializeCursor();
+  // }, [fireStore, params.searchTerm]);
   return (
     <Container>
       <div className='result'>

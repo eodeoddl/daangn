@@ -12,31 +12,27 @@ const Search = ({ match, fireStore, userInfo, searchTerm }) => {
   const limitCount = 6;
 
   useEffect(() => {
+    console.log('search.jsx useEffect');
     fireStore.initializeCursor();
+    fireStore.initializeDocCount();
 
-    const getArticle = async () => {
-      const res = await fireStore.getOrderedArticle(searchTerm, limitCount);
+    // const aaa = async () => {
+    //   const res = await fireStore.testSearchItem(searchTerm, limitCount);
+    //   dispatch({ type: 'getArticleByTerm', articles: res });
+    //   if (!userInfo.region_B) return;
+    //   dispatch({ type: 'orderByRegion', region_B: userInfo.region_B });
+    // };
+
+    const fetchingData = async () => {
+      const res = await fireStore.getOrderedBySearchTerm(
+        searchTerm,
+        limitCount
+      );
       dispatch({ type: 'getArticleByTerm', articles: res });
-      if (!userInfo.region_B) return;
-      dispatch({ type: 'orderByRegion', region_B: userInfo.region_B });
-      // dispatch({ type: 'editArticle', loadIdx });
-    };
-
-    const aaa = async () => {
-      const res = await fireStore.testSearchItem(searchTerm, limitCount);
-      dispatch({ type: 'getArticleByTerm', articles: res });
-      if (!userInfo.region_B) return;
-      dispatch({ type: 'orderByRegion', region_B: userInfo.region_B });
-    };
-
-    const bbb = async () => {
-      const res = await fireStore.test2(searchTerm, limitCount);
       console.log(res);
     };
 
-    // getArticle();
-    aaa();
-    bbb();
+    fetchingData();
   }, [fireStore, searchTerm, userInfo.region_B]);
 
   // 검색어 바뀔시 idx 초기값으로 설정
@@ -53,8 +49,14 @@ const Search = ({ match, fireStore, userInfo, searchTerm }) => {
   // 새로운 목록6개씩 로딩(idx값 증가)
   const handleLoading = async () => {
     setLoadingState(true);
-    await timer(1000).then(() => {
-      setLoadIdx((prevIdx) => prevIdx + 6);
+    await timer(1000).then(async () => {
+      // setLoadIdx((prevIdx) => prevIdx + 6);
+      const res = await fireStore.getOrderedBySearchTerm(
+        searchTerm,
+        limitCount
+      );
+      console.log(' click event res ', res);
+      dispatch({ type: 'getArticleByTerm', articles: res });
     });
     setLoadingState(false);
   };
@@ -71,6 +73,7 @@ const Search = ({ match, fireStore, userInfo, searchTerm }) => {
             searchedItem={searchedItem}
             handleLoading={handleLoading}
             loadingState={loadingState}
+            fireStore={fireStore}
           />
         ) : (
           <NoResult fireStore={fireStore}>
@@ -87,7 +90,8 @@ export default withRouter(Search);
 const reducer = (state, action) => {
   switch (action.type) {
     case 'getArticleByTerm':
-      return [...action.articles];
+      console.log('prevState ', state);
+      return [...state, ...action.articles];
     case 'orderByRegion':
       const sortedByRegion = state
         .reduce((acc, curr, index) => {
