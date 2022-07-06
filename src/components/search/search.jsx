@@ -1,13 +1,12 @@
 import React, { useEffect, useState, useReducer } from 'react';
 import { withRouter, Route, Redirect } from 'react-router-dom';
 import HeaderMessage from './headerMessage';
-import LatestItem from './latestItem';
+// import LatestItem from './latestItem';
 import NoResult from './noResult';
 import SearchResult from './searchResult';
 
 const Search = ({ match, fireStore, userInfo, searchTerm }) => {
   const [searchedItem, dispatch] = useReducer(reducer, []);
-  const [loadIdx, setLoadIdx] = useState(6);
   const [loadingState, setLoadingState] = useState(false);
   const limitCount = 6;
 
@@ -15,30 +14,21 @@ const Search = ({ match, fireStore, userInfo, searchTerm }) => {
     console.log('search.jsx useEffect');
     fireStore.initializeCursor();
     fireStore.initializeDocCount();
-
-    // const aaa = async () => {
-    //   const res = await fireStore.testSearchItem(searchTerm, limitCount);
-    //   dispatch({ type: 'getArticleByTerm', articles: res });
-    //   if (!userInfo.region_B) return;
-    //   dispatch({ type: 'orderByRegion', region_B: userInfo.region_B });
-    // };
+    dispatch({ type: 'initializeItem' });
 
     const fetchingData = async () => {
       const res = await fireStore.getOrderedBySearchTerm(
         searchTerm,
         limitCount
       );
-      dispatch({ type: 'getArticleByTerm', articles: res });
-      console.log(res);
+      console.log('res ', res);
+      dispatch({ type: 'getArticleByTerm', articles: res, searchTerm });
+      if (userInfo.region_B) return;
+      // dispatch({ type: 'orderByRegion' });
     };
 
     fetchingData();
   }, [fireStore, searchTerm, userInfo.region_B]);
-
-  // 검색어 바뀔시 idx 초기값으로 설정
-  useEffect(() => {
-    setLoadIdx(6);
-  }, [searchTerm]);
 
   let timer = (timeout) => {
     return new Promise((resolve) => {
@@ -50,7 +40,6 @@ const Search = ({ match, fireStore, userInfo, searchTerm }) => {
   const handleLoading = async () => {
     setLoadingState(true);
     await timer(1000).then(async () => {
-      // setLoadIdx((prevIdx) => prevIdx + 6);
       const res = await fireStore.getOrderedBySearchTerm(
         searchTerm,
         limitCount
@@ -76,9 +65,7 @@ const Search = ({ match, fireStore, userInfo, searchTerm }) => {
             fireStore={fireStore}
           />
         ) : (
-          <NoResult fireStore={fireStore}>
-            <LatestItem fireStore={fireStore} />
-          </NoResult>
+          <NoResult fireStore={fireStore} />
         )}
       </Route>
     </>
@@ -90,8 +77,55 @@ export default withRouter(Search);
 const reducer = (state, action) => {
   switch (action.type) {
     case 'getArticleByTerm':
-      console.log('prevState ', state);
-      return [...state, ...action.articles];
+      const articleArray = [...state, ...action.articles];
+      // console.log('prev state ', state);
+      // console.log(articleArray);
+      const sortedTitle = sortByTermRepeat(
+        'title',
+        action.searchTerm,
+        articleArray
+      );
+
+      // console.log('sortedTitle ', sortedTitle);
+      const sortedDescription = sortByTermRepeat(
+        'description',
+        action.searchTerm,
+        articleArray
+      );
+      // console.log('sortedDescription ', sortedDescription);
+      const sortedArticle = sortedTitle.concat(sortedDescription);
+      console.log('sortedArticle ', sortedArticle);
+      const removedSameArticle = sortedArticle.reduce((acc, curr) => {
+        // console.log(
+        //   acc.some((accItem) => {
+        //     console.log(
+        //       'acc item index ',
+        //       accItem.index,
+        //       'curr index ',
+        //       curr.index
+        //     );
+        //     return accItem.index !== curr.index;
+        //   })
+        // );
+        if (acc.length === 0) {
+          acc.push(curr);
+        }
+
+        // acc.find((element) => element.index === curr.index);
+
+        // acc.forEach((accItem) => {
+        //   if (accItem.id) {
+
+        //   }
+        // })
+
+        return acc;
+      }, []);
+      console.log('removedSameArticle ', removedSameArticle);
+      const sortedByTerm = removedSameArticle.map(
+        (el) => articleArray[el.index]
+      );
+      return sortedByTerm;
     case 'orderByRegion':
       const sortedByRegion = state
         .reduce((acc, curr, index) => {
@@ -117,9 +151,26 @@ const reducer = (state, action) => {
         .sort((a, b) => b.depthMatchCount - a.depthMatchCount);
       const result = sortedByRegion.map((el) => state[el.index]);
       return [...result];
-    case 'editArticle':
-      return [...state.slice(0, action.loadIdx)];
+    case 'initializeItem':
+      return [];
     default:
       throw new Error();
   }
+};
+
+// 무조건 단어를 포함하고있음.
+const sortByTermRepeat = (propertyName, searchTerm, array) => {
+  const regExp = new RegExp(`${searchTerm}`, 'g');
+
+  return array
+    .reduce((acc, curr, index) => {
+      if (curr[propertyName].match(regExp)) {
+        return acc.concat({
+          index,
+          termRepeat: curr[propertyName].match(regExp).length,
+        });
+      }
+      return acc;
+    }, [])
+    .sort((a, b) => b.termRepeat - a.termRepeat);
 };

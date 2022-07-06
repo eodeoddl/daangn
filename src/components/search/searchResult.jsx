@@ -125,12 +125,7 @@ const Container = styled.section`
   }
 `;
 
-const SearchResult = ({
-  searchedItem,
-  handleLoading,
-  loadingState,
-  fireStore,
-}) => {
+const SearchResult = ({ searchedItem, handleLoading, loadingState }) => {
   const params = useParams();
   // useEffect(() => {
   //   console.log(params.searchTerm);

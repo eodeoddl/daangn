@@ -29,7 +29,7 @@ const Container = styled(ResultSection)`
   }
 `;
 
-const NoResult = ({ match, children }) => {
+const NoResult = ({ match, fireStore }) => {
   return (
     <Container>
       <section className='empty_result'>
@@ -40,7 +40,7 @@ const NoResult = ({ match, children }) => {
         </p>
         <button className='research_btn'>다시 검색하기</button>
       </section>
-      {children}
+      {/* <LatestItem fireStore={fireStore} /> */}
     </Container>
   );
 };

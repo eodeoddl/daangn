@@ -94,6 +94,10 @@ const LatestItem = ({ fireStore }) => {
       });
     };
     fetchingData();
+
+    return () => {
+      fireStore.initializeCursor();
+    };
   }, [searchTerm, fireStore]);
 
   const handleLoading = async () => {

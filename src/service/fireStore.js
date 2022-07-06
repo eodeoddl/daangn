@@ -14,7 +14,6 @@ import {
   arrayUnion,
   arrayRemove,
   limit,
-  startAt,
   startAfter,
 } from 'firebase/firestore';
 
@@ -141,16 +140,12 @@ class FireStore {
   }
 
   async getOrderedBySearchTerm(searchTerm, limitCount) {
-    console.log('call test2 function');
+    console.log('call fetching function');
     const collectionRef = collection(firebaseStore, 'article');
     const result = [];
     const collectionSnapshot = await getDocs(collectionRef);
-    const maxDocCount = collectionSnapshot.size;
 
-    // let docCount = 0;
     checkResult: while (result.length < limitCount) {
-      // console.log(docCount + limitCount);
-      // docCount = docCount + limitCount;
       const q = this.queryCursor
         ? query(
             collectionRef,
@@ -166,32 +161,35 @@ class FireStore {
             limit(limitCount)
           );
       const querySnapshot = await getDocs(q);
-      // queryCursor가 있는 상태에서 검색할때 실질적인 docCount 값을 계산해야함.
-      // queryCursor의 index 값을 찾고,
-      // docCount = this.queryCursor ? null :  docCount + querySnapshot.size;
+
       for (const doc of querySnapshot.docs) {
-        this.documentCount++;
         const { title, description } = doc.data();
-        // 아래 if 문에 걸렸다는것은 6개의 searchTerm 검색이 완료되었음을 의미
-        if (result.length === limitCount) {
-          this.queryCursor = doc;
-          break checkResult;
-        }
+        this.documentCount++;
+
+        // query된 doc에서 조건에 맞춰서 결과 data에 push
         if (title.includes(searchTerm) || description.includes(searchTerm)) {
           result.push({
             articleId: doc.id,
             ...doc.data(),
           });
         }
+
+        // 가져오고자 하는 data의 숫자만큼 검색이 완료되었을때 while loop종료하고 결과리턴
+        if (result.length === limitCount) {
+          this.queryCursor = doc;
+          break checkResult;
+        }
+
+        // querySnap의 마지막 루프가 끝날때 다음 while 문 loop의 query startAfter인자 값을 querySnap의 마지막 doc으로 설정.
+        if (querySnapshot.docs[querySnapshot.docs.length - 1].id === doc.id) {
+          this.queryCursor = doc;
+        }
       }
-      console.log(this.documentCount >= maxDocCount);
-      if (this.documentCount >= collectionSnapshot.size) {
-        this.queryCursor = null;
-        this.documentCount = 0;
-        break;
-      }
-      console.log('this.documentCount ', this.documentCount);
-      console.log('res ', result);
+
+      // article collection의 모든 doc을 검색했지만 limit count 이상의 문서를 발견하지 못했을땐 while문을 종료하고 검색된 값들만 리턴
+      if (this.documentCount >= collectionSnapshot.size) break;
+
+      // console.log('res ', result);
     }
 
     return result;
@@ -199,67 +197,66 @@ class FireStore {
 
   // 모든 article중에 필터링에 따라서 article요청
   // arguments condition is serverTimeStamp, region, searchTerm
-  async getOrderedArticle(searchTerm, limitCount) {
-    const articles = [];
-    const collectionRef = collection(firebaseStore, 'article');
-    // ---------------------------아래코드부터는 loop를 도는데 return할 값인 sortedByTerm의 길이가 limitCount 값과
-    // 같아 질때까지 돌아야함.
+  // async getOrderedArticle(searchTerm, limitCount) {
+  //   const articles = [];
+  //   const collectionRef = collection(firebaseStore, 'article');
+  //   // ---------------------------아래코드부터는 loop를 도는데 return할 값인 sortedByTerm의 길이가 limitCount 값과
+  //   // 같아 질때까지 돌아야함.
 
-    const timeStampQuery = query(
-      collectionRef,
-      where('workProgress', '==', true),
-      orderBy('uploaded', 'desc'),
-      limit(limitCount)
-    );
-    const querySnapshot = await getDocs(timeStampQuery);
+  //   const timeStampQuery = query(
+  //     collectionRef,
+  //     where('workProgress', '==', true),
+  //     orderBy('uploaded', 'desc'),
+  //     limit(limitCount)
+  //   );
+  //   const querySnapshot = await getDocs(timeStampQuery);
 
-    // 여기서는 쿼리필터링된 값을 배열로 만들어서 리턴함.
-    querySnapshot.forEach((snapshot) => {
-      articles.push({
-        articleId: snapshot.id,
-        ...snapshot.data(),
-      });
-    });
+  //   // 여기서는 쿼리필터링된 값을 배열로 만들어서 리턴함.
+  //   querySnapshot.forEach((snapshot) => {
+  //     articles.push({
+  //       articleId: snapshot.id,
+  //       ...snapshot.data(),
+  //     });
+  //   });
 
-    const sortByTermRepeat = (propertyName, searchTerm, array) => {
-      const regExp = new RegExp(`${searchTerm}`, 'g');
+  //   const sortByTermRepeat = (propertyName, searchTerm, array) => {
+  //     const regExp = new RegExp(`${searchTerm}`, 'g');
 
-      return array
-        .reduce((acc, curr, index) => {
-          // if (index === 0) console.log('첫번째 루프', acc, curr === array[0]);
-          if (curr[propertyName].includes(searchTerm)) {
-            return acc.concat({
-              index,
-              termRepeat: curr[propertyName].match(regExp).length,
-            });
-          }
-          return acc;
-        }, [])
-        .sort((a, b) => b.termRepeat - a.termRepeat);
-    };
+  //     return array
+  //       .reduce((acc, curr, index) => {
+  //         if (curr[propertyName].includes(searchTerm)) {
+  //           return acc.concat({
+  //             index,
+  //             termRepeat: curr[propertyName].match(regExp).length,
+  //           });
+  //         }
+  //         return acc;
+  //       }, [])
+  //       .sort((a, b) => b.termRepeat - a.termRepeat);
+  //   };
 
-    // title, description 소트를 두번한다. 그리고 결과값을 concat으로 이어붙인다.
-    // 그후에 index가 곂칠경우 뒤에 위치한 인덱스를 누적하지 않는다.
-    const sortedTitle = sortByTermRepeat('title', searchTerm, articles);
-    const sortedDescription = sortByTermRepeat(
-      'description',
-      searchTerm,
-      articles
-    );
-    const sortedArticle = sortedTitle.concat(sortedDescription);
+  //   // title, description 소트를 두번한다. 그리고 결과값을 concat으로 이어붙인다.
+  //   // 그후에 index가 곂칠경우 뒤에 위치한 인덱스를 누적하지 않는다.
+  //   const sortedTitle = sortByTermRepeat('title', searchTerm, articles);
+  //   const sortedDescription = sortByTermRepeat(
+  //     'description',
+  //     searchTerm,
+  //     articles
+  //   );
+  //   const sortedArticle = sortedTitle.concat(sortedDescription);
 
-    const removedSameArticle = sortedArticle.reduce((acc, curr) => {
-      if (acc.length === 0 || acc[acc.length - 1].index !== curr.index) {
-        acc.push(curr);
-      }
-      return acc;
-    }, []);
+  //   const removedSameArticle = sortedArticle.reduce((acc, curr) => {
+  //     if (acc.length === 0 || acc[acc.length - 1].index !== curr.index) {
+  //       acc.push(curr);
+  //     }
+  //     return acc;
+  //   }, []);
 
-    const sortedByTerm = removedSameArticle.map((el) => articles[el.index]);
-    // 검색하고자하는 단어의 반복이 많을 수록 우선순위가 된다.
+  //   const sortedByTerm = removedSameArticle.map((el) => articles[el.index]);
+  //   // 검색하고자하는 단어의 반복이 많을 수록 우선순위가 된다.
 
-    return sortedByTerm;
-  }
+  //   return sortedByTerm;
+  // }
 
   // 유저가 구독버튼을 눌렀을때 user > subcribeList 업데이트
   // 유저가 로그인을 하지않았을경우는 실행할 수 없음.
@@ -297,6 +294,7 @@ class FireStore {
     const querySnapshot = await getDocs(q);
     // console.log('queryCursor ', querySnapshot.docs[limitCount - 1]);
     this.queryCursor = querySnapshot.docs[limitCount - 1];
+    console.log('get latestArticle cursor', this.queryCursor);
 
     querySnapshot.forEach((snapshot) => {
       result.push({ id: snapshot.id, ...snapshot.data() });
@@ -306,9 +304,8 @@ class FireStore {
   }
 
   initializeCursor() {
-    // console.log(this.queryCursor);
-    console.log(' call initialize queryCursor ');
     this.queryCursor = null;
+    console.log('call initialize queryCursor ', this.queryCursor);
   }
 
   initializeDocCount() {
