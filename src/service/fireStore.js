@@ -15,11 +15,13 @@ import {
   arrayRemove,
   limit,
   startAfter,
+  onSnapshot,
 } from 'firebase/firestore';
 
 class FireStore {
   constructor() {
-    this.queryCursor = null;
+    this.searhTermQueryCursor = null;
+    this.resentQueryCursor = null;
     this.documentCount = 0;
   }
 
@@ -108,6 +110,8 @@ class FireStore {
     });
   }
 
+  async observeOnchange(fieldName) {}
+
   // data arg comes from postingForm.jsx
   async setArticle(data, uid) {
     const userRef = doc(firebaseStore, 'users', uid);
@@ -146,12 +150,12 @@ class FireStore {
     const collectionSnapshot = await getDocs(collectionRef);
 
     checkResult: while (result.length < limitCount) {
-      const q = this.queryCursor
+      const q = this.searhTermQueryCursor
         ? query(
             collectionRef,
             where('workProgress', '==', true),
             orderBy('uploaded', 'desc'),
-            startAfter(this.queryCursor),
+            startAfter(this.searhTermQueryCursor),
             limit(limitCount)
           )
         : query(
@@ -176,13 +180,13 @@ class FireStore {
 
         // 가져오고자 하는 data의 숫자만큼 검색이 완료되었을때 while loop종료하고 결과리턴
         if (result.length === limitCount) {
-          this.queryCursor = doc;
+          this.searhTermQueryCursor = doc;
           break checkResult;
         }
 
         // querySnap의 마지막 루프가 끝날때 다음 while 문 loop의 query startAfter인자 값을 querySnap의 마지막 doc으로 설정.
         if (querySnapshot.docs[querySnapshot.docs.length - 1].id === doc.id) {
-          this.queryCursor = doc;
+          this.searhTermQueryCursor = doc;
         }
       }
 
@@ -194,69 +198,6 @@ class FireStore {
 
     return result;
   }
-
-  // 모든 article중에 필터링에 따라서 article요청
-  // arguments condition is serverTimeStamp, region, searchTerm
-  // async getOrderedArticle(searchTerm, limitCount) {
-  //   const articles = [];
-  //   const collectionRef = collection(firebaseStore, 'article');
-  //   // ---------------------------아래코드부터는 loop를 도는데 return할 값인 sortedByTerm의 길이가 limitCount 값과
-  //   // 같아 질때까지 돌아야함.
-
-  //   const timeStampQuery = query(
-  //     collectionRef,
-  //     where('workProgress', '==', true),
-  //     orderBy('uploaded', 'desc'),
-  //     limit(limitCount)
-  //   );
-  //   const querySnapshot = await getDocs(timeStampQuery);
-
-  //   // 여기서는 쿼리필터링된 값을 배열로 만들어서 리턴함.
-  //   querySnapshot.forEach((snapshot) => {
-  //     articles.push({
-  //       articleId: snapshot.id,
-  //       ...snapshot.data(),
-  //     });
-  //   });
-
-  //   const sortByTermRepeat = (propertyName, searchTerm, array) => {
-  //     const regExp = new RegExp(`${searchTerm}`, 'g');
-
-  //     return array
-  //       .reduce((acc, curr, index) => {
-  //         if (curr[propertyName].includes(searchTerm)) {
-  //           return acc.concat({
-  //             index,
-  //             termRepeat: curr[propertyName].match(regExp).length,
-  //           });
-  //         }
-  //         return acc;
-  //       }, [])
-  //       .sort((a, b) => b.termRepeat - a.termRepeat);
-  //   };
-
-  //   // title, description 소트를 두번한다. 그리고 결과값을 concat으로 이어붙인다.
-  //   // 그후에 index가 곂칠경우 뒤에 위치한 인덱스를 누적하지 않는다.
-  //   const sortedTitle = sortByTermRepeat('title', searchTerm, articles);
-  //   const sortedDescription = sortByTermRepeat(
-  //     'description',
-  //     searchTerm,
-  //     articles
-  //   );
-  //   const sortedArticle = sortedTitle.concat(sortedDescription);
-
-  //   const removedSameArticle = sortedArticle.reduce((acc, curr) => {
-  //     if (acc.length === 0 || acc[acc.length - 1].index !== curr.index) {
-  //       acc.push(curr);
-  //     }
-  //     return acc;
-  //   }, []);
-
-  //   const sortedByTerm = removedSameArticle.map((el) => articles[el.index]);
-  //   // 검색하고자하는 단어의 반복이 많을 수록 우선순위가 된다.
-
-  //   return sortedByTerm;
-  // }
 
   // 유저가 구독버튼을 눌렀을때 user > subcribeList 업데이트
   // 유저가 로그인을 하지않았을경우는 실행할 수 없음.
@@ -282,19 +223,19 @@ class FireStore {
   async getLatestArticle(limitCount) {
     let result = [];
     const articleRef = collection(firebaseStore, 'article');
-    const q = this.queryCursor
+    const q = this.resentQueryCursor
       ? query(
           articleRef,
           orderBy('uploaded', 'desc'),
-          startAfter(this.queryCursor),
+          startAfter(this.resentQueryCursor),
           limit(limitCount)
         )
       : query(articleRef, orderBy('uploaded', 'desc'), limit(limitCount));
 
     const querySnapshot = await getDocs(q);
     // console.log('queryCursor ', querySnapshot.docs[limitCount - 1]);
-    this.queryCursor = querySnapshot.docs[limitCount - 1];
-    console.log('get latestArticle cursor', this.queryCursor);
+    this.resentQueryCursor = querySnapshot.docs[limitCount - 1];
+    console.log('get latestArticle cursor', this.resentQueryCursor);
 
     querySnapshot.forEach((snapshot) => {
       result.push({ id: snapshot.id, ...snapshot.data() });
@@ -303,8 +244,17 @@ class FireStore {
     return result;
   }
 
-  initializeCursor() {
-    this.queryCursor = null;
+  initializeCursor(type) {
+    switch (type) {
+      case 'searchTerm':
+        this.searhTermQueryCursor = null;
+        break;
+      case 'resent':
+        this.resentQueryCursor = null;
+        break;
+      default:
+        console.log('select a type');
+    }
     console.log('call initialize queryCursor ', this.queryCursor);
   }
 

@@ -12,7 +12,7 @@ const Search = ({ match, fireStore, userInfo, searchTerm }) => {
 
   useEffect(() => {
     console.log('search.jsx useEffect');
-    fireStore.initializeCursor();
+    fireStore.initializeCursor('searchTerm');
     fireStore.initializeDocCount();
     dispatch({ type: 'initializeItem' });
 
@@ -23,8 +23,8 @@ const Search = ({ match, fireStore, userInfo, searchTerm }) => {
       );
       console.log('res ', res);
       dispatch({ type: 'getArticleByTerm', articles: res, searchTerm });
-      if (userInfo.region_B) return;
-      // dispatch({ type: 'orderByRegion' });
+      if (!userInfo.address.region_B) return;
+      dispatch({ type: 'orderByRegion', region_B: userInfo.address.region_B });
     };
 
     fetchingData();
@@ -45,7 +45,9 @@ const Search = ({ match, fireStore, userInfo, searchTerm }) => {
         limitCount
       );
       console.log(' click event res ', res);
-      dispatch({ type: 'getArticleByTerm', articles: res });
+      dispatch({ type: 'getArticleByTerm', articles: res, searchTerm });
+      if (!userInfo.address.region_B) return;
+      dispatch({ type: 'orderByRegion', region_B: userInfo.address.region_B });
     });
     setLoadingState(false);
   };
@@ -77,55 +79,37 @@ export default withRouter(Search);
 const reducer = (state, action) => {
   switch (action.type) {
     case 'getArticleByTerm':
-      const articleArray = [...state, ...action.articles];
-      // console.log('prev state ', state);
-      // console.log(articleArray);
+      const articleArray = [...action.articles];
+
       const sortedTitle = sortByTermRepeat(
         'title',
         action.searchTerm,
         articleArray
       );
 
-      // console.log('sortedTitle ', sortedTitle);
       const sortedDescription = sortByTermRepeat(
         'description',
         action.searchTerm,
         articleArray
       );
-      // console.log('sortedDescription ', sortedDescription);
+
       const sortedArticle = sortedTitle.concat(sortedDescription);
-      console.log('sortedArticle ', sortedArticle);
+
       const removedSameArticle = sortedArticle.reduce((acc, curr) => {
-        // console.log(
-        //   acc.some((accItem) => {
-        //     console.log(
-        //       'acc item index ',
-        //       accItem.index,
-        //       'curr index ',
-        //       curr.index
-        //     );
-        //     return accItem.index !== curr.index;
-        //   })
-        // );
-        if (acc.length === 0) {
-          acc.push(curr);
-        }
+        const checkSameId = (article) => {
+          return article.index === curr.index;
+        };
 
-        // acc.find((element) => element.index === curr.index);
-
-        // acc.forEach((accItem) => {
-        //   if (accItem.id) {
-
-        //   }
-        // })
+        if (!acc.find(checkSameId)) acc.push(curr);
 
         return acc;
       }, []);
+
       console.log('removedSameArticle ', removedSameArticle);
       const sortedByTerm = removedSameArticle.map(
         (el) => articleArray[el.index]
       );
-      return sortedByTerm;
+      return [...state, ...sortedByTerm];
     case 'orderByRegion':
       const sortedByRegion = state
         .reduce((acc, curr, index) => {
@@ -158,7 +142,7 @@ const reducer = (state, action) => {
   }
 };
 
-// 무조건 단어를 포함하고있음.
+// array는 무조건 단어를 포함하고있음.
 const sortByTermRepeat = (propertyName, searchTerm, array) => {
   const regExp = new RegExp(`${searchTerm}`, 'g');
 

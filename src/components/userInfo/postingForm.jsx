@@ -219,6 +219,7 @@ const PostingForm = ({ userInfo, fireStorage, fireStore }) => {
   console.log(userInfo);
 
   useEffect(() => {
+    console.log(' on load useEffect ');
     dispatch({ type: 'onLoad', userInfo });
   }, [userInfo]);
 
@@ -436,6 +437,7 @@ const reducer = (state, action) => {
       files.splice(action.index, 1);
       return { ...state, files: [...files] };
     case 'onLoad':
+      console.log('onLoad ', action.userInfo);
       return init(action.userInfo);
     case 'reset':
       const { uid, region_B } = state;
@@ -446,6 +448,7 @@ const reducer = (state, action) => {
 };
 
 const init = (userInfo) => {
+  console.log(userInfo);
   const { uid, address, displayName, photoURL } = userInfo;
   const region_B = address.region_B;
   return {

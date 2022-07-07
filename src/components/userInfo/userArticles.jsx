@@ -89,21 +89,24 @@ const UserArticles = ({ fireStore, data }) => {
   const [article, setArticle] = useState(null);
 
   useEffect(() => {
+    console.log('article path data', data);
     const getArticleData = async () => {
       const articleData = data.map((articlePath) => {
         return fireStore.readRefs(articlePath);
       });
       const result = await Promise.all(articleData);
-      // console.log(result);
+      console.log(result);
       setArticle(result);
     };
     getArticleData();
   }, [data, fireStore]);
 
   return (
-    article && (
-      <Section>
-        {article.map((item) => {
+    // article && (
+    <Section>
+      {article &&
+        article.map((item, i) => {
+          console.log('render block item ', item, 'item Index', i);
           return (
             <div className='card-wrap' key={item.id}>
               {/* <div className='card'> */}
@@ -132,9 +135,9 @@ const UserArticles = ({ fireStore, data }) => {
             </div>
           );
         })}
-      </Section>
-    )
+    </Section>
   );
+  // )
 };
 
 export default memo(UserArticles);

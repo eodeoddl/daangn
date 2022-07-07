@@ -40,7 +40,7 @@ const NoResult = ({ match, fireStore }) => {
         </p>
         <button className='research_btn'>다시 검색하기</button>
       </section>
-      {/* <LatestItem fireStore={fireStore} /> */}
+      <LatestItem fireStore={fireStore} />
     </Container>
   );
 };

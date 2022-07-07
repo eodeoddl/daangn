@@ -86,7 +86,7 @@ const LatestItem = ({ fireStore }) => {
   useEffect(() => {
     console.log('search Term이 바뀔때마다 실행되는 useEffect 입니다.');
     setLatestItemList([]);
-    fireStore.initializeCursor();
+    fireStore.initializeCursor('resent');
     const fetchingData = async () => {
       const latestArticles = await fireStore.getLatestArticle(limitCount);
       setLatestItemList((prevState) => {
@@ -96,7 +96,7 @@ const LatestItem = ({ fireStore }) => {
     fetchingData();
 
     return () => {
-      fireStore.initializeCursor();
+      fireStore.initializeCursor('resent');
     };
   }, [searchTerm, fireStore]);
 
