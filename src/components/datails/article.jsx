@@ -212,6 +212,7 @@ const Article = ({ fireStore, userInfo }) => {
             price={articleData.price}
             fireStore={fireStore}
             uid={userInfo.uid}
+            subscribeList={userInfo.subscribeList}
           />
         </Container>
         {showModal && (

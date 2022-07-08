@@ -211,17 +211,12 @@ const fileTypes = [
 const PostingForm = ({ userInfo, fireStorage, fireStore }) => {
   const [fileImg, setFileImg] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [formData, dispatch] = useReducer(reducer, {}, init);
+  const [formData, dispatch] = useReducer(reducer, userInfo, init);
   const history = useHistory();
   const priceLabel = useRef(null);
   const fileInputRef = useRef(null);
 
   console.log(userInfo);
-
-  useEffect(() => {
-    console.log(' on load useEffect ');
-    dispatch({ type: 'onLoad', userInfo });
-  }, [userInfo]);
 
   const onPriceInput = (e) => {
     e.target.value = e.target.value.replace(/[^0-9.]/g, '');
@@ -436,9 +431,6 @@ const reducer = (state, action) => {
       const files = state.files.slice();
       files.splice(action.index, 1);
       return { ...state, files: [...files] };
-    case 'onLoad':
-      console.log('onLoad ', action.userInfo);
-      return init(action.userInfo);
     case 'reset':
       const { uid, region_B } = state;
       return { uid, region_B };
@@ -448,9 +440,8 @@ const reducer = (state, action) => {
 };
 
 const init = (userInfo) => {
-  console.log(userInfo);
-  const { uid, address, displayName, photoURL } = userInfo;
-  const region_B = address.region_B;
+  const { uid, displayName, photoURL } = userInfo;
+  const region_B = userInfo.address.region_B;
   return {
     uid,
     region_B,

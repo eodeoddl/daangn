@@ -89,7 +89,6 @@ const UserArticles = ({ fireStore, data }) => {
   const [article, setArticle] = useState(null);
 
   useEffect(() => {
-    console.log('article path data', data);
     const getArticleData = async () => {
       const articleData = data.map((articlePath) => {
         return fireStore.readRefs(articlePath);

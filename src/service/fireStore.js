@@ -16,6 +16,7 @@ import {
   limit,
   startAfter,
   onSnapshot,
+  documentId,
 } from 'firebase/firestore';
 
 class FireStore {
@@ -110,7 +111,17 @@ class FireStore {
     });
   }
 
-  async observeOnchange(fieldName) {}
+  observeUserInfo(uid, dispatch) {
+    const userRef = doc(firebaseStore, 'users', uid);
+
+    onSnapshot(userRef, (doc) => {
+      const source = doc.metadata.hasPendingWrites ? 'Local' : 'Server';
+      console.log(source, ' data  => ', doc.data());
+      console.log('doc data article size ', doc.data().userArticles.length);
+      console.log('subscibe list size ', doc.data().subscribeList.length);
+      dispatch({ type: 'updateInfo', userData: { ...doc.data() } });
+    });
+  }
 
   // data arg comes from postingForm.jsx
   async setArticle(data, uid) {

@@ -198,14 +198,20 @@ function App({ loginService, fireStore, fireStorage, kakaoMapAPI }) {
   }, [fireStore, history, kakaoMapAPI, loginService]);
 
   // 유저가 외부업체auth로 로그인에 성공했을때 dispatch로 정보업데이트
+  // useEffect(() => {
+  //   if (!loginState) return;
+  //   const getUser = async () => {
+  //     const data = await fireStore.getUserInfo(userInfo.uid);
+  //     dispatch({ type: 'setUserInfo', data });
+  //   };
+  //   getUser();
+  // }, [fireStore, loginState, userInfo.uid]);
+
   useEffect(() => {
+    console.log('active observe user data');
     if (!loginState) return;
-    const getUser = async () => {
-      const data = await fireStore.getUserInfo(userInfo.uid);
-      dispatch({ type: 'setUserInfo', data });
-    };
-    getUser();
-  }, [fireStore, loginState, userInfo.uid]);
+    fireStore.observeUserInfo(userInfo.uid, dispatch);
+  }, [fireStore, userInfo.uid, loginState]);
 
   return (
     <>
@@ -270,8 +276,8 @@ const reducer = (state, action) => {
       return {};
     case 'setUserInfo':
       return { ...state, ...action.data };
-    // case 'setUserInfo1':
-    //   return { ...state, ...action.userData };
+    case 'updateInfo':
+      return { ...state, ...action.userData };
     default:
       throw new Error();
   }
