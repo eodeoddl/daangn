@@ -7,6 +7,7 @@ import Portal from '../portal/portal';
 import Carousel from '../publicStyle/carousel';
 import LatestItem from '../search/latestItem';
 import { CgClose } from 'react-icons/cg';
+import ArticleAdminMenu from '../userInfo/articleAdminMenu';
 
 const Container = styled.article`
   margin-top: 100px;
@@ -155,7 +156,7 @@ const Article = ({ fireStore, userInfo }) => {
   useEffect(() => {
     const fetchingData = async () => {
       const data = await fireStore.getArticleById(articleId);
-      console.log(data);
+      console.log('aricle.jsx ', data);
       const { uploaded } = data;
       console.log(uploaded.toDate());
       setArticleData(data);
@@ -208,12 +209,16 @@ const Article = ({ fireStore, userInfo }) => {
           <section className='more-item'>
             <LatestItem fireStore={fireStore} />
           </section>
-          <ArticleFooter
-            price={articleData.price}
-            fireStore={fireStore}
-            uid={userInfo.uid}
-            subscribeList={userInfo.subscribeList}
-          />
+          {articleData.uid === userInfo.uid ? (
+            <ArticleAdminMenu />
+          ) : (
+            <ArticleFooter
+              price={articleData.price}
+              fireStore={fireStore}
+              uid={userInfo.uid}
+              subscribeList={userInfo.subscribeList}
+            />
+          )}
         </Container>
         {showModal && (
           <Portal idSelector='carousel-modal'>

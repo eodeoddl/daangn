@@ -203,8 +203,6 @@ class FireStore {
 
       // article collection의 모든 doc을 검색했지만 limit count 이상의 문서를 발견하지 못했을땐 while문을 종료하고 검색된 값들만 리턴
       if (this.documentCount >= collectionSnapshot.size) break;
-
-      // console.log('res ', result);
     }
 
     return result;

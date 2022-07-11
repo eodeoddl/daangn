@@ -5,10 +5,17 @@ import HeaderMessage from './headerMessage';
 import NoResult from './noResult';
 import SearchResult from './searchResult';
 
+const limitCount = 6;
+
 const Search = ({ match, fireStore, userInfo, searchTerm }) => {
-  const [searchedItem, dispatch] = useReducer(reducer, []);
   const [loadingState, setLoadingState] = useState(false);
-  const limitCount = 6;
+  // const [searchedItem, dispatch] = useReducer(
+  //   reducer,
+  //   { searchTerm, fireStore },
+  //   fetchData
+  // );
+
+  const [searchedItem, dispatch] = useReducer(reducer, []);
 
   useEffect(() => {
     console.log('search.jsx useEffect');
@@ -29,6 +36,13 @@ const Search = ({ match, fireStore, userInfo, searchTerm }) => {
 
     fetchingData();
   }, [fireStore, searchTerm, userInfo.region_B]);
+
+  // useEffect(() => {
+  //   if (!searchedItem) return;
+  //   dispatch({ type: 'getArticleByTerm', articles: searchedItem, searchTerm });
+  //   if (!userInfo.address.region_B) return;
+  //   dispatch({ type: 'orderByRegion', region_B: userInfo.address.region_B });
+  // }, [fireStore, searchTerm, userInfo.region_B, searchedItem]);
 
   let timer = (timeout) => {
     return new Promise((resolve) => {
@@ -79,6 +93,7 @@ export default withRouter(Search);
 const reducer = (state, action) => {
   switch (action.type) {
     case 'getArticleByTerm':
+      console.log(action.articles);
       const articleArray = [...action.articles];
 
       const sortedTitle = sortByTermRepeat(
@@ -137,6 +152,8 @@ const reducer = (state, action) => {
       return [...result];
     case 'initializeItem':
       return [];
+    case 'requestMore':
+      return fetchData();
     default:
       throw new Error();
   }
@@ -157,4 +174,14 @@ const sortByTermRepeat = (propertyName, searchTerm, array) => {
       return acc;
     }, [])
     .sort((a, b) => b.termRepeat - a.termRepeat);
+};
+
+const fetchData = ({ searchTerm, fireStore }) => {
+  console.log('searchTerm ', searchTerm);
+  const getData = async () => {
+    const res = await fireStore.getOrderedBySearchTerm(searchTerm, limitCount);
+    console.log('res ', res);
+    return res;
+  };
+  return getData();
 };

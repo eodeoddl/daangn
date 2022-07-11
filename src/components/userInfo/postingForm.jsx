@@ -208,7 +208,7 @@ const fileTypes = [
   'image/x-icon',
 ];
 
-const PostingForm = ({ userInfo, fireStorage, fireStore }) => {
+const PostingForm = ({ userInfo, fireStorage, fireStore, className }) => {
   const [fileImg, setFileImg] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [formData, dispatch] = useReducer(reducer, userInfo, init);
@@ -313,7 +313,7 @@ const PostingForm = ({ userInfo, fireStorage, fireStore }) => {
 
   return (
     <>
-      <Form onSubmit={(e) => onSubmit(e)}>
+      <Form onSubmit={(e) => onSubmit(e)} className={className}>
         <input
           type='text'
           name='title'

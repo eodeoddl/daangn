@@ -12,6 +12,8 @@ import HotArticles from './components/hot_articles/article';
 import LoginForm from './components/login/loginForm';
 import Portal from './components/portal/portal';
 import Search from './components/search/search';
+import EditForm from './components/userInfo/editForm';
+import PostingForm from './components/userInfo/postingForm';
 import UserInfo from './components/userInfo/userInfo';
 
 function App({ loginService, fireStore, fireStorage, kakaoMapAPI }) {
@@ -252,6 +254,18 @@ function App({ loginService, fireStore, fireStorage, kakaoMapAPI }) {
             userInfo={userInfo}
             fireStore={fireStore}
             fireStorage={fireStorage}
+          />
+        </Route>
+        <Route path='/article/:articleId/edit'>
+          {/* <PostingForm
+            userInfo={userInfo}
+            fireStore={fireStore}
+            fireStrage={fireStorage}
+          /> */}
+          <EditForm
+            userInfo={userInfo}
+            fireStore={fireStore}
+            fireStrage={fireStorage}
           />
         </Route>
       </Switch>

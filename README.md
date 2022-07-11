@@ -1,3 +1,9 @@
+## 2022\-07\-11
+
+사용자 프로필 판매목록, 구매목록, 관심목록
+userAdminMenu.jsx 세가지 기능있음 -> 수정, 끌어올리기, 삭제, 숨기기
+styled-components의 확장할때 확장하는 컴포넌트에 className을 props를 넘겨주고 className을 해당 styled-component에 적용해야지 component확장이 가능.
+
 ## 2022\-07\-08
 
 ## 2022\-07\-07
