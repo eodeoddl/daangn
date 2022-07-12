@@ -10,7 +10,12 @@ const Form = styled(PostingForm)`
 
 const EditForm = ({ fireStore, fireStorage, userInfo }) => {
   return (
-    <Form fireStor={fireStore} fireStorage={fireStorage} userInfo={userInfo} />
+    <Form
+      fireStore={fireStore}
+      fireStorage={fireStorage}
+      userInfo={userInfo}
+      action='edit'
+    />
   );
 };
 

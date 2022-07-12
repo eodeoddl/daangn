@@ -256,7 +256,7 @@ function App({ loginService, fireStore, fireStorage, kakaoMapAPI }) {
             fireStorage={fireStorage}
           />
         </Route>
-        <Route path='/article/:articleId/edit'>
+        <Route path='/editArticle/:articleId'>
           {/* <PostingForm
             userInfo={userInfo}
             fireStore={fireStore}
@@ -265,7 +265,8 @@ function App({ loginService, fireStore, fireStorage, kakaoMapAPI }) {
           <EditForm
             userInfo={userInfo}
             fireStore={fireStore}
-            fireStrage={fireStorage}
+            fireStorage={fireStorage}
+            // action='edit'
           />
         </Route>
       </Switch>

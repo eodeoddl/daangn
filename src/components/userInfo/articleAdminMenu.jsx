@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, useRouteMatch } from 'react-router-dom';
+import { Link, useRouteMatch, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 
 const Container = styled.div`
@@ -42,9 +42,9 @@ const Container = styled.div`
   }
 `;
 
-const ArticleAdminMenu = () => {
-  const match = useRouteMatch();
-  console.log(match.url);
+const ArticleAdminMenu = ({ articleData }) => {
+  const { articleId } = useParams();
+  console.log(articleId);
   // 끌올, 수정, 삭제, 숨기기
   return (
     <Container>
@@ -52,13 +52,14 @@ const ArticleAdminMenu = () => {
         <button>
           <Link className='anchor'>끌어올리기</Link>
         </button>
-
         <button>
-          <Link to={{ pathname: `${match.url}/edit` }} className='anchor'>
+          <Link
+            to={{ pathname: '/editArticle/' + articleId, state: articleData }}
+            className='anchor'
+          >
             수정하기
           </Link>
         </button>
-
         <button>
           <Link className='anchor'>숨기기</Link>
         </button>

@@ -1,5 +1,5 @@
 import { useState, useReducer, useRef, useCallback, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { MdAddAPhoto, MdClose } from 'react-icons/md';
 import { IoIosArrowDown } from 'react-icons/io';
@@ -208,15 +208,42 @@ const fileTypes = [
   'image/x-icon',
 ];
 
-const PostingForm = ({ userInfo, fireStorage, fireStore, className }) => {
+const PostingForm = ({
+  userInfo,
+  fireStorage,
+  fireStore,
+  action,
+  className,
+}) => {
   const [fileImg, setFileImg] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [formData, dispatch] = useReducer(reducer, userInfo, init);
   const history = useHistory();
   const priceLabel = useRef(null);
   const fileInputRef = useRef(null);
+  const { articleId } = useParams();
 
-  console.log(userInfo);
+  console.log('history ', history);
+  console.log('params.articleId ', articleId);
+
+  useEffect(() => {
+    console.log('formData ', formData);
+    if (!action === 'edit') return;
+    console.log(history.location.state);
+    const fetchData = async () => {
+      const data = await fireStore.getArticleById(articleId);
+      return data;
+    };
+    const { cartegory, description, image, price, title } =
+      history.location.state || fetchData();
+    setFileImg(image);
+    fireStorage.getFileList(articleId);
+    console.log(fileInputRef.current.files);
+    dispatch({
+      type: 'editForm',
+      data: { cartegory, description, image, price, title },
+    });
+  }, [history.location.state, fireStore, articleId]);
 
   const onPriceInput = (e) => {
     e.target.value = e.target.value.replace(/[^0-9.]/g, '');
@@ -311,6 +338,10 @@ const PostingForm = ({ userInfo, fireStorage, fireStore, className }) => {
     dispatch({ type: 'setFormData', name, value });
   }, []);
 
+  // const defualtValue = (targetName) => {
+  //   return editFormData ? editFormData[targetName] : null;
+  // };
+
   return (
     <>
       <Form onSubmit={(e) => onSubmit(e)} className={className}>
@@ -319,13 +350,14 @@ const PostingForm = ({ userInfo, fireStorage, fireStore, className }) => {
           name='title'
           placeholder='제목'
           onChange={(e) => onChangeValue(e)}
+          defaultValue={formData.title || null}
         />
         <button
           type='button'
           className='cartegory'
           onClick={() => onInputCartegory()}
         >
-          {formData.cartegory ? formData.cartegory : '카테고리를 선택하세요'}
+          {formData.cartegory || '카테고리를 선택하세요'}
           <IoIosArrowDown />
         </button>
         <label htmlFor='price' className='price-label' ref={priceLabel}>
@@ -342,12 +374,14 @@ const PostingForm = ({ userInfo, fireStorage, fireStore, className }) => {
           }}
           onBlur={(e) => onBlur(e)}
           onFocus={() => onFocus()}
+          defaultValue={formData.price || null}
         />
         <textarea
           name='description'
           type='text'
           placeholder='텍스트를 입력하세요'
           onChange={(e) => onChangeValue(e)}
+          defaultValue={formData.description || null}
         />
         <div className='img-container'>
           <label htmlFor='image_uploads'>
@@ -366,30 +400,33 @@ const PostingForm = ({ userInfo, fireStorage, fireStore, className }) => {
             ref={fileInputRef}
           />
           <div className='preview-img-container'>
-            {fileImg.length ? (
-              <ul>
-                {fileImg.map((url, i) => {
-                  return (
-                    <li key={`img Index${i}`}>
-                      <img alt={`img Index${i}`} src={url} />
-                      {i === 0 ? <p className='thumbnail'>대표사진</p> : null}
-                      <button
-                        type='button'
-                        className='delete-btn'
-                        onClick={() => {
-                          onDeleteImg(i);
-                          onDeleteFile(i);
-                        }}
-                      >
-                        <MdClose className='close-img' />
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            ) : (
-              <span className=''>이미지를 선택하세요</span>
-            )}
+            {
+              // fileImg = editFormData ? editFormData.image : fileImg
+              fileImg.length ? (
+                <ul>
+                  {fileImg.map((url, i) => {
+                    return (
+                      <li key={`img Index${i}`}>
+                        <img alt={`img Index${i}`} src={url} />
+                        {i === 0 ? <p className='thumbnail'>대표사진</p> : null}
+                        <button
+                          type='button'
+                          className='delete-btn'
+                          onClick={() => {
+                            onDeleteImg(i);
+                            onDeleteFile(i);
+                          }}
+                        >
+                          <MdClose className='close-img' />
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <span className=''>이미지를 선택하세요</span>
+              )
+            }
           </div>
         </div>
         {/* <input type='text' name='hash tag' /> */}
@@ -434,12 +471,17 @@ const reducer = (state, action) => {
     case 'reset':
       const { uid, region_B } = state;
       return { uid, region_B };
+    case 'editForm':
+      console.log('state ', state);
+      console.log('data ', action.data);
+      return { ...state, ...action.data };
     default:
       throw new Error();
   }
 };
 
 const init = (userInfo) => {
+  // console.log('useInfo  => ', userInfo, 'editData => ', editData);
   const { uid, displayName, photoURL } = userInfo;
   const region_B = userInfo.address.region_B;
   return {

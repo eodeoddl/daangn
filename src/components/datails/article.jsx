@@ -210,7 +210,7 @@ const Article = ({ fireStore, userInfo }) => {
             <LatestItem fireStore={fireStore} />
           </section>
           {articleData.uid === userInfo.uid ? (
-            <ArticleAdminMenu />
+            <ArticleAdminMenu articleData={articleData} />
           ) : (
             <ArticleFooter
               price={articleData.price}
