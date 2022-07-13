@@ -1,3 +1,15 @@
+## 2022\-07\-13
+
+image downloadURl을 이용해서 xhr request를 하거나 axios이용해서 파일을 메모리상으로 다운로드 해서 editform.jsx의 file input 으로 넣어줘야함.
+
+하지만 서버요청시에 아래의 에러가 발생함.
+
+from origin 'http://localhost:3000' has been blocked by CORS policy: Request header field access-control-allow-origin is not allowed by Access-Control-Allow-Headers in preflight response.
+
+CORS는 교차 출처 리소스 공유의 약자로 추가 HTTP 헤더를 사용하여, 한 출처에서 실행 중인 웹 애플리케이션이 다른 출처의 선택한 자원에 접근할 수 있는 권한을 부여하도록 브라우저에 알려주는 체제이다. 웹 애플리케이션은 리소스가 자신의 출처(도메인, 프로토콜, 포트)와 다를 때 교차 출처 HTTP 요청을 실행합니다. 내 앱에서 예시를 들면 http://localhost:3000의 프론트 엔드 코드로 서버에 통신 요청을하는데 해당 통신 URL은 http://locallhost:3000이 아닌 https://firebasestorage.googleapis.com/blabla...를 통하여 리소스를 요청하기 때문에 발생하는 문제이다
+
+이문제를 해결해야 정상적으로 앱의 메모리상으로 file을 받아 files객체를 만들어 필요한 곳에 처리를 할 수 있음.
+
 ## 2022\-07\-12
 
 사용자 메뉴 버튼 이미지로 대체하고 마우스 hover때 tooltip으로 설명란추가
