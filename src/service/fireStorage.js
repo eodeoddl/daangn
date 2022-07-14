@@ -23,6 +23,7 @@ class FireStorage {
     const storageRef = ref(firebaseStorage, `${articleId}/image`);
     const fileImage = await listAll(storageRef);
     const imageURL = [];
+    const res = [];
 
     console.log(fileImage.items);
 
@@ -31,29 +32,19 @@ class FireStorage {
       imageURL.push(url);
     }
     console.log(imageURL);
-    const xhr = new XMLHttpRequest();
-    xhr.responseType = 'blob';
 
     imageURL.forEach((url) => {
+      const xhr = new XMLHttpRequest();
+      xhr.responseType = 'blob';
       xhr.open('GET', url);
-      // xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
       xhr.send();
+      xhr.onload = (event) => {
+        console.log('xhr onload ', event);
+        const blob = xhr.response;
+        console.log(' response ', blob);
+        res.push(blob);
+      };
     });
-
-    xhr.onload = (event) => {
-      const blob = xhr.response;
-      console.log(blob);
-    };
-    // console.log(blob);
-
-    // fileImage.items.forEach((itemRef) => {
-    //   const url = await getDownloadURL(itemRef);
-    //   console.log(url);
-    // });
-
-    // fileImage.prefixes.forEach((item) => {
-    //   console.log(typeof item);
-    // });
   }
 
   // async upload(articleRef, path, file) {
