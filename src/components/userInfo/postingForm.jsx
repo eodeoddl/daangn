@@ -227,23 +227,39 @@ const PostingForm = ({
   console.log('params.articleId ', articleId);
 
   useEffect(() => {
-    console.log('formData ', formData);
-    if (!action === 'edit') return;
+    console.log('action  ', action);
+    if (!(action === 'edit')) return;
+
     console.log(history.location.state);
     const fetchData = async () => {
       const data = await fireStore.getArticleById(articleId);
       return data;
     };
+
+    const getFile = async () => {
+      const dataTransfer = new DataTransfer();
+      const aa = await fireStorage.getFileList(articleId);
+      console.log(aa);
+      console.log(dataTransfer);
+      aa.forEach((item) =>
+        dataTransfer.items.add(new File(item.value, item.name))
+      );
+      console.log(dataTransfer.files);
+
+      fileInputRef.current.files = dataTransfer.files;
+      console.log(fileInputRef.current.files);
+    };
+    getFile();
+
     const { cartegory, description, image, price, title } =
       history.location.state || fetchData();
     setFileImg(image);
-    fireStorage.getFileList(articleId);
-    console.log(fileInputRef.current.files);
+
     dispatch({
       type: 'editForm',
       data: { cartegory, description, image, price, title },
     });
-  }, [history.location.state, fireStore, articleId]);
+  }, [history.location.state, fireStore, articleId, fireStorage, action]);
 
   const onPriceInput = (e) => {
     e.target.value = e.target.value.replace(/[^0-9.]/g, '');
@@ -311,6 +327,7 @@ const PostingForm = ({
 
   const onSubmit = async (e) => {
     e.preventDefault();
+    console.log('submit action ', action);
     const { files } = fileInputRef.current;
     const urlArr = [];
 
@@ -386,7 +403,7 @@ const PostingForm = ({
         <div className='img-container'>
           <label htmlFor='image_uploads'>
             <MdAddAPhoto className='MdAddAPhoto' />
-            <span>{fileImg.length}/10</span>
+            {/* <span>{fileImg.length || 0}/10</span> */}
           </label>
           <input
             id='image_uploads'

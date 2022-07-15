@@ -1,3 +1,16 @@
+## 2022\-07\-15
+
+문서 업데이트시 로직. submit 이벤트에서 분기처리.
+firstore.js 에서 article 수정로직필요. setArticle에서 분기처리 or 새로운 api 만들기.
+만약 article 값이 삭제되면 user collection 문서의 userArticles필드도 같이 삭제처리
+article 수정시에 image file의변동이 있으면 storage도 다시 업데이트해야함.
+
+오류 노트
+
+배열을 이용해 순차적인 서버와 통신을 할때 기본적으로 비동기식으로 동작을하는데, 배열 메서드인 forEach로 이작업을 수행할때 forEach의 콜백함수가 async await 적용이 되어있다하더라도 promise 를 await 하지않고 코드가 진행됨.
+
+때문에 for..of 문을 사용해서 await를 사용해서 순차적인 실행을 할 수도 있고, 순차적실행이아닌 병렬적 실행을 의해 map함수로 promise 배열을 만들어 return 하고 Promise.all()을 이용해서 비동기함수들을 동시에 실행 시키고 값을 promise값을 받을 수 잇음
+
 ## 2022\-07\-14
 
 ## 2022\-07\-13

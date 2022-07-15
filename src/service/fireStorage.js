@@ -5,6 +5,7 @@ import {
   listAll,
   ref,
   uploadBytes,
+  getMetadata,
 } from 'firebase/storage';
 
 class FireStorage {
@@ -29,36 +30,40 @@ class FireStorage {
 
     for (const fileRef of fileImage.items) {
       const url = await getDownloadURL(fileRef);
-      imageURL.push(url);
+      const metadata = await getMetadata(fileRef);
+      console.log(metadata.name);
+      imageURL.push({ url, name: metadata.name });
     }
     console.log(imageURL);
 
-    imageURL.forEach((url) => {
-      const xhr = new XMLHttpRequest();
-      xhr.responseType = 'blob';
-      xhr.open('GET', url);
-      xhr.send();
-      xhr.onload = (event) => {
-        console.log('xhr onload ', event);
-        const blob = xhr.response;
-        console.log(' response ', blob);
-        res.push(blob);
-      };
-    });
+    // imageURL.forEach((url) => {
+    //   const getData = async () => {
+    //     const data = await fetch(url, { method: 'GET' });
+    //     console.log(data);
+    //   };
+    //   getData();
+    //   const xhr = new XMLHttpRequest();
+    //   xhr.responseType = 'blob';
+    //   xhr.open('GET', url);
+    //   xhr.send();
+    //   console.log(xhr.response);
+    //   return xhr;
+    // });
+    // console.log(promiseList);
+    // });
+
+    for (const { url, name } of imageURL) {
+      const response = await fetch(url, { method: 'GET' });
+      console.log(response);
+      console.log(response.headers.values());
+      const stream = await response.body.getReader().read();
+      console.log('stream object', stream);
+      // console.log('buffer.value ', buffer.value);
+      res.push({ value: stream.value, name });
+    }
+    console.log('after', res);
+    return res;
   }
-
-  // async upload(articleRef, path, file) {
-  //   const storageRef = ref(
-  //     firebaseStorage,
-  //     `${articleRef}/${path}/${file.name}`
-  //   );
-  //   const snapshot = await uploadBytes(storageRef, file);
-  //   return snapshot.ref;
-  // }
-
-  // getFileFromUrl(url) {
-
-  // }
 }
 
 export default FireStorage;

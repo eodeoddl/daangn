@@ -16,7 +16,6 @@ import {
   limit,
   startAfter,
   onSnapshot,
-  documentId,
 } from 'firebase/firestore';
 
 class FireStore {
@@ -111,6 +110,7 @@ class FireStore {
     });
   }
 
+  // observe userInfo
   observeUserInfo(uid, dispatch) {
     const userRef = doc(firebaseStore, 'users', uid);
 
