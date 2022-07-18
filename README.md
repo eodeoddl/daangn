@@ -1,3 +1,18 @@
+## 2022\-07\-18
+
+firestore 기능중에 transaction이란 기능이있다. tarnsaction기능의 정의는 한 필드의 값을 현재값 또는 다른 필드의 값에 따라 업데이트 하려는 경우 사용할 수 있는 기능이다.
+
+또 fireStor 기능중에 onSnapshot() 메서드로 문서의 변화를 수신 대기할 수 있다. 해당 메서드는 사용자가 제공하는 콜백이 최초로 호출될때 단일 문서의 현재 콘텐츠로 문서스냅삿이 즉시 생되고 콘텐츠가 변경될때마다 콜백이 호출되어 문서 스냅샷을 업데이트한다.
+
+현재 내 app 에서 사용자가 자신의 문서를 업데이트를 할 때 article collection 의 해당 article의 document의 image 필드의 storage 참조 배열의 변화, users collection의 해당유저의 document의 userArticles 필드의 article 참조배열, 유저가 좋아요를 누른 subscribeList의 article 참조배열의 변화를 감지하고 업데이트를 해주어야한다. 이것을 onSnapshot() 메서드, 혹은 tarnsaction을 이용한 처리를 해야하는데 아직까지 그 둘의 차이점에 대한 공부가 부족하고 어떤것을 적용해야하는지에 대한 확신이 필요한것같다.
+
+나의 app에서 현재 실험적으로 onSnapshot() 메서드를 적용한 observUserInfo메서드가 존재하고 단지 데이터 변화만 추적하고 app의 state 만 업데이트할뿐 store의 업데이트가 수행되지않는 메서드이다. 이것을먼저 수정해서 firestore 문서업데이트를 하고 문서를 한번 가져오는 get 역할을 수행하는 메서드가 업데이트된 값을 제대로 수신하는지 검증이 필요한것같다. 혹은 변화를 감지하고 state를 변경하는 dispatch 혹은 setState 함수로 수동적으로 업데이트 해야하는지에 대한 검증도 필요함.
+
+postingForm.jsx 에서 업로드방식은 postingForm의 file을 제외한 나머지 입력값을 store에 업데이트를 한다. 업데이트를 하고 난후 해당 document의 자동생성 id값을 리턴받는다. 자동생성 id값을 이용해서 fireStorage의 path를 만들고 해당 path에 file을 업로드한다. file업로드가 끝나면 file이 storage에 저장된 참조를 이용하여 downloadURL을 만들고 URL을 return 한다. return 받은 URL을 다시 아까 업로드했던 article document의 image필드로 업데이트하는 로직으로 구현되어있다.
+
+update와 add하는 로직을 분리하고 postingForm의 action props 로 update 해야될 상황과 add 할 상황을 분리해서 작업하기로함.
+컴포넌트의 단순 state는 업데이트 가능함. 하지만 file 객체를 다시 받아와서 다시 storage로 업뎃할때 file이 제대로 된 값이 올라가지 않는 문제점.. uint8array로 받아온 file을 다시 file 객체로 바꿔서 업로드 해야함..  
+
 ## 2022\-07\-15
 
 문서 업데이트시 로직. submit 이벤트에서 분기처리.
@@ -9,7 +24,7 @@ article 수정시에 image file의변동이 있으면 storage도 다시 업데�
 
 배열을 이용해 순차적인 서버와 통신을 할때 기본적으로 비동기식으로 동작을하는데, 배열 메서드인 forEach로 이작업을 수행할때 forEach의 콜백함수가 async await 적용이 되어있다하더라도 promise 를 await 하지않고 코드가 진행됨.
 
-때문에 for..of 문을 사용해서 await를 사용해서 순차적인 실행을 할 수도 있고, 순차적실행이아닌 병렬적 실행을 의해 map함수로 promise 배열을 만들어 return 하고 Promise.all()을 이용해서 비동기함수들을 동시에 실행 시키고 값을 promise값을 받을 수 잇음
+때문에 for..of 문을 사용해서 await를 사용해서 순차적인 실행을 할 수도 있고, 순차적실행이아닌 병렬적 실행을 의해 map함수로 promise 배열을 만들어 return 하고 Promise.all()을 이용해서 비동기함수들을 동시에 실행시킨 값을 받을 수 잇음
 
 ## 2022\-07\-14
 

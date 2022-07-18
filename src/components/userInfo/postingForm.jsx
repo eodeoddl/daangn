@@ -238,11 +238,12 @@ const PostingForm = ({
 
     const getFile = async () => {
       const dataTransfer = new DataTransfer();
-      const aa = await fireStorage.getFileList(articleId);
-      console.log(aa);
-      console.log(dataTransfer);
-      aa.forEach((item) =>
-        dataTransfer.items.add(new File(item.value, item.name))
+      const uint8ArrayList = await fireStorage.getFileList(articleId);
+      console.log(typeof uint8ArrayList[0]);
+      uint8ArrayList.forEach((item) =>
+        dataTransfer.items.add(
+          new File(item.value, item.name, { type: item.contentType })
+        )
       );
       console.log(dataTransfer.files);
 
@@ -327,27 +328,28 @@ const PostingForm = ({
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    console.log('submit action ', action);
+    console.log('submit action ', action, articleId);
     const { files } = fileInputRef.current;
+    console.log('files ', files);
     const urlArr = [];
 
     alert('게시글이 등록되었습니다.');
     history.push('/');
 
     // this api return articleId asynchronously
-    const articleId = await fireStore.setArticle(formData, userInfo.uid);
+    const docId = await fireStore.setArticle(formData, userInfo.uid, articleId);
 
     // uploadFile api needs arguments & run asynchronously & return file download url
-    for (let file of files) {
+    for (const file of files) {
       const url = await fireStorage.uploadFile(
-        articleId,
+        docId,
         makeStoragePath(file),
         file
       );
 
       urlArr.push(url);
     }
-    fireStore.updateImageUrl(articleId, urlArr);
+    fireStore.updateImageUrl(docId, urlArr);
   };
 
   const onChangeValue = useCallback((e) => {
@@ -355,9 +357,7 @@ const PostingForm = ({
     dispatch({ type: 'setFormData', name, value });
   }, []);
 
-  // const defualtValue = (targetName) => {
-  //   return editFormData ? editFormData[targetName] : null;
-  // };
+  const updateArticle = (articleId) => {};
 
   return (
     <>

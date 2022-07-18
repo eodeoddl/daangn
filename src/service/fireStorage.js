@@ -1,6 +1,5 @@
 import { firebaseStorage } from './firebase.js';
 import {
-  getBlob,
   getDownloadURL,
   listAll,
   ref,
@@ -31,8 +30,13 @@ class FireStorage {
     for (const fileRef of fileImage.items) {
       const url = await getDownloadURL(fileRef);
       const metadata = await getMetadata(fileRef);
-      console.log(metadata.name);
-      imageURL.push({ url, name: metadata.name });
+      console.log(metadata);
+      imageURL.push({
+        url,
+        name: metadata.name,
+        contentType: metadata.contentType,
+        type: metadata.type,
+      });
     }
     console.log(imageURL);
 
@@ -52,14 +56,14 @@ class FireStorage {
     // console.log(promiseList);
     // });
 
-    for (const { url, name } of imageURL) {
+    for (const { url, name, contentType } of imageURL) {
       const response = await fetch(url, { method: 'GET' });
       console.log(response);
       console.log(response.headers.values());
       const stream = await response.body.getReader().read();
       console.log('stream object', stream);
       // console.log('buffer.value ', buffer.value);
-      res.push({ value: stream.value, name });
+      res.push({ value: stream.value, name, contentType });
     }
     console.log('after', res);
     return res;

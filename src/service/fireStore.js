@@ -110,8 +110,8 @@ class FireStore {
     });
   }
 
-  // observe userInfo
-  observeUserInfo(uid, dispatch) {
+  // observe userInfo for update
+  async observeUserInfo(uid, dispatch) {
     const userRef = doc(firebaseStore, 'users', uid);
 
     onSnapshot(userRef, (doc) => {
@@ -124,21 +124,44 @@ class FireStore {
   }
 
   // data arg comes from postingForm.jsx
-  async setArticle(data, uid) {
+  async setArticle(data, uid, articleId) {
     const userRef = doc(firebaseStore, 'users', uid);
     const collectionRef = collection(firebaseStore, 'article');
-    const docRef = await addDoc(collectionRef, {
-      ...data,
-      uploaded: serverTimestamp(),
-    });
+    let docRef;
+
+    if (articleId) {
+      docRef = doc(collectionRef, articleId);
+      updateDoc(docRef, {
+        ...data,
+        uploaded: serverTimestamp(),
+      });
+    } else {
+      docRef = await addDoc(collectionRef, {
+        ...data,
+        uploaded: serverTimestamp(),
+      });
+    }
     // 여기서 유저 document도 업데이트
     updateDoc(userRef, {
       userArticles: arrayUnion(docRef.path),
     });
+
     return docRef.id;
   }
 
+  // async udateArticle(articleId, data) {
+  //   const articleRef = doc(firebaseStore, 'articles', articleId);
+  //   if (articleRef.exists()) {
+  //     updateDoc(articleRef, {
+  //       ...data,
+  //       uploaded: serverTimestamp(),
+  //     });
+  //   }
+  // }
+
+  //
   async updateImageUrl(articleId, url) {
+    console.log('updateImageURL function ', url);
     const docRef = doc(firebaseStore, 'article', articleId);
     await setDoc(docRef, { image: url }, { merge: true });
     updateDoc(docRef, { workProgress: true });
