@@ -1,3 +1,11 @@
+## 2022\-07\-19
+
+수정 폼에서 사용자 게시글에 첨부해서 저장했던 file을 fileinput에 files 값으로 설정하려고했는데, 보안상문제로 js 코드로 파일을 강제로 지정하는것은 잘못된 방식임. 수정시에 로직을 다시 한번 생각해 봐야할것같음.
+
+arrayBuffer 와 typedArray 의 관계와 uInt8array를 이용한 객체비교후 바뀐 값이있으면 fireStorage업로드를 다시하는 것으로.
+
+
+
 ## 2022\-07\-18
 
 firestore 기능중에 transaction이란 기능이있다. tarnsaction기능의 정의는 한 필드의 값을 현재값 또는 다른 필드의 값에 따라 업데이트 하려는 경우 사용할 수 있는 기능이다.
@@ -11,7 +19,7 @@ firestore 기능중에 transaction이란 기능이있다. tarnsaction기능의 �
 postingForm.jsx 에서 업로드방식은 postingForm의 file을 제외한 나머지 입력값을 store에 업데이트를 한다. 업데이트를 하고 난후 해당 document의 자동생성 id값을 리턴받는다. 자동생성 id값을 이용해서 fireStorage의 path를 만들고 해당 path에 file을 업로드한다. file업로드가 끝나면 file이 storage에 저장된 참조를 이용하여 downloadURL을 만들고 URL을 return 한다. return 받은 URL을 다시 아까 업로드했던 article document의 image필드로 업데이트하는 로직으로 구현되어있다.
 
 update와 add하는 로직을 분리하고 postingForm의 action props 로 update 해야될 상황과 add 할 상황을 분리해서 작업하기로함.
-컴포넌트의 단순 state는 업데이트 가능함. 하지만 file 객체를 다시 받아와서 다시 storage로 업뎃할때 file이 제대로 된 값이 올라가지 않는 문제점.. uint8array로 받아온 file을 다시 file 객체로 바꿔서 업로드 해야함..  
+컴포넌트의 단순 state는 업데이트 가능함. 하지만 file 객체를 다시 받아와서 다시 storage로 업뎃할때 file이 제대로 된 값이 올라가지 않는 문제점.. uint8array로 받아온 file을 다시 file 객체로 바꿔서 업로드 해야함..
 
 ## 2022\-07\-15
 

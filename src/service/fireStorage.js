@@ -61,9 +61,9 @@ class FireStorage {
       console.log(response);
       console.log(response.headers.values());
       const stream = await response.body.getReader().read();
-      console.log('stream object', stream);
-      // console.log('buffer.value ', buffer.value);
-      res.push({ value: stream.value, name, contentType });
+      console.log('stream object', stream instanceof Blob);
+      console.log('array buffer ', stream.value);
+      res.push({ buffer: stream.value, name, contentType });
     }
     console.log('after', res);
     return res;

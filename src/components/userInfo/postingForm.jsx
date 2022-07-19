@@ -238,13 +238,18 @@ const PostingForm = ({
 
     const getFile = async () => {
       const dataTransfer = new DataTransfer();
-      const uint8ArrayList = await fireStorage.getFileList(articleId);
-      console.log(typeof uint8ArrayList[0]);
-      uint8ArrayList.forEach((item) =>
+      const arrayBufferList = await fireStorage.getFileList(articleId);
+      console.log(arrayBufferList);
+      arrayBufferList.forEach((item) => {
+        console.log('item.buffer ', item.buffer);
+        const file = new File(item.buffer, item.name, {
+          type: item.contentType,
+        });
+        console.log(file instanceof File);
         dataTransfer.items.add(
-          new File(item.value, item.name, { type: item.contentType })
-        )
-      );
+          new File(item.buffer, item.name, { type: item.contentType })
+        );
+      });
       console.log(dataTransfer.files);
 
       fileInputRef.current.files = dataTransfer.files;
