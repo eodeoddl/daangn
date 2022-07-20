@@ -38,32 +38,17 @@ class FireStorage {
         type: metadata.type,
       });
     }
-    console.log(imageURL);
 
-    // imageURL.forEach((url) => {
-    //   const getData = async () => {
-    //     const data = await fetch(url, { method: 'GET' });
-    //     console.log(data);
-    //   };
-    //   getData();
-    //   const xhr = new XMLHttpRequest();
-    //   xhr.responseType = 'blob';
-    //   xhr.open('GET', url);
-    //   xhr.send();
-    //   console.log(xhr.response);
-    //   return xhr;
-    // });
-    // console.log(promiseList);
-    // });
+    console.log(imageURL);
 
     for (const { url, name, contentType } of imageURL) {
       const response = await fetch(url, { method: 'GET' });
       console.log(response);
       console.log(response.headers.values());
-      const stream = await response.body.getReader().read();
-      console.log('stream object', stream instanceof Blob);
-      console.log('array buffer ', stream.value);
-      res.push({ buffer: stream.value, name, contentType });
+      const buffer = await response.body.getReader().read();
+      console.log('stream object', buffer instanceof Blob); // false
+      console.log('array buffer ', buffer.value);
+      res.push({ typedArray: buffer.value, name, contentType });
     }
     console.log('after', res);
     return res;

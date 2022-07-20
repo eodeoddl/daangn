@@ -237,33 +237,43 @@ const PostingForm = ({
     };
 
     const getFile = async () => {
-      const dataTransfer = new DataTransfer();
-      const arrayBufferList = await fireStorage.getFileList(articleId);
-      console.log(arrayBufferList);
-      arrayBufferList.forEach((item) => {
-        console.log('item.buffer ', item.buffer);
-        const file = new File(item.buffer, item.name, {
-          type: item.contentType,
-        });
-        console.log(file instanceof File);
-        dataTransfer.items.add(
-          new File(item.buffer, item.name, { type: item.contentType })
-        );
-      });
-      console.log(dataTransfer.files);
-
-      fileInputRef.current.files = dataTransfer.files;
-      console.log(fileInputRef.current.files);
+      const responseArr = await fireStorage.getFileList(articleId);
+      console.log(responseArr);
+      const arr = [];
+      for (const data of responseArr) {
+        // const reader = new FileReader();
+        const blob = new Blob(data.typedArray, { type: data.contentType });
+        console.log(blob);
+        const url = URL.createObjectURL(blob);
+        arr.push(url);
+        // reader.onload = async (e) => {
+        //   const dataURL = await e.target.result;
+        //   console.log(dataURL);
+        //   arr.push(dataURL);
+        // };
+        // reader.readAsDataURL(blob);
+      }
+      // responseArr.forEach((data) => {
+      //   const reader = new FileReader();
+      //   const blob = new Blob(data.typedArray, { type: data.contentType });
+      //   reader.onload = (e) => {
+      //     console.log(e.target.result);
+      //     arr.push(e.target.result);
+      //   };
+      //   reader.readAsDataURL(blob);
+      // });
+      console.log('useEffect setFile', arr);
+      setFileImg(arr);
     };
     getFile();
 
-    const { cartegory, description, image, price, title } =
+    const { cartegory, description, price, title } =
       history.location.state || fetchData();
-    setFileImg(image);
+    // setFileImg(image);
 
     dispatch({
       type: 'editForm',
-      data: { cartegory, description, image, price, title },
+      data: { cartegory, description, price, title },
     });
   }, [history.location.state, fireStore, articleId, fireStorage, action]);
 
@@ -283,6 +293,7 @@ const PostingForm = ({
 
   const updateImageDisplay = (e) => {
     const { files } = e.target;
+    const reader = new FileReader();
 
     if (files.length === 0) {
       return;
@@ -297,7 +308,7 @@ const PostingForm = ({
         }
       }
 
-      setFileImg(imgSrc);
+      setFileImg((prevState) => [...prevState, ...imgSrc]);
     }
   };
 
@@ -362,8 +373,6 @@ const PostingForm = ({
     dispatch({ type: 'setFormData', name, value });
   }, []);
 
-  const updateArticle = (articleId) => {};
-
   return (
     <>
       <Form onSubmit={(e) => onSubmit(e)} className={className}>
@@ -408,7 +417,7 @@ const PostingForm = ({
         <div className='img-container'>
           <label htmlFor='image_uploads'>
             <MdAddAPhoto className='MdAddAPhoto' />
-            {/* <span>{fileImg.length || 0}/10</span> */}
+            <span>{fileImg.length || 0}/10</span>
           </label>
           <input
             id='image_uploads'
@@ -427,6 +436,7 @@ const PostingForm = ({
               fileImg.length ? (
                 <ul>
                   {fileImg.map((url, i) => {
+                    console.log('img src ', url);
                     return (
                       <li key={`img Index${i}`}>
                         <img alt={`img Index${i}`} src={url} />

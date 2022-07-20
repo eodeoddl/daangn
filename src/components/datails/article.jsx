@@ -219,6 +219,12 @@ const Article = ({ fireStore, userInfo }) => {
               subscribeList={userInfo.subscribeList}
             />
           )}
+          {/* <ArticleFooter
+            price={articleData.price}
+            fireStore={fireStore}
+            uid={userInfo.uid}
+            subscribeList={userInfo.subscribeList}
+          /> */}
         </Container>
         {showModal && (
           <Portal idSelector='carousel-modal'>

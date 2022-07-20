@@ -1,10 +1,14 @@
+## 2022\-07\-20
+
+storage 업데이트는 file 로 올리지않고 blob으로 올린다. onSubmit 했을때 fileInputRef.current의 files를 이용하는것이 아닌 Reducer state의 uploadData 필드에 저장한 blob을 이용해서 storage에 넣어준다.
+
+사용자가 수정을하게되면, storage의 모든 file을 삭제해주고, 삭제가 이루어지기전 storage에 업로드 되어있던 기존데이터를 blob형태로 바꾸어 reducer state에 갖고있는다.
+
 ## 2022\-07\-19
 
 수정 폼에서 사용자 게시글에 첨부해서 저장했던 file을 fileinput에 files 값으로 설정하려고했는데, 보안상문제로 js 코드로 파일을 강제로 지정하는것은 잘못된 방식임. 수정시에 로직을 다시 한번 생각해 봐야할것같음.
 
 arrayBuffer 와 typedArray 의 관계와 uInt8array를 이용한 객체비교후 바뀐 값이있으면 fireStorage업로드를 다시하는 것으로.
-
-
 
 ## 2022\-07\-18
 
