@@ -239,20 +239,23 @@ const PostingForm = ({
     const getFile = async () => {
       const responseArr = await fireStorage.getFileList(articleId);
       console.log(responseArr);
-      const arr = [];
-      for (const data of responseArr) {
-        // const reader = new FileReader();
-        const blob = new Blob(data.typedArray, { type: data.contentType });
-        console.log(blob);
-        const url = URL.createObjectURL(blob);
-        arr.push(url);
-        // reader.onload = async (e) => {
-        //   const dataURL = await e.target.result;
-        //   console.log(dataURL);
-        //   arr.push(dataURL);
-        // };
-        // reader.readAsDataURL(blob);
-      }
+      // const arr = [];
+      // for (const data of responseArr) {
+      //   // const reader = new FileReader();
+      //   // console.log(data.typedArray.buffer)
+      //   const blob = new Blob(data.typedArray, {
+      //     type: data.contentType,
+      //   });
+      //   console.log(blob);
+      //   const url = URL.createObjectURL(blob);
+      //   arr.push(url);
+      // reader.onload = (e) => {
+      //   const dataURL = e.target.result;
+      //   console.log(dataURL);
+      //   arr.push(dataURL);
+      // };
+      // reader.readAsDataURL(blob);
+      // }
       // responseArr.forEach((data) => {
       //   const reader = new FileReader();
       //   const blob = new Blob(data.typedArray, { type: data.contentType });
@@ -262,10 +265,9 @@ const PostingForm = ({
       //   };
       //   reader.readAsDataURL(blob);
       // });
-      console.log('useEffect setFile', arr);
-      setFileImg(arr);
+      console.log('useEffect setFile');
+      setFileImg(responseArr);
     };
-    getFile();
 
     const { cartegory, description, price, title } =
       history.location.state || fetchData();
@@ -275,6 +277,7 @@ const PostingForm = ({
       type: 'editForm',
       data: { cartegory, description, price, title },
     });
+    getFile();
   }, [history.location.state, fireStore, articleId, fireStorage, action]);
 
   const onPriceInput = (e) => {

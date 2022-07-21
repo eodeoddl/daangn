@@ -1,3 +1,11 @@
+## 2022\-07\-21
+
+서버에 get 요청으로 storage 저장된파일 가져옴. response.body.getReader().read() 의 데이터 타입은 uInt8Array(typedArray)이고 이값을 이용해서 blob을 만든다. 생성된 blob을 이용해서 URL.createObjectURL 메서드로 url을 만든다. 해당 url을 img태그의 src 속성으로 제공한다.
+
+img태그의 src제공을 했지만 해당 url이 제대로 인식되지않아 이미지가 뜨지않는다. 이유를 모르겠음.
+
+fetch api를 이용해서 response 되는 data 는 기본적으로 body에 readable stream 객체를 제공한다. readable stream을 이용해서 data를 읽고 해당 data에서 object URL을 가져와서 img.src로 이용하는 방법시도.
+
 ## 2022\-07\-20
 
 storage 업데이트는 file 로 올리지않고 blob으로 올린다. onSubmit 했을때 fileInputRef.current의 files를 이용하는것이 아닌 Reducer state의 uploadData 필드에 저장한 blob을 이용해서 storage에 넣어준다.
