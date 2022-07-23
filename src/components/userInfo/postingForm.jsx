@@ -215,19 +215,14 @@ const PostingForm = ({
   action,
   className,
 }) => {
-  const [fileImg, setFileImg] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [fileList, setFileList] = useState([]);
   const [formData, dispatch] = useReducer(reducer, userInfo, init);
   const history = useHistory();
   const priceLabel = useRef(null);
-  const fileInputRef = useRef(null);
   const { articleId } = useParams();
 
-  console.log('history ', history);
-  console.log('params.articleId ', articleId);
-
   useEffect(() => {
-    console.log('action  ', action);
     if (!(action === 'edit')) return;
 
     console.log(history.location.state);
@@ -238,43 +233,14 @@ const PostingForm = ({
 
     const getFile = async () => {
       const responseArr = await fireStorage.getFileList(articleId);
-      console.log(responseArr);
-      // const arr = [];
-      // for (const data of responseArr) {
-      //   // const reader = new FileReader();
-      //   // console.log(data.typedArray.buffer)
-      //   const blob = new Blob(data.typedArray, {
-      //     type: data.contentType,
-      //   });
-      //   console.log(blob);
-      //   const url = URL.createObjectURL(blob);
-      //   arr.push(url);
-      // reader.onload = (e) => {
-      //   const dataURL = e.target.result;
-      //   console.log(dataURL);
-      //   arr.push(dataURL);
-      // };
-      // reader.readAsDataURL(blob);
-      // }
-      // responseArr.forEach((data) => {
-      //   const reader = new FileReader();
-      //   const blob = new Blob(data.typedArray, { type: data.contentType });
-      //   reader.onload = (e) => {
-      //     console.log(e.target.result);
-      //     arr.push(e.target.result);
-      //   };
-      //   reader.readAsDataURL(blob);
-      // });
-      console.log('useEffect setFile');
-      setFileImg(responseArr);
+      setFileList(responseArr);
     };
 
     const { cartegory, description, price, title } =
       history.location.state || fetchData();
-    // setFileImg(image);
 
     dispatch({
-      type: 'editForm',
+      type: 'setEditForm',
       data: { cartegory, description, price, title },
     });
     getFile();
@@ -294,43 +260,42 @@ const PostingForm = ({
     return file.type.split('/')[0];
   };
 
-  const updateImageDisplay = (e) => {
-    const { files } = e.target;
-    const reader = new FileReader();
+  // const updateImageDisplay = (e) => {
+  //   const { files } = e.target;
 
-    if (files.length === 0) {
-      return;
-    } else {
-      const imgSrc = [];
+  //   if (files.length === 0) {
+  //     return;
+  //   } else {
+  //     const imgSrc = [];
 
-      for (let file of files) {
-        if (validFileType(file)) {
-          imgSrc.push(URL.createObjectURL(file));
-        } else {
-          console.log('wrong file type');
-        }
-      }
+  //     for (let file of files) {
+  //       if (validFileType(file)) {
+  //         imgSrc.push(URL.createObjectURL(file));
+  //       } else {
+  //         console.log('wrong file type');
+  //       }
+  //     }
 
-      setFileImg((prevState) => [...prevState, ...imgSrc]);
-    }
-  };
-
-  const onDeleteImg = (index) => {
-    const newFileImg = fileImg.slice();
-    newFileImg.splice(index, 1);
-    setFileImg([...newFileImg]);
-  };
+  //     setFileImg((prevState) => [...prevState, ...imgSrc]);
+  //   }
+  // };
 
   const onDeleteFile = (index) => {
-    const { files } = fileInputRef.current;
-    const dataTransfer = new DataTransfer();
-
-    Array.from(files)
-      .filter((file) => file !== files[index])
-      .forEach((file) => dataTransfer.items.add(file));
-
-    fileInputRef.current.files = dataTransfer.files;
+    const newFileImg = fileList.slice();
+    newFileImg.splice(index, 1);
+    setFileList(newFileImg);
   };
+
+  // const onDeleteFile = (index) => {
+  //   const { files } = fileInputRef.current;
+  //   const dataTransfer = new DataTransfer();
+
+  //   Array.from(files)
+  //     .filter((file) => file !== files[index])
+  //     .forEach((file) => dataTransfer.items.add(file));
+
+  //   fileInputRef.current.files = dataTransfer.files;
+  // };
 
   const onInputCartegory = () => {
     setShowModal(true);
@@ -347,9 +312,6 @@ const PostingForm = ({
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    console.log('submit action ', action, articleId);
-    const { files } = fileInputRef.current;
-    console.log('files ', files);
     const urlArr = [];
 
     alert('게시글이 등록되었습니다.');
@@ -359,7 +321,8 @@ const PostingForm = ({
     const docId = await fireStore.setArticle(formData, userInfo.uid, articleId);
 
     // uploadFile api needs arguments & run asynchronously & return file download url
-    for (const file of files) {
+    for (const file of fileList) {
+      console.log(file);
       const url = await fireStorage.uploadFile(
         docId,
         makeStoragePath(file),
@@ -372,8 +335,12 @@ const PostingForm = ({
   };
 
   const onChangeValue = useCallback((e) => {
-    const { name, value } = e.target;
-    dispatch({ type: 'setFormData', name, value });
+    const { name, value, files } = e.target;
+    if (files) {
+      setFileList((prevFile) => [...prevFile, ...Array.from(files)]);
+    } else {
+      dispatch({ type: 'setFormData', name, value });
+    }
   }, []);
 
   return (
@@ -420,7 +387,7 @@ const PostingForm = ({
         <div className='img-container'>
           <label htmlFor='image_uploads'>
             <MdAddAPhoto className='MdAddAPhoto' />
-            <span>{fileImg.length || 0}/10</span>
+            <span>{fileList.length || 0}/10</span>
           </label>
           <input
             id='image_uploads'
@@ -429,39 +396,37 @@ const PostingForm = ({
             accept='image/*'
             name='files'
             onChange={(e) => {
-              updateImageDisplay(e);
+              onChangeValue(e);
             }}
-            ref={fileInputRef}
           />
           <div className='preview-img-container'>
-            {
-              // fileImg = editFormData ? editFormData.image : fileImg
-              fileImg.length ? (
-                <ul>
-                  {fileImg.map((url, i) => {
-                    console.log('img src ', url);
-                    return (
-                      <li key={`img Index${i}`}>
-                        <img alt={`img Index${i}`} src={url} />
-                        {i === 0 ? <p className='thumbnail'>대표사진</p> : null}
-                        <button
-                          type='button'
-                          className='delete-btn'
-                          onClick={() => {
-                            onDeleteImg(i);
-                            onDeleteFile(i);
-                          }}
-                        >
-                          <MdClose className='close-img' />
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              ) : (
-                <span className=''>이미지를 선택하세요</span>
-              )
-            }
+            {fileList.length ? (
+              <ul>
+                {fileList.map((fileObj, i) => {
+                  // console.log('img src ', fileObj);
+                  return (
+                    <li key={`img Index${i}`}>
+                      <img
+                        alt={`img Index${i}`}
+                        src={URL.createObjectURL(fileObj)}
+                      />
+                      {i === 0 ? <p className='thumbnail'>대표사진</p> : null}
+                      <button
+                        type='button'
+                        className='delete-btn'
+                        onClick={() => {
+                          onDeleteFile(i);
+                        }}
+                      >
+                        <MdClose className='close-img' />
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            ) : (
+              <span className=''>이미지를 선택하세요</span>
+            )}
           </div>
         </div>
         {/* <input type='text' name='hash tag' /> */}
@@ -469,8 +434,8 @@ const PostingForm = ({
           <button
             type='reset'
             onClick={() => {
-              dispatch({ type: 'reset' });
-              setFileImg([]);
+              dispatch({ type: 'reset', userInfo });
+              setFileList([]);
             }}
           >
             취소
@@ -499,16 +464,9 @@ const reducer = (state, action) => {
       return { ...state, cartegory: cartegory[action.index] };
     case 'setFormData':
       return { ...state, [action.name]: action.value };
-    case 'deleteFile':
-      const files = state.files.slice();
-      files.splice(action.index, 1);
-      return { ...state, files: [...files] };
     case 'reset':
-      const { uid, region_B } = state;
-      return { uid, region_B };
-    case 'editForm':
-      console.log('state ', state);
-      console.log('data ', action.data);
+      return init(action.userInfo);
+    case 'setEditForm':
       return { ...state, ...action.data };
     default:
       throw new Error();
@@ -516,7 +474,6 @@ const reducer = (state, action) => {
 };
 
 const init = (userInfo) => {
-  // console.log('useInfo  => ', userInfo, 'editData => ', editData);
   const { uid, displayName, photoURL } = userInfo;
   const region_B = userInfo.address.region_B;
   return {
@@ -526,6 +483,7 @@ const init = (userInfo) => {
     profileImg: photoURL,
     workProgress: false,
     subscribe: 0,
+    description: '',
     comments: null,
   };
 };

@@ -1,3 +1,9 @@
+## 2022\-07\-22
+
+서버에 get요청으로 blob data 를 받아오고, blob data createURL 메서드로 이미지 미리보기 처리를한다. 원본객체를 가지고 있어야 해당 URL을 src 속성으로 사용가능한듯.
+
+기존에 작성된  file upload 로직을 input file 에서 직접 가져오는게 아니라 input file에 onchange event로 file변화 감지해서 해당 file을 state업데이트 하는걸로 바꾸기.
+
 ## 2022\-07\-21
 
 서버에 get 요청으로 storage 저장된파일 가져옴. response.body.getReader().read() 의 데이터 타입은 uInt8Array(typedArray)이고 이값을 이용해서 blob을 만든다. 생성된 blob을 이용해서 URL.createObjectURL 메서드로 url을 만든다. 해당 url을 img태그의 src 속성으로 제공한다.

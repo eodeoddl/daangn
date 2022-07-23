@@ -232,7 +232,7 @@ function App({ loginService, fireStore, fireStorage, kakaoMapAPI }) {
           <MainContent3 />
           <ContentHot hotItems={hotItems} />
         </Route>
-        <Route path='/hoft_articles'>
+        <Route path='/hot_articles'>
           <HotArticles hotItems={hotItems} />
         </Route>
         <Route path='/search'>
